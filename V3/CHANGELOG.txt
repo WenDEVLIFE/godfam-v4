@@ -1,0 +1,79 @@
+CHURCH MANAGEMENT SYSTEM - CHANGELOG & CODE CHANGES
+Date: 2026-04-11
+
+================================================================================
+1. DATABASE REPAIR (database/schema.sql)
+================================================================================
+FIXED: SQL syntax error caused by a trailing comma in the INSERT statement.
+
+MODIFIED CODE:
+---------------
+(Before)
+(6, 'Committee Head', 'committee@church.com', '...'),
+
+(After)
+(6, 'Committee Head', 'committee@church.com', '...');
+
+================================================================================
+2. MEMBER MANAGEMENT (public/members.php)
+================================================================================
+ADDED: Full Edit CRUD functionality with a dynamic modal.
+
+NEW UI ELEMENTS:
+----------------
+- Edit button with data attributes:
+  <button type="button" class="edit-member-btn" data-id="..." data-name="..." ...>Edit</button>
+
+- Edit Member Modal:
+  <div id="editMemberModal" class="modal-overlay">...</div>
+
+NEW JAVASCRIPT:
+----------------
+document.querySelectorAll('.edit-member-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('edit_member_id').value = this.dataset.id;
+        document.getElementById('edit_full_name').value = this.dataset.name;
+        // ... fills other fields
+        document.getElementById('editMemberModal').classList.add('active');
+    });
+});
+
+================================================================================
+3. ATTENDANCE ENHANCEMENTS (public/attendance.php)
+================================================================================
+ADDED: Searchable selection and printable logs.
+
+SEARCH BAR IMPLEMENTATION:
+--------------------------
+- Text input + datalist for rapid member lookup:
+  <input type="text" id="memberSearch" list="memberList">
+  <datalist id="memberList">...</datalist>
+  <input type="hidden" name="member_id" id="hidden_member_id">
+
+PRINT FEATURE:
+--------------
+- Print button: <button onclick="window.print()">Print Logs</button>
+- Print header (hidden in UI, shows on paper):
+  <div class="print-header d-none">
+    <h1>ATTENDANCE LOG</h1>
+    <h3>[Event Title]</h3>
+    <p>[Event Date]</p>
+  </div>
+
+================================================================================
+4. GLOBAL STYLING (public/assets/css/main.css)
+================================================================================
+ADDED: Print media queries and utility classes.
+
+CODE SNIPPETS:
+--------------
+@media print {
+    .sidebar, .top-header, .no-print, .btn { display: none !important; }
+    .print-header.d-none { display: block !important; }
+    .table { border: 1px solid black !important; color: black !important; }
+    .table th { background-color: #eee !important; }
+}
+
+.d-none { display: none !important; }
+.font-weight-bold { font-weight: 700; }
+================================================================================

@@ -1,0 +1,10 @@
+{
+    "require": {
+        "endroid/qr-code": "^3.9"
+    },
+    "config": {
+        "platform": {
+            "php": "8.0.30"
+        }
+    }
+}

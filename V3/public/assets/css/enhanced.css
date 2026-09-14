@@ -1,0 +1,287 @@
+/* Enhanced UI Components */
+
+/* Modern ID Card */
+.id-card-modern {
+    width: 420px;
+    height: 600px; /* Vertical Orientation looks more professional */
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    font-family: 'Inter', sans-serif;
+    margin: 20px auto;
+    border: 1px solid #e2e8f0;
+}
+
+.id-card-top-header {
+    height: 160px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+.id-church-logo {
+    max-height: 80px;
+    margin-bottom: 10px;
+}
+
+.id-church-titles {
+    text-align: center;
+}
+
+.id-church-name {
+    font-size: 24px;
+    font-weight: 900;
+    color: #000;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.id-church-sub {
+    font-size: 14px;
+    font-weight: 400;
+    color: #444;
+    margin-top: 5px;
+}
+
+.id-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 30px 30px;
+    background: white;
+}
+
+.id-avatar-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #f8fafc;
+    background: #edf2f7;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.id-avatar-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.id-avatar-placeholder {
+    font-size: 48px;
+    color: #a0aec0;
+    font-weight: 700;
+}
+
+.id-church-logo {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-height: 40px;
+}
+
+.id-member-name {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a202c;
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+.id-member-role {
+    font-size: 12px;
+    font-weight: 600;
+    color: #3182ce;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 24px;
+}
+
+.id-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.id-stat-item {
+    text-align: center;
+}
+
+.id-stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #718096;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.id-stat-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.id-qr-box {
+    padding: 15px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.id-qr-box svg {
+    width: 120px;
+    height: 120px;
+    display: block;
+}
+
+.id-card-footer-modern {
+    padding: 15px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+    font-size: 10px;
+    color: #a0aec0;
+}
+
+/* Modal Enhancements */
+.modal-lg { max-width: 800px; }
+
+/* Status Styles */
+.status-active { color: #38a169; }
+.status-inactive { color: #e53e3e; }
+
+/* Searchable Select Utility */
+.search-select-container { position: relative; }
+.search-results-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    z-index: 1050;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.search-result-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f7fafc;
+}
+.search-result-item:hover { background: #ebf8ff; }
+.search-result-item:last-child { border-bottom: none; }
+
+/* Print Optimization */
+@media print {
+    @page {
+        margin: 0;
+        size: auto;
+    }
+
+    html,
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: auto !important;
+        height: auto !important;
+        background: #fff !important;
+        overflow: hidden !important;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #printable-id-card,
+    #printable-id-card * {
+        visibility: visible !important;
+    }
+
+    .sidebar,
+    .top-header,
+    .header,
+    .no-print,
+    .modal-overlay,
+    .page-title,
+    .breadcrumb,
+    .sidebar-layout::before {
+        display: none !important;
+    }
+
+    .sidebar-layout,
+    .main-content,
+    .content-area {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding: 0 !important;
+        width: auto !important;
+        min-height: 0 !important;
+        display: block !important;
+        background: #fff !important;
+    }
+
+    #printable-id-card {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: auto !important;
+        height: auto !important;
+        background: #fff !important;
+    }
+
+    .id-card-modern {
+        box-shadow: none !important;
+        margin: 0 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+}
+
+/* Dropdown Menu Styles */
+.dropdown-menu {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    padding: 8px 0 !important;
+}
+
+.dropdown-item {
+    display: block !important;
+    padding: 10px 16px !important;
+    color: #4a5568 !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
+    transition: background 0.2s !important;
+}
+
+.dropdown-item:hover {
+    background: #f7fafc !important;
+    color: #3182ce !important;
+    text-decoration: none !important;
+}
