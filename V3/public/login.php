@@ -47,17 +47,22 @@ $csrf_token = generateCsrfToken();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- BoxIcons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <!-- Main CSS -->
+    <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body class="login-container">
     <div class="login-card">
         <div class="login-header">
-            <img src="assets/images/logo.png" alt="Logo" style="height: 80px; width: 80px; border-radius: 50%; margin-bottom: 15px; border: 2px solid var(--gray-100);">
-            <h2>GFUMC</h2>
-            <p class="text-muted">God's Family United Methodist Church</p>
+            <img src="assets/images/logo.png" alt="Logo">
+            <h2></h2>
+            <p>God's Family United Methodist Church</p>
         </div>
         
         <div class="login-body">
@@ -68,13 +73,15 @@ $csrf_token = generateCsrfToken();
 
             <?php if ($success): ?>
                 <div class="alert alert-success">
-                    <?php echo htmlspecialchars($success); ?>
+                    <i class='bx bx-check-circle'></i>
+                    <div><?php echo htmlspecialchars($success); ?></div>
                 </div>
             <?php endif; ?>
 
             <?php if ($error): ?>
                 <div class="alert alert-danger">
-                    <?php echo htmlspecialchars($error); ?>
+                    <i class='bx bx-error-circle'></i>
+                    <div><?php echo htmlspecialchars($error); ?></div>
                 </div>
             <?php endif; ?>
 
@@ -83,12 +90,21 @@ $csrf_token = generateCsrfToken();
                 
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="admin@example.com" required autofocus>
+                    <div class="search-input-wrapper">
+                        <i class='bx bx-envelope'></i>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email address" required autofocus>
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+                    <div class="search-input-wrapper">
+                        <i class='bx bx-lock-alt'></i>
+                        <input type="password" id="password" name="password" class="form-control has-toggle" placeholder="••••••••" required>
+                        <button type="button" id="togglePassword" class="password-toggle-btn" aria-label="Toggle password visibility" title="Show/Hide Password">
+                            <i class='bx bx-hide' id="toggleIcon"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group" style="margin-top: 15px;">
@@ -100,8 +116,8 @@ $csrf_token = generateCsrfToken();
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary w-100">
-                    Sign In
+                <button type="submit" class="btn btn-primary w-100" style="padding: 12px; font-size: 15px;">
+                    <i class='bx bx-log-in-circle'></i> Sign In
                 </button>
                 
                 <div class="text-center mt-3">
@@ -132,5 +148,23 @@ $csrf_token = generateCsrfToken();
             </div>
         </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        if (togglePasswordBtn && passwordInput && toggleIcon) {
+            togglePasswordBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const isPassword = passwordInput.getAttribute('type') === 'password';
+                passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+                toggleIcon.className = isPassword ? 'bx bx-show' : 'bx bx-hide';
+                togglePasswordBtn.setAttribute('title', isPassword ? 'Hide Password' : 'Show Password');
+            });
+        }
+    });
+    </script>
 </body>
 </html>

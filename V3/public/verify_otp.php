@@ -1,7 +1,7 @@
 <?php
 /**
  * OTP Verification View
- * Step 2: Enter 6rd-digit code.
+ * Step 2: Enter 6-digit code.
  */
 
 if (!defined('BASE_PATH')) {
@@ -36,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: reset_password.php");
             exit;
         } else {
-            // verifyOTP returns descriptive error strings with attempt count
             $error = is_string($verifyResult) ? $verifyResult : "Invalid or expired OTP code.";
         }
     }
@@ -51,8 +50,14 @@ $csrf_token = generateCsrfToken();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify OTP - God's Family United Methodist Church</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- BoxIcons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/main.css">
     <style>
         .otp-input {
@@ -66,12 +71,13 @@ $csrf_token = generateCsrfToken();
 <body class="login-container">
     <div class="login-card fade-in">
         <div class="login-header">
-            <h2 class="mt-0">VERIFY CODE</h2>
-            <p class="login-subtitle">Enter the 6-digit OTP sent to your email</p>
+            <img src="assets/images/logo.png" alt="Logo">
+            <h2>VERIFY CODE</h2>
+            <p>God's Family United Methodist Church</p>
         </div>
         
         <div class="login-body">
-            <div class="alert alert-info py-2" style="font-size: 0.85rem; text-align: center;">
+            <div class="alert alert-info py-2 text-center" style="font-size: 0.85rem;">
                 <i class='bx bx-envelope'></i> Code sent to: <strong><?php echo htmlspecialchars($email); ?></strong>
             </div>
 

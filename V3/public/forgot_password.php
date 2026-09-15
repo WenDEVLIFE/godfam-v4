@@ -43,15 +43,22 @@ $csrf_token = generateCsrfToken();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password - God's Family United Methodist Church</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- BoxIcons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body class="login-container">
     <div class="login-card fade-in">
         <div class="login-header">
-            <h2 class="mt-0">FORGOT PASSWORD</h2>
-            <p class="login-subtitle">We'll send an OTP to your email</p>
+            <img src="assets/images/logo.png" alt="Logo">
+            <h2>FORGOT PASSWORD</h2>
+            <p>God's Family United Methodist Church</p>
         </div>
         
         <div class="login-body">
@@ -60,6 +67,10 @@ $csrf_token = generateCsrfToken();
                     <i class='bx bx-error-circle'></i> <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
+
+            <p class="text-muted text-center mb-4" style="font-size: 0.9rem;">
+                Enter your registered name and email address to receive a 6-digit verification code.
+            </p>
 
             <form method="POST">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
@@ -86,7 +97,11 @@ $csrf_token = generateCsrfToken();
             </form>
         </div>
         
-    
+        <div class="login-footer">
+            <p class="mb-0 text-muted" style="font-size: 0.85rem;">
+                &copy; <?php echo date('Y'); ?> God's Family United Methodist Church. All rights reserved.
+            </p>
+        </div>
     </div>
 </body>
 </html>

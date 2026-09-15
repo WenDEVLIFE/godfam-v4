@@ -124,4 +124,43 @@ class Attendance {
         $stmt->execute([(int)$memberId]);
         return (int)$stmt->fetchColumn();
     }
+
+    /**
+     * Get per-day present count for the last 7 days.
+     * Returns array of ['date' => 'YYYY-MM-DD', 'label' => 'Mon Jul 28', 'count' => 12].
+     */
+    public function getWeeklyStats(): array {
+        $stmt = $this->pdo->query(
+            "SELECT
+                a.date,
+                DATE_FORMAT(a.date, '%a %b %d') AS label,
+                COUNT(*) AS count
+             FROM attendance a
+             WHERE a.date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+               AND a.status = 'Present'
+             GROUP BY a.date
+             ORDER BY a.date ASC"
+        );
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get per-month present count for each month of the given year.
+     * Returns array of ['month_num' => 1..12, 'label' => 'Jan', 'count' => 45].
+     */
+    public function getMonthlyStats(int $year): array {
+        $stmt = $this->pdo->prepare(
+            "SELECT
+                MONTH(a.date)                      AS month_num,
+                DATE_FORMAT(a.date, '%b')          AS label,
+                COUNT(*)                           AS count
+             FROM attendance a
+             WHERE YEAR(a.date) = ?
+               AND a.status = 'Present'
+             GROUP BY MONTH(a.date), label
+             ORDER BY month_num ASC"
+        );
+        $stmt->execute([$year]);
+        return $stmt->fetchAll();
+    }
 }

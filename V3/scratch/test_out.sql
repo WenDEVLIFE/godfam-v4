@@ -1,5 +1,5 @@
 -- Full Database Export for Church Management System
--- Updated: 2026-07-29 (Synchronized & Consolidated)
+-- Generated: 2026-07-29 21:52:23
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   PRIMARY KEY (`role_id`),
   UNIQUE KEY `role_name` (`role_name`),
   UNIQUE KEY `uniq_role_slug` (`role_slug`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 -- Table structure for table `members`
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `members` (
   KEY `idx_member_email` (`email`),
   KEY `fk_members_role` (`role_id`),
   CONSTRAINT `fk_members_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 -- Table structure for table `users`
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `member_id` (`member_id`),
   CONSTRAINT `user_fk_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`member_id`) ON DELETE SET NULL,
   CONSTRAINT `user_fk_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 -- Table structure for table `events`
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `events` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`event_id`),
   KEY `idx_event_date` (`date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 -- Table structure for table `attendance`
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `attendance` (
   KEY `idx_attendance_member_status` (`member_id`,`status`),
   CONSTRAINT `att_fk_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`) ON DELETE CASCADE,
   CONSTRAINT `att_fk_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`member_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 -- Table structure for table `announcements`
@@ -173,12 +173,8 @@ CREATE TABLE IF NOT EXISTS `collections` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`collection_id`),
   KEY `idx_collection_date` (`collection_date`),
-  KEY `idx_collection_category` (`category`),
-  KEY `member_id` (`member_id`),
-  KEY `recorded_by` (`recorded_by`),
-  CONSTRAINT `col_fk_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`member_id`) ON DELETE SET NULL,
-  CONSTRAINT `col_fk_recorder` FOREIGN KEY (`recorded_by`) REFERENCES `users` (`user_id`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `idx_collection_category` (`category`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 -- Table structure for table `expenses`
@@ -193,10 +189,8 @@ CREATE TABLE IF NOT EXISTS `expenses` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`expense_id`),
   KEY `idx_expense_date` (`expense_date`),
-  KEY `idx_expense_category` (`category`),
-  KEY `recorded_by` (`recorded_by`),
-  CONSTRAINT `exp_fk_recorder` FOREIGN KEY (`recorded_by`) REFERENCES `users` (`user_id`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `idx_expense_category` (`category`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 -- Table structure for table `notifications`
@@ -212,10 +206,8 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`notification_id`),
   KEY `idx_reminder_date` (`reminder_date`),
-  KEY `idx_notification_type` (`type`),
-  KEY `member_id` (`member_id`),
-  CONSTRAINT `notif_fk_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`member_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `idx_notification_type` (`type`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 -- Table structure for table `audit_logs`
@@ -231,7 +223,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   PRIMARY KEY (`log_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `audit_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 -- Table structure for table `permissions`
@@ -245,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `permissions` (
   PRIMARY KEY (`permission_id`),
   UNIQUE KEY `uniq_permission_key` (`permission_key`),
   KEY `idx_permission_module` (`module`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 -- Table structure for table `role_permissions`
@@ -264,16 +256,13 @@ CREATE TABLE IF NOT EXISTS `role_permissions` (
 -- View structure for `role_permission_matrix`
 -- --------------------------------------------------------
 DROP VIEW IF EXISTS `role_permission_matrix`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `role_permission_matrix` AS 
-select `r`.`role_id` AS `role_id`,`r`.`role_name` AS `role_name`,`r`.`role_slug` AS `role_slug`,`p`.`permission_id` AS `permission_id`,`p`.`permission_key` AS `permission_key`,`p`.`module` AS `module`,`p`.`description` AS `description` 
-from ((`roles` `r` join `role_permissions` `rp` on(`rp`.`role_id` = `r`.`role_id`)) join `permissions` `p` on(`p`.`permission_id` = `rp`.`permission_id`));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `role_permission_matrix` AS select `r`.`role_id` AS `role_id`,`r`.`role_name` AS `role_name`,`r`.`role_slug` AS `role_slug`,`p`.`permission_id` AS `permission_id`,`p`.`permission_key` AS `permission_key`,`p`.`module` AS `module`,`p`.`description` AS `description` from ((`roles` `r` join `role_permissions` `rp` on(`rp`.`role_id` = `r`.`role_id`)) join `permissions` `p` on(`p`.`permission_id` = `rp`.`permission_id`));
 
 -- --------------------------------------------------------
 -- Seed Data for `roles`
 -- --------------------------------------------------------
 INSERT IGNORE INTO `roles` (`role_id`, `role_name`, `role_slug`, `description`, `is_system`) VALUES
 (1, 'Administrator', 'administrator', 'System Administrator with full access', 1),
-(2, 'Pastor', 'pastor', 'Pastoral leadership', 1),
 (3, 'Staff', 'staff', 'Operational church staff', 1),
 (4, 'Member', 'member', 'Standard church member', 1),
 (5, 'Secretary', 'secretary', 'Administrative secretary', 1),
@@ -284,7 +273,7 @@ INSERT IGNORE INTO `roles` (`role_id`, `role_name`, `role_slug`, `description`, 
 -- Seed Default Admin User
 -- --------------------------------------------------------
 INSERT IGNORE INTO `users` (`user_id`, `role_id`, `name`, `email`, `password`) VALUES
-(1, 1, 'Camille Jane Madrid', 'camillejanemadrid629@gmail.com', '$2y$10$ht3egELlhO4SI9M1o4jrIewEtNQDhR5O3RHg98gWJ4l/CCllg4XM6');
+(1, 1, 'System Admin', 'admin@church.com', '$2y$10$da7FAxna.U8VuLth.3Clde8Jr73F8JuEa7JrSy4QZh5Hgv9ZJGB0G');
 
 -- --------------------------------------------------------
 -- Seed Default System Settings

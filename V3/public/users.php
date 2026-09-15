@@ -18,8 +18,6 @@ if (!isAdmin()) {
 $controller = new UserController($pdo);
 $error = '';
 $success = '';
-
-// Handle Actions (Add, Edit, Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validateCsrfToken($_POST['csrf_token'] ?? '');
 
@@ -29,6 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $controller->add($_POST);
         if ($result === true) $success = "User account created successfully.";
         else $error = $result;
+    } elseif ($action === 'edit') {
+        $result = $controller->edit($_POST['id'] ?? 0, $_POST);
+        if ($result === true) $success = "User account updated successfully.";
+        else $error = $result;
     } elseif ($action === 'delete') {
         $result = $controller->delete($_POST['id'] ?? 0);
         if ($result === true) $success = "User account deleted successfully.";
@@ -36,7 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$users = $controller->index();
+$allUsers = $controller->index(true);
+$filterRole = $_GET['filter'] ?? 'member';
+
+$users = array_filter($allUsers, function($u) use ($filterRole) {
+    if (strtolower($u['role_name'] ?? '') === 'administrator') {
+        return false;
+    }
+    if ($filterRole === 'all') {
+        return true;
+    }
+    return strtolower($u['role_name'] ?? '') === strtolower($filterRole);
+});
+
 $roles = $controller->roleList();
 $csrf_token = generateCsrfToken();
 
@@ -68,81 +82,97 @@ include __DIR__ . '/layout/header.php';
 include __DIR__ . '/layout/sidebar.php';
 ?>
 
-<div class="fade-in">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h2 style="font-weight: 800; font-size: 1.8rem; color: var(--primary-color);">System Administration</h2>
-            <p style="color: var(--muted-text); font-size: 1rem;">Manage privileged access and ministry staff accounts.</p>
-        </div>
-        <button onclick="toggleModal('addUserModal')" class="btn btn-primary shadow-sm" style="padding: 14px 32px;">
-            <i class='bx bx-user-plus' style="font-size: 1.2rem;"></i> Create Account
-        </button>
+<div class="fade-in py-2">
+    <!-- Top Header -->
+    <div class="mb-4">
+        <h2 style="font-weight: 800; font-size: 1.85rem; color: var(--primary-color); margin-bottom: 6px;">System Users</h2>
+        <p style="color: var(--muted-text); font-size: 1.02rem; margin-bottom: 0;">Manage member user accounts, system access, and credentials.</p>
     </div>
 
-    <?php if ($error): ?>
-        <div class="alert alert-danger shadow-sm"><i class='bx bx-error-circle'></i> <?php echo htmlspecialchars($error); ?></div>
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger shadow-sm mb-4" style="border-radius: 8px; padding: 14px 18px;"><i class='bx bx-error-circle'></i> <?php echo htmlspecialchars($error); ?></div>
     <?php endif; ?>
-    <?php if ($success): ?>
-        <div class="alert alert-success shadow-sm"><i class='bx bx-check-circle'></i> <?php echo htmlspecialchars($success); ?></div>
+    <?php if (!empty($success)): ?>
+        <div class="alert alert-success shadow-sm mb-4" style="border-radius: 8px; padding: 14px 18px;"><i class='bx bx-check-circle'></i> <?php echo htmlspecialchars($success); ?></div>
     <?php endif; ?>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-transparent py-4 px-4" style="border-bottom: 1px solid rgba(0,0,0,0.03);">
-            <h5 style="margin: 0; font-weight: 800; color: var(--dark-text); opacity: 0.8;">PRIVILEGED ACCOUNTS</h5>
+    <div class="card border-0 shadow-sm mb-5" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-header bg-transparent py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
+            <div class="btn-group" role="group" aria-label="Account Filter">
+                <a href="users.php?filter=member" class="btn btn-sm <?php echo $filterRole !== 'all' ? 'btn-primary' : 'btn-outline-secondary'; ?>" style="font-weight: 600; padding: 8px 20px; border-radius: 6px 0 0 6px;">Member Accounts</a>
+                <a href="users.php?filter=all" class="btn btn-sm <?php echo $filterRole === 'all' ? 'btn-primary' : 'btn-outline-secondary'; ?>" style="font-weight: 600; padding: 8px 20px; border-radius: 0 6px 6px 0;">All Accounts</a>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge badge-info" style="font-size: 12px; padding: 8px 14px; border-radius: 20px;"><?php echo count($users); ?> Accounts</span>
+                <button onclick="toggleModal('addUserModal')" class="btn btn-primary shadow-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; font-weight: 600; font-size: 0.875rem; border-radius: 8px;">
+                    <i class='bx bx-user-plus' style="font-size: 1.1rem;"></i> Create Account
+                </button>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table mb-0">
                     <thead>
                         <tr>
-                            <th style="padding-left: 32px;">User</th>
-                            <th>Email Address</th>
-                            <th>System Role</th>
-                            <th class="text-right" style="padding-right: 32px;">Actions</th>
+                            <th style="padding: 18px 24px;">User Name</th>
+                            <th style="padding: 18px 24px;">Email Address</th>
+                            <th style="padding: 18px 24px;">Account Role</th>
+                            <th class="text-right" style="padding: 18px 24px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($users as $u): ?>
-                        <?php $isProtectedAccount = in_array($u['role_name'], ['Administrator', 'Secretary'], true); ?>
-                        <?php $avatar = userAvatarPath($u['member_photo'] ?? ''); ?>
-                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.02);">
-                            <td style="padding-left: 32px;">
-                                <div class="d-flex align-items-center">
-                                    <img src="<?php echo htmlspecialchars($avatar); ?>" class="user-avatar" alt="Profile">
-                                    <div>
-                                        <div style="font-weight: 700; color: var(--dark-text);"><?php echo htmlspecialchars($u['name']); ?></div>
+                        <?php if (empty($users)): ?>
+                            <tr>
+                                <td colspan="4" class="text-center p-4 text-muted">No user accounts found.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($users as $u): ?>
+                            <?php $isProtectedAccount = in_array($u['role_name'], ['Administrator', 'Secretary'], true); ?>
+                            <?php $avatar = userAvatarPath($u['member_photo'] ?? ''); ?>
+                            <tr style="border-bottom: 1px solid rgba(0,0,0,0.03);">
+                                <td style="padding-left: 24px;">
+                                    <div class="d-flex align-items-center">
+                                        <img src="<?php echo htmlspecialchars($avatar); ?>" class="user-avatar" alt="Profile">
+                                        <div>
+                                            <div style="font-weight: 700; color: var(--dark-text);"><?php echo htmlspecialchars($u['name']); ?></div>
+                                            <?php if ($u['user_id'] == $_SESSION['user_id']): ?>
+                                                <span style="font-size: 0.65rem; color: var(--primary-color); font-weight: 800; text-transform: uppercase;">Current Session</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="color: var(--muted-text); font-weight: 500;"><?php echo htmlspecialchars($u['email']); ?></td>
+                                <td>
+                                    <span class="badge badge-secondary" style="background: rgba(30, 58, 138, 0.05); color: var(--navy-blue); border: none;">
+                                        <i class='bx bx-user-check'></i> <?php echo htmlspecialchars($u['role_name']); ?>
+                                    </span>
+                                </td>
+                                <td class="text-right" style="padding-right: 24px;">
+                                    <div class="d-flex justify-content-end align-items-center gap-2">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" style="display: inline-flex; align-items: center; gap: 4px;"
+                                                onclick="openEditUserModal(<?php echo (int)$u['user_id']; ?>, '<?php echo htmlspecialchars(addslashes($u['name'])); ?>', '<?php echo htmlspecialchars(addslashes($u['email'])); ?>', <?php echo (int)$u['role_id']; ?>)" 
+                                                title="Edit User Account">
+                                            <i class='bx bx-edit'></i> Edit
+                                        </button>
+                                        
                                         <?php if ($u['user_id'] == $_SESSION['user_id']): ?>
-                                            <span style="font-size: 0.6rem; color: var(--primary-color); font-weight: 800; text-transform: uppercase;">Current Session</span>
+                                            <span class="badge badge-info shadow-none" style="opacity: 0.7; align-self: center;">ACTIVE</span>
+                                        <?php elseif ($isProtectedAccount): ?>
+                                            <span class="badge badge-secondary shadow-none" style="opacity: 0.75; align-self: center;" title="Protected account - cannot be deleted">
+                                                Protected
+                                            </span>
+                                        <?php else: ?>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" style="display: inline-flex; align-items: center; gap: 4px;"
+                                                    onclick="openDeleteUserModal(<?php echo (int)$u['user_id']; ?>, '<?php echo htmlspecialchars(addslashes($u['name'])); ?>')" 
+                                                    title="Delete User Account">
+                                                <i class='bx bx-trash'></i> Delete
+                                            </button>
                                         <?php endif; ?>
                                     </div>
-                                </div>
-                            </td>
-                            <td style="color: var(--muted-text); font-weight: 500;"><?php echo htmlspecialchars($u['email']); ?></td>
-                            <td>
-                                <span class="badge badge-secondary" style="background: rgba(30, 58, 138, 0.05); color: var(--navy-blue); border: none;">
-                                    <i class='bx bx-lock-alt'></i> <?php echo htmlspecialchars($u['role_name']); ?>
-                                </span>
-                            </td>
-                            <td class="text-right" style="padding-right: 32px;">
-                                <?php if ($u['user_id'] == $_SESSION['user_id']): ?>
-                                    <span class="badge badge-info shadow-none" style="opacity: 0.7;">ACTIVE</span>
-                                <?php elseif ($isProtectedAccount): ?>
-                                    <span class="badge badge-secondary shadow-none" style="opacity: 0.75;" title="Protected account - cannot be deleted">
-                                        Protected
-                                    </span>
-                                <?php else: ?>
-                                    <form method="POST" style="display:inline;" onsubmit="event.preventDefault(); var form = this; confirmAction('Are you sure you want to delete this system user? This cannot be undone.', function() { form.submit(); });">
-                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-                                        <input type="hidden" name="action" value="delete">
-                                        <input type="hidden" name="id" value="<?php echo (int)$u['user_id']; ?>">
-                                        <button type="submit" class="btn btn-sm" style="background: rgba(210, 38, 48, 0.05); color: var(--church-red); padding: 8px; border-radius: 10px;" title="Delete User">
-                                            <i class='bx bx-trash' style="font-size: 1.1rem;"></i>
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -153,49 +183,125 @@ include __DIR__ . '/layout/sidebar.php';
     <div class="modal-overlay" id="addUserModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class='bx bx-plus-circle'></i> Create New System User</h3>
-                <button class="modal-close" onclick="toggleModal('addUserModal')"><i class='bx bx-x'></i></button>
+                <h3 class="mb-0"><i class='bx bx-user-plus' style="color:var(--cms-red); margin-right:8px;"></i>Create New User Account</h3>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleModal('addUserModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <form method="POST" class="row">
+                <form method="POST">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                     <input type="hidden" name="action" value="add">
                     
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="The name used in system" required>
-                    </div>
-                    
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-control" placeholder="login@church.com" required>
-                    </div>
-                    
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">System Role</label>
-                        <select name="role_id" class="form-select" required>
-                            <?php foreach ($roles as $role): ?>
-                                <option value="<?php echo $role['role_id']; ?>"><?php echo htmlspecialchars($role['role_name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    
-                    <div class="col-md-6 mb-4">
-                        <label class="form-label">Initial Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
-                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Full name of user" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="email" class="form-control" placeholder="user@church.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">System Role</label>
+                            <select name="role_id" class="form-select" required>
+                                <?php foreach ($roles as $role): ?>
+                                    <option value="<?php echo $role['role_id']; ?>" <?php echo strtolower($role['role_name']) === 'member' ? 'selected' : ''; ?>><?php echo htmlspecialchars($role['role_name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Initial Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                        </div>
 
-                    <div class="col-12 mb-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <input type="checkbox" id="user_agree" required style="width: 16px; height: 16px;">
-                            <label for="user_agree" class="small text-muted mb-0">I confirm the user has been notified of and agrees to the Church Privacy Policy.</label>
+                        <div class="form-group full-width mb-0">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="checkbox" id="user_agree" required style="width: 16px; height: 16px;">
+                                <label for="user_agree" class="small text-muted mb-0" style="cursor:pointer;">I confirm the user account credentials have been verified.</label>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="col-12 text-right">
-                        <p class="text-muted small mb-3">Note: System users can be staff or administrators who manage the church data.</p>
-                        <button type="button" class="btn btn-light mr-2" onclick="toggleModal('addUserModal')">Cancel</button>
-                        <button type="submit" class="btn btn-primary px-5">Create Account <i class='bx bx-check'></i></button>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline-secondary" onclick="toggleModal('addUserModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class='bx bx-check-circle'></i> Create Account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal-overlay" id="editUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="mb-0"><i class='bx bx-edit' style="color:var(--cms-blue); margin-right:8px;"></i>Edit User Account</h3>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleModal('editUserModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="editUserForm" onsubmit="return confirmEditUserSubmission(event, this)">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                    <input type="hidden" name="action" value="edit">
+                    <input type="hidden" name="id" id="edit_user_id" value="">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="name" id="edit_user_name" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="email" id="edit_user_email" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Account Role</label>
+                            <select name="role_id" id="edit_user_role_id" class="form-select" required>
+                                <?php foreach ($roles as $role): ?>
+                                    <option value="<?php echo $role['role_id']; ?>"><?php echo htmlspecialchars($role['role_name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">New Password (Optional)</label>
+                            <input type="password" name="password" class="form-control" placeholder="Leave blank to keep unchanged">
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <p class="text-muted small mb-0 mr-auto">Note: Leaving password empty preserves the existing password.</p>
+                        <button type="button" class="btn btn-outline-secondary" onclick="toggleModal('editUserModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class='bx bx-save'></i> Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Confirmation Modal -->
+    <div class="modal-overlay" id="deleteUserModal">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3 class="mb-0 text-danger"><i class='bx bx-trash' style="margin-right:8px;"></i>Confirm Account Deletion</h3>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleModal('deleteUserModal')">&times;</button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class='bx bx-error-circle' style="font-size: 3.5rem; color: #dc2626; margin-bottom: 12px; display: block;"></i>
+                <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 8px;">Are you sure?</h4>
+                <p class="text-muted small mb-4">You are about to delete the user account for <strong id="delete_user_name_text" class="text-dark">this member</strong>. This action cannot be undone.</p>
+
+                <form method="POST" id="deleteUserForm">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="id" id="delete_user_id" value="">
+
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-outline-secondary" onclick="toggleModal('deleteUserModal')">Cancel</button>
+                        <button type="submit" class="btn btn-danger"><i class='bx bx-trash'></i> Delete Account</button>
                     </div>
                 </form>
             </div>
@@ -226,6 +332,30 @@ include __DIR__ . '/layout/sidebar.php';
         } else {
             modal.classList.add('active');
         }
+    }
+
+    function openEditUserModal(id, name, email, roleId) {
+        document.getElementById('edit_user_id').value = id;
+        document.getElementById('edit_user_name').value = name;
+        document.getElementById('edit_user_email').value = email;
+        document.getElementById('edit_user_role_id').value = roleId;
+        toggleModal('editUserModal');
+    }
+
+    function openDeleteUserModal(id, name) {
+        document.getElementById('delete_user_id').value = id;
+        document.getElementById('delete_user_name_text').textContent = name;
+        toggleModal('deleteUserModal');
+    }
+
+    function confirmEditUserSubmission(event, form) {
+        event.preventDefault();
+        const userName = document.getElementById('edit_user_name').value;
+        
+        if (confirm(`Are you sure you want to save changes for user account "${userName}"?`)) {
+            form.submit();
+        }
+        return false;
     }
 
     // Close modal when clicking outside

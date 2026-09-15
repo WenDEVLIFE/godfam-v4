@@ -131,6 +131,7 @@ include __DIR__ . '/layout/sidebar.php';
                                             data-address="<?php echo htmlspecialchars($member['address'] ?? ''); ?>"
                                             data-contact="<?php echo htmlspecialchars($member['contact_info'] ?? ''); ?>"
                                             data-photo="<?php echo htmlspecialchars($member['photo_path'] ?? ''); ?>"
+                                            data-birthday="<?php echo htmlspecialchars($member['birthday'] ?? ''); ?>"
                                             data-status="<?php echo htmlspecialchars($member['status']); ?>">
                                         Edit
                                     </button>
@@ -197,71 +198,76 @@ include __DIR__ . '/layout/sidebar.php';
 <div class="modal-overlay" id="addMemberModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="mb-0">Add New Member</h3>
-            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('addMemberModal').classList.remove('active')">&times;</button>
+            <h3 class="mb-0"><i class='bx bx-user-plus' style="color:var(--cms-red); margin-right:8px;"></i>Add New Member</h3>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('addMemberModal').classList.remove('active')">&times;</button>
         </div>
-        <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+        <div class="modal-body">
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                 <input type="hidden" name="action" value="add">
                 
-                <div class="form-group">
-                    <label class="form-label">Profile Photo</label>
-                    <input type="file" name="photo" class="form-control" accept="image/*">
-                    <p class="text-muted small mt-1">Optional. Recommended square image, Max 2MB.</p>
-                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="full_name" class="form-control" placeholder="John Doe" required>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="full_name" class="form-control" placeholder="John Doe" required>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label class="form-label">Email</label>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
                         <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
                     </div>
-                    <div class="col-md-6 form-group">
-                        <label class="form-label">Phone</label>
+
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
                         <input type="text" name="phone" class="form-control" placeholder="09123456789">
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Address</label>
-                    <textarea name="address" class="form-control" rows="2" placeholder="Street, Barangay, City"></textarea>
-                </div>
 
-                <div class="form-group">
-                    <label class="form-label">Additional Contact Info</label>
-                    <input type="text" name="contact_info" class="form-control" placeholder="Emergency contact, etc.">
-                </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Address</label>
+                        <textarea name="address" class="form-control" rows="2" placeholder="Street, Barangay, City"></textarea>
+                    </div>
 
-                <div class="row">
-                    <div class="col-md-6 form-group">
+                    <div class="form-group full-width">
+                        <label class="form-label">Additional Contact Info</label>
+                        <input type="text" name="contact_info" class="form-control" placeholder="Emergency contact, relationship, etc.">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Birthday</label>
+                        <input type="date" name="birthday" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Initial Status</label>
+                        <select name="status" class="form-control">
+                            <option value="active">Active</option>
+                            <option value="visiting">Visiting</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
                         <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required>
-                    </div>
-                        <div class="col-md-6 form-group">
-                            <label class="form-label">Initial Status</label>
-                            <select name="status" class="form-control">
-                                <option value="active">Active</option>
-                                <option value="visiting">Visiting</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
+                        <input type="password" name="password" class="form-control" placeholder="Set member login password" required>
                     </div>
 
-                    <div class="form-group mt-2">
+                    <div class="form-group full-width">
+                        <label class="form-label">Profile Photo (Optional)</label>
+                        <input type="file" name="photo" class="form-control" accept="image/*">
+                        <p class="text-muted small mt-1 mb-0">Recommended square image, max 2MB.</p>
+                    </div>
+
+                    <div class="form-group full-width mb-0">
                         <div class="d-flex align-items-center gap-2">
                             <input type="checkbox" id="member_agree" required style="width: 16px; height: 16px;">
-                            <label for="member_agree" class="small text-muted mb-0">Member agrees to the Church Privacy Policy and Terms of Service.</label>
+                            <label for="member_agree" class="small text-muted mb-0" style="cursor:pointer;">Member agrees to the Church Privacy Policy and Terms of Service.</label>
                         </div>
                     </div>
-                
-                <div class="mt-4 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addMemberModal').classList.remove('active')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create Member Record</button>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('addMemberModal').classList.remove('active')">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class='bx bx-check-circle'></i> Create Member Record</button>
                 </div>
             </form>
         </div>
@@ -272,60 +278,67 @@ include __DIR__ . '/layout/sidebar.php';
 <div class="modal-overlay" id="editMemberModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="mb-0">Edit Member Record</h3>
-            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('editMemberModal').classList.remove('active')">&times;</button>
+            <h3 class="mb-0"><i class='bx bx-edit' style="color:var(--cms-blue); margin-right:8px;"></i>Edit Member Record</h3>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('editMemberModal').classList.remove('active')">&times;</button>
         </div>
-        <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+        <div class="modal-body">
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="id" id="edit_member_id">
                 
-                <div class="form-group mb-4">
+                <div class="form-group full-width mb-4">
                     <label class="form-label">Profile Photo</label>
                     <div class="d-flex align-items-center gap-3">
-                        <div id="edit_photo_preview" class="user-avatar" style="width: 60px; height: 60px; font-size: 1.2rem;"></div>
+                        <div id="edit_photo_preview" class="user-avatar" style="width: 64px; height: 64px; font-size: 1.2rem;"></div>
                         <div class="flex-grow-1">
-                            <input type="file" name="photo" class="form-control mb-1" accept="image/*">
-                            <label class="small text-danger" style="cursor:pointer;">
+                            <input type="file" name="photo" class="form-control mb-2" accept="image/*">
+                            <label class="small text-danger mb-0" style="cursor:pointer;">
                                 <input type="checkbox" name="delete_photo" value="1"> Remove current photo
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="full_name" id="edit_full_name" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" id="edit_email" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="text" name="phone" id="edit_phone" class="form-control">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Address</label>
-                    <textarea name="address" id="edit_address" class="form-control" rows="2"></textarea>
-                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="full_name" id="edit_full_name" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" id="edit_email" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" name="phone" id="edit_phone" class="form-control">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label class="form-label">Address</label>
+                        <textarea name="address" id="edit_address" class="form-control" rows="2"></textarea>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select name="status" id="edit_status" class="form-control">
-                        <option value="active">Active</option>
-                        <option value="visiting">Visiting</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+                    <div class="form-group">
+                        <label class="form-label">Birthday</label>
+                        <input type="date" name="birthday" id="edit_birthday" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select name="status" id="edit_status" class="form-control">
+                            <option value="active">Active</option>
+                            <option value="visiting">Visiting</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <div class="mt-4 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('editMemberModal').classList.remove('active')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('editMemberModal').classList.remove('active')">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class='bx bx-save'></i> Save Changes</button>
                 </div>
             </form>
         </div>
@@ -401,6 +414,12 @@ document.querySelectorAll('.edit-member-btn').forEach(btn => {
         document.getElementById('edit_phone').value = d.phone;
         document.getElementById('edit_address').value = d.address;
         document.getElementById('edit_status').value = d.status;
+        
+        if (d.birthday) {
+            document.getElementById('edit_birthday').value = d.birthday;
+        } else {
+            document.getElementById('edit_birthday').value = '';
+        }
         
         // Photo Preview
         const editPhotoPreview = document.getElementById('edit_photo_preview');

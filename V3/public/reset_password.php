@@ -63,15 +63,22 @@ $csrf_token = generateCsrfToken();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - God's Family United Methodist Church</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- BoxIcons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body class="login-container">
     <div class="login-card fade-in">
         <div class="login-header">
-            <h2 class="mt-0">RESET PASSWORD</h2>
-            <p class="login-subtitle">Choose a new secure password</p>
+            <img src="assets/images/logo.png" alt="Logo">
+            <h2>RESET PASSWORD</h2>
+            <p>God's Family United Methodist Church</p>
         </div>
         
         <div class="login-body">

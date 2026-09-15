@@ -1,6 +1,6 @@
 <?php
 /**
- * Attendance Export Handler
+ * Collection/Financial Export Handler
  * Supports: csv, pdf (print dialog), excel (.xlsx via PhpSpreadsheet)
  */
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -11,24 +11,41 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
-require_once __DIR__ . '/../models/Attendance.php';
+require_once __DIR__ . '/../models/Collection.php';
 
 if (!isAdmin() && !isStaff()) {
     die("Unauthorized access.");
 }
 
-$format = $_GET['format'] ?? 'csv';
-$filters = [
-    'event_id'   => $_GET['event_id']   ?? null,
-    'member_id'  => $_GET['member_id']  ?? null,
-    'status'     => $_GET['status']     ?? null,
-    'start_date' => $_GET['start_date'] ?? null,
-    'end_date'   => $_GET['end_date']   ?? null,
-];
+$format       = $_GET['format'] ?? 'csv';
+$report_type  = $_GET['type']   ?? 'daily';
+$filter_date  = $_GET['date']   ?? date('Y-m-d');
+$filter_month = (int)($_GET['month'] ?? date('n'));
+$filter_year  = (int)($_GET['year']  ?? date('Y'));
 
-$attendanceModel = new Attendance($pdo);
-$logs            = $attendanceModel->getLog($filters);
-$filename        = "attendance_report_" . date('Y-m-d_His');
+$collectionModel = new Collection($pdo);
+
+$logs = [];
+$reportTitle = '';
+
+if ($report_type === 'daily') {
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $filter_date)) $filter_date = date('Y-m-d');
+    $logs = $collectionModel->getByDate($filter_date);
+    $reportTitle = "Daily Financial Report - " . date('F j, Y', strtotime($filter_date));
+    $filename = "financial_report_daily_" . $filter_date;
+} else {
+    $filter_month = max(1, min(12, $filter_month));
+    $filter_year  = max(2020, min((int)date('Y') + 1, $filter_year));
+    $logs = $collectionModel->getByMonth($filter_year, $filter_month);
+    
+    $month_names = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    $monthName = $month_names[$filter_month-1];
+    
+    $reportTitle = "Monthly Financial Report - " . $monthName . " " . $filter_year;
+    $filename = "financial_report_monthly_" . $filter_year . "_" . str_pad($filter_month, 2, '0', STR_PAD_LEFT);
+}
+
+$totalAmount = array_sum(array_column($logs, 'amount'));
 
 // ============================================================
 // CSV Export
@@ -38,17 +55,27 @@ if ($format === 'csv') {
     header('Content-Disposition: attachment; filename=' . $filename . '.csv');
 
     $output = fopen('php://output', 'w');
-    fputcsv($output, ['Event', 'Member Name', 'Date', 'Status', 'Time In', 'Time Out']);
+    
+    // Title row
+    fputcsv($output, [$reportTitle]);
+    fputcsv($output, []); // Empty row
+    
+    fputcsv($output, ['Date', 'Member Name', 'Type', 'Amount', 'Notes', 'Recorded By']);
     foreach ($logs as $log) {
+        $memberName = $log['full_name'] ? $log['full_name'] : 'Anonymous';
         fputcsv($output, [
-            $log['event_title'],
-            $log['full_name'],
-            $log['date'],
-            $log['status'],
-            date('h:i A', strtotime($log['created_at'])),
-            !empty($log['time_out']) ? date('h:i A', strtotime($log['time_out'])) : '',
+            $log['collection_date'],
+            $memberName,
+            ucfirst($log['type']),
+            $log['amount'],
+            $log['notes'],
+            $log['recorded_by_name']
         ]);
     }
+    
+    fputcsv($output, []); // Empty row
+    fputcsv($output, ['TOTAL:', '', '', $totalAmount]);
+    
     fclose($output);
     exit;
 }
@@ -67,34 +94,23 @@ if ($format === 'excel') {
 
     $spreadsheet = new Spreadsheet();
     $sheet       = $spreadsheet->getActiveSheet();
-    $sheet->setTitle('Attendance Report');
+    $sheet->setTitle('Financial Report');
 
     // ---- Church letterhead (row 1-2) ----
     $sheet->mergeCells('A1:F1');
-    $sheet->setCellValue('A1', "God's Family United Methodist Church – Attendance Report");
+    $sheet->setCellValue('A1', "God's Family United Methodist Church – Financial Report");
     $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
     $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
     $sheet->mergeCells('A2:F2');
-    $dateLabel = '';
-    if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
-        $dateLabel = date('F j, Y', strtotime($filters['start_date']));
-        if ($filters['start_date'] !== $filters['end_date']) {
-            $dateLabel .= ' – ' . date('F j, Y', strtotime($filters['end_date']));
-        }
-    } else {
-        $dateLabel = 'All Dates';
-    }
-    $sheet->setCellValue('A2', "Period: {$dateLabel} | Generated: " . date('F j, Y h:i A'));
+    $sheet->setCellValue('A2', $reportTitle . " | Generated: " . date('F j, Y h:i A'));
     $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
     $sheet->getStyle('A2')->getFont()->setSize(10)->setItalic(true);
 
     // ---- Column headers (row 4) ----
-    $headers = ['#', 'Member Name', 'Event', 'Date', 'Status', 'Time In', 'Time Out'];
-    $cols    = ['A','B','C','D','E','F','G'];
-    $sheet->mergeCells('A1:G1');
-    $sheet->mergeCells('A2:G2');
-
+    $headers = ['Date', 'Member Name', 'Type', 'Amount (PHP)', 'Notes', 'Recorded By'];
+    $cols    = ['A','B','C','D','E','F'];
+    
     foreach ($headers as $i => $header) {
         $cell = $cols[$i] . '4';
         $sheet->setCellValue($cell, $header);
@@ -107,22 +123,26 @@ if ($format === 'excel') {
         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'FFFFFF']]],
     ];
-    $sheet->getStyle('A4:G4')->applyFromArray($headerStyle);
+    $sheet->getStyle('A4:F4')->applyFromArray($headerStyle);
 
     // ---- Data rows ----
     $row = 5;
     foreach ($logs as $idx => $log) {
-        $sheet->setCellValue('A' . $row, $idx + 1);
-        $sheet->setCellValue('B' . $row, $log['full_name']);
-        $sheet->setCellValue('C' . $row, $log['event_title']);
-        $sheet->setCellValue('D' . $row, date('M d, Y', strtotime($log['date'])));
-        $sheet->setCellValue('E' . $row, $log['status']);
-        $sheet->setCellValue('F' . $row, date('h:i A', strtotime($log['created_at'])));
-        $sheet->setCellValue('G' . $row, !empty($log['time_out']) ? date('h:i A', strtotime($log['time_out'])) : '—');
+        $memberName = $log['full_name'] ? $log['full_name'] : 'Anonymous';
+        
+        $sheet->setCellValue('A' . $row, date('M d, Y', strtotime($log['collection_date'])));
+        $sheet->setCellValue('B' . $row, $memberName);
+        $sheet->setCellValue('C' . $row, ucfirst($log['type']));
+        $sheet->setCellValue('D' . $row, $log['amount']);
+        $sheet->setCellValue('E' . $row, $log['notes']);
+        $sheet->setCellValue('F' . $row, $log['recorded_by_name']);
+        
+        // Format amount column
+        $sheet->getStyle('D' . $row)->getNumberFormat()->setFormatCode('#,##0.00');
 
         // Alternate row shading
         if ($idx % 2 === 0) {
-            $sheet->getStyle("A{$row}:G{$row}")->getFill()
+            $sheet->getStyle("A{$row}:F{$row}")->getFill()
                   ->setFillType(Fill::FILL_SOLID)
                   ->getStartColor()->setRGB('F7FAFC');
         }
@@ -130,14 +150,17 @@ if ($format === 'excel') {
     }
 
     // ---- Total row ----
-    $sheet->setCellValue('A' . $row, 'Total Present');
-    $sheet->mergeCells("A{$row}:D{$row}");
-    $sheet->setCellValue('E' . $row, count($logs));
+    $sheet->setCellValue('A' . $row, 'Total Collection');
+    $sheet->mergeCells("A{$row}:C{$row}");
+    $sheet->setCellValue('D' . $row, $totalAmount);
+    $sheet->getStyle('D' . $row)->getNumberFormat()->setFormatCode('#,##0.00');
+    
     $totalStyle = [
         'font' => ['bold' => true],
         'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'EBF8FF']],
     ];
-    $sheet->getStyle("A{$row}:G{$row}")->applyFromArray($totalStyle);
+    $sheet->getStyle("A{$row}:F{$row}")->applyFromArray($totalStyle);
+    $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
     // Auto-size columns
     foreach ($cols as $col) {
@@ -162,20 +185,7 @@ if ($format === 'pdf') {
         require_once __DIR__ . '/../vendor/autoload.php';
     }
 
-    $dateLabel = '';
-    if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
-        $startStr = date('F j, Y', strtotime($filters['start_date']));
-        $endStr   = date('F j, Y', strtotime($filters['end_date']));
-        $dateLabel = ($filters['start_date'] === $filters['end_date']) ? $startStr : "{$startStr} – {$endStr}";
-    } elseif (!empty($logs[0]['date'])) {
-        $dateLabel = date('F j, Y', strtotime($logs[0]['date']));
-    } else {
-        $dateLabel = 'All Dates';
-    }
-
-    $eventLabel = (!empty($filters['event_id']) && !empty($logs[0]['event_title'])) ? $logs[0]['event_title'] : 'All Events';
     $preparedByName = htmlspecialchars($_SESSION['name'] ?? 'System Admin');
-
     $logoPath = __DIR__ . '/assets/images/logo.png';
     $logoSrc = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : '';
 
@@ -188,19 +198,28 @@ if ($format === 'pdf') {
         $tableRowsHtml = '';
         $i = 1;
         foreach ($logs as $log) {
-            $timeOut = !empty($log['time_out']) ? date('h:i A', strtotime($log['time_out'])) : '---';
-            $timeIn = date('h:i A', strtotime($log['created_at']));
+            $cat = !empty($log['category']) ? ucfirst($log['category']) : (!empty($log['type']) ? ucfirst($log['type']) : 'Offering');
+            $method = !empty($log['payment_method']) ? htmlspecialchars($log['payment_method']) : 'Cash';
+            $memberName = $log['full_name'] ? htmlspecialchars($log['full_name']) : '<em>Anonymous</em>';
+            $remarks = !empty($log['remarks']) ? htmlspecialchars($log['remarks']) : (!empty($log['notes']) ? htmlspecialchars($log['notes']) : '');
+
             $tableRowsHtml .= '<tr>';
             $tableRowsHtml .= '<td>' . $i++ . '</td>';
-            $tableRowsHtml .= '<td><strong>' . htmlspecialchars($log['full_name']) . '</strong></td>';
-            $tableRowsHtml .= '<td>' . htmlspecialchars($log['event_title']) . '</td>';
-            $tableRowsHtml .= '<td>Present</td>';
-            $tableRowsHtml .= '<td>' . $timeIn . '</td>';
-            $tableRowsHtml .= '<td>' . $timeOut . '</td>';
+            $tableRowsHtml .= '<td>' . date('M d, Y', strtotime($log['collection_date'])) . '</td>';
+            $tableRowsHtml .= '<td>' . $memberName . '</td>';
+            $tableRowsHtml .= '<td>' . $cat . ' (' . $method . ')</td>';
+            $tableRowsHtml .= '<td style="text-align: right;">₱' . number_format($log['amount'], 2) . '</td>';
+            $tableRowsHtml .= '<td>' . $remarks . '</td>';
             $tableRowsHtml .= '</tr>';
         }
         if (empty($logs)) {
-            $tableRowsHtml = '<tr><td colspan="6" style="text-align:center;">No attendance records found.</td></tr>';
+            $tableRowsHtml = '<tr><td colspan="6" style="text-align:center;">No financial records found for this period.</td></tr>';
+        } else {
+            $tableRowsHtml .= '<tr style="background-color:#ebf8ff;font-weight:bold;">';
+            $tableRowsHtml .= '<td colspan="4" style="text-align:right;">TOTAL:</td>';
+            $tableRowsHtml .= '<td style="text-align:right;">₱' . number_format($totalAmount, 2) . '</td>';
+            $tableRowsHtml .= '<td></td>';
+            $tableRowsHtml .= '</tr>';
         }
 
         $pdfHtml = '
@@ -213,7 +232,6 @@ if ($format === 'pdf') {
                 .header { text-align: center; margin-bottom: 20px; }
                 .logo { width: 65px; height: 65px; border-radius: 50%; }
                 .report-title { font-size: 16px; font-weight: bold; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
-                .sub-title { font-size: 10px; color: #555; margin-top: 4px; }
                 table { width: 100%; border-collapse: collapse; margin-top: 15px; }
                 th, td { border: 1px solid #333; padding: 7px 9px; text-align: left; font-size: 10px; }
                 th { background-color: #f2f2f2; font-weight: bold; }
@@ -230,19 +248,18 @@ if ($format === 'pdf') {
                 <div style="font-size:8px;color:#555;">South Nueva Ecija Philippine Annual Conference</div>
                 <div style="font-size:12px;font-weight:bold;margin-top:2px;">God\'s Family United Methodist Church</div>
                 <hr style="border:0;border-top:1.5px solid #000;margin-top:8px;">
-                <div class="report-title">Attendance Report</div>
-                <div class="sub-title"><strong>Scope:</strong> ' . htmlspecialchars($eventLabel) . ' &nbsp;|&nbsp; <strong>Date:</strong> ' . htmlspecialchars($dateLabel) . '</div>
+                <div class="report-title">' . htmlspecialchars($reportTitle) . '</div>
             </div>
 
             <table>
                 <thead>
                     <tr>
                         <th style="width:30px;">#</th>
+                        <th>Date</th>
                         <th>Member Name</th>
-                        <th>Event</th>
-                        <th>Status</th>
-                        <th>Time In</th>
-                        <th>Time Out</th>
+                        <th>Category</th>
+                        <th style="text-align:right;">Amount (₱)</th>
+                        <th>Remarks</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -256,7 +273,7 @@ if ($format === 'pdf') {
                         Prepared by:
                         <div class="sig-line"></div>
                         <strong>' . $preparedByName . '</strong><br>
-                        <span style="font-size:9px;color:#666;">System Admin</span>
+                        <span style="font-size:9px;color:#666;">System Admin / Staff</span>
                     </td>
                     <td>
                         Noted by:
@@ -286,7 +303,7 @@ if ($format === 'pdf') {
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Attendance Report - <?php echo htmlspecialchars($eventLabel); ?></title>
+        <title><?php echo htmlspecialchars($reportTitle); ?></title>
         <style>
             body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #333; line-height: 1.5; }
             .print-header { text-align: center; margin-bottom: 30px; }
@@ -306,6 +323,7 @@ if ($format === 'pdf') {
             .sig-line { border-bottom: 1px solid #000; width: 220px; margin: 40px 0 5px; }
             .sig-name { font-weight: bold; margin: 0; }
             .sig-title { font-size: 0.9rem; color: #666; margin: 0; }
+            .total-row { background-color: #ebf8ff; font-weight: bold; }
             @page { margin: 0; }
             @media print { .no-print { display: none !important; } body { margin: 0; padding: 15mm 20mm; } }
         </style>
@@ -329,37 +347,39 @@ if ($format === 'pdf') {
                 </div>
             </div>
             <hr style="border:0;border-top:2px solid #000;">
-            <div class="report-title">Attendance Report</div>
-            <p style="margin-top: 5px; font-size: 0.95rem;">
-                <strong>Scope:</strong> <?php echo htmlspecialchars($eventLabel); ?> &nbsp;|&nbsp; 
-                <strong>Date:</strong> <?php echo htmlspecialchars($dateLabel); ?>
-            </p>
+            <div class="report-title"><?php echo htmlspecialchars($reportTitle); ?></div>
         </div>
 
         <table>
             <thead>
                 <tr>
                     <th style="width:40px;">#</th>
+                    <th>Date</th>
                     <th>Member Name</th>
-                    <th>Event</th>
-                    <th>Status</th>
-                    <th>Time In</th>
-                    <th>Time Out</th>
+                    <th>Category</th>
+                    <th style="text-align: right;">Amount (₱)</th>
+                    <th>Remarks</th>
                 </tr>
             </thead>
             <tbody>
                 <?php $i = 1; foreach ($logs as $log): ?>
                 <tr>
                     <td><?php echo $i++; ?></td>
-                    <td><strong><?php echo htmlspecialchars($log['full_name']); ?></strong></td>
-                    <td><?php echo htmlspecialchars($log['event_title']); ?></td>
-                    <td>Present</td>
-                    <td><?php echo date('h:i A', strtotime($log['created_at'])); ?></td>
-                    <td><?php echo !empty($log['time_out']) ? date('h:i A', strtotime($log['time_out'])) : '---'; ?></td>
+                    <td><?php echo date('M d, Y', strtotime($log['collection_date'])); ?></td>
+                    <td><?php echo $log['full_name'] ? htmlspecialchars($log['full_name']) : '<em>Anonymous</em>'; ?></td>
+                    <td><?php echo !empty($log['category']) ? ucfirst($log['category']) : (!empty($log['type']) ? ucfirst($log['type']) : 'Offering'); ?></td>
+                    <td style="text-align: right;"><?php echo number_format($log['amount'], 2); ?></td>
+                    <td><?php echo !empty($log['remarks']) ? htmlspecialchars($log['remarks']) : (!empty($log['notes']) ? htmlspecialchars($log['notes']) : ''); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($logs)): ?>
-                    <tr><td colspan="6" style="text-align:center;">No attendance records found.</td></tr>
+                    <tr><td colspan="6" style="text-align:center;">No financial records found for this period.</td></tr>
+                <?php else: ?>
+                    <tr class="total-row">
+                        <td colspan="4" style="text-align:right;"><strong>TOTAL:</strong></td>
+                        <td style="text-align: right;"><strong>₱<?php echo number_format($totalAmount, 2); ?></strong></td>
+                        <td></td>
+                    </tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -370,7 +390,7 @@ if ($format === 'pdf') {
                     <p>Prepared by:</p>
                     <div class="sig-line"></div>
                     <p class="sig-name"><?php echo htmlspecialchars($_SESSION['name'] ?? 'System Admin'); ?></p>
-                    <p class="sig-title">System Admin</p>
+                    <p class="sig-title">System Admin / Staff</p>
                 </div>
                 <div class="signature-box">
                     <p>Noted by:</p>

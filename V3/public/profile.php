@@ -138,8 +138,8 @@ include __DIR__ . '/layout/sidebar.php';
 
 <div id="printable-id-card" class="d-flex justify-content-center">
     <div class="id-card-modern">
-        <div class="id-card-top-header">
-           
+        <div class="id-card-top-header d-flex align-items-center justify-content-center gap-3">
+            <img src="assets/images/logo.png" alt="Logo" style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--cms-gold); object-fit: cover;">
             <div class="id-church-titles">
                 <div class="id-church-name">GOD'S FAMILY</div>
                 <div class="id-church-sub">United Methodist Church</div>

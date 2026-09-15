@@ -107,36 +107,40 @@ include __DIR__ . '/layout/sidebar.php';
 ?>
 
 <div class="mb-4">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="page-title">Event Management</h1>
-            <p class="text-muted small">System Calendar and Church Activities</p>
-        </div>
-        <?php if ($canScheduleEvents): ?>
-            <button onclick="document.getElementById('addEventModal').classList.add('active')" class="btn btn-primary">
-                Schedule New Event
-            </button>
-        <?php endif; ?>
-    </div>
+    <h1 class="page-title">Event Management</h1>
+    <p class="text-muted small">System Calendar and Church Activities</p>
 </div>
 
 <?php if ($error): ?>
-    <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+    <div class="alert alert-danger shadow-sm"><?php echo htmlspecialchars($error); ?></div>
 <?php endif; ?>
 <?php if ($success): ?>
-    <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+    <div class="alert alert-success shadow-sm"><?php echo htmlspecialchars($success); ?></div>
 <?php endif; ?>
 
 <!-- Calendar Section -->
 <div class="calendar-container">
-    <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-                <a href="?ym=<?php echo $prev; ?>" class="btn btn-outline-primary btn-sm">&lt;</a>
-                <h3 class="mb-0" style="min-width: 150px; text-align: center;"><?php echo $html_title; ?></h3>
-                <a href="?ym=<?php echo $next; ?>" class="btn btn-outline-primary btn-sm">&gt;</a>
+    <div class="card mb-4 border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-header bg-transparent py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
+            <div class="d-flex align-items-center gap-2">
+                <a href="?ym=<?php echo $prev; ?>" class="btn btn-outline-secondary btn-sm" title="Previous Month">
+                    <i class='bx bx-chevron-left'></i> Prev
+                </a>
+                <h3 class="calendar-header-title mb-0" style="font-weight: 800; font-size: 1.25rem; color: var(--primary-color); margin: 0 8px;"><?php echo $html_title; ?></h3>
+                <a href="?ym=<?php echo $next; ?>" class="btn btn-outline-secondary btn-sm" title="Next Month">
+                    Next <i class='bx bx-chevron-right'></i>
+                </a>
             </div>
-            <a href="?ym=<?php echo date('Y-m'); ?>" class="btn btn-secondary btn-sm">Today</a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="?ym=<?php echo date('Y-m'); ?>" class="btn btn-outline-secondary btn-sm" style="font-weight: 600; padding: 6px 14px;">
+                    <i class='bx bx-calendar-event'></i> Today
+                </a>
+                <?php if ($canScheduleEvents): ?>
+                    <button onclick="document.getElementById('addEventModal').classList.add('active')" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; font-weight: 600; border-radius: 6px;">
+                        <i class='bx bx-plus-circle'></i> Schedule New Event
+                    </button>
+                <?php endif; ?>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="calendar-grid">
@@ -230,7 +234,7 @@ include __DIR__ . '/layout/sidebar.php';
                                         <button type="button" class="btn btn-outline-primary btn-sm" onclick="openEditEventModal(<?php echo (int)$event['event_id']; ?>)">
                                             <i class='bx bx-edit'></i> Edit
                                         </button>
-                                        <form method="POST" class="event-inline-form" onsubmit="event.preventDefault(); var form = this; confirmAction('Delete this event? This cannot be undone.', function() { form.submit(); });">
+                                        <form method="POST" class="event-inline-form" onsubmit="event.preventDefault(); var form = this; confirmAction('Are you sure you want to delete this event? This action cannot be undone.', function() { form.submit(); }, 'Delete Event?', '📅 <?php echo htmlspecialchars(addslashes($event['title'])); ?> &bull; <?php echo date('M d, Y', strtotime($event['date'])); ?>', 'Delete Event', 'Keep Event');">
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="event_id" value="<?php echo (int)$event['event_id']; ?>">
@@ -294,7 +298,7 @@ include __DIR__ . '/layout/sidebar.php';
                                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="openEditEventModal(<?php echo (int)$event['event_id']; ?>)">
                                         <i class='bx bx-edit'></i> Edit
                                     </button>
-                                    <form method="POST" class="event-inline-form" onsubmit="event.preventDefault(); var form = this; confirmAction('Delete this event? This cannot be undone.', function() { form.submit(); });">
+                                    <form method="POST" class="event-inline-form" onsubmit="event.preventDefault(); var form = this; confirmAction('Are you sure you want to delete this event? This action cannot be undone.', function() { form.submit(); }, 'Delete Event?', '📅 <?php echo htmlspecialchars(addslashes($event['title'])); ?> &bull; <?php echo date('M d, Y', strtotime($event['date'])); ?>', 'Delete Event', 'Keep Event');">
                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="event_id" value="<?php echo (int)$event['event_id']; ?>">
@@ -330,46 +334,48 @@ include __DIR__ . '/layout/sidebar.php';
 <div class="modal-overlay" id="addEventModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="mb-0">Schedule Event</h3>
-            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('addEventModal').classList.remove('active')">&times;</button>
+            <h3 class="mb-0"><i class='bx bx-calendar-plus' style="color:var(--cms-red); margin-right:8px;"></i>Schedule Event</h3>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('addEventModal').classList.remove('active')">&times;</button>
         </div>
         <div class="modal-body">
             <form method="POST">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                 <input type="hidden" name="action" value="add">
                 
-                <div class="form-group">
-                    <label class="form-label">Event Title</label>
-                    <input type="text" name="title" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Date</label>
-                    <input type="date" name="date" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Time</label>
-                    <input type="time" name="time" class="form-control" required>
-                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">Event Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="Service title, meeting, etc." required>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label">Location</label>
-                    <input type="text" name="location" class="form-control">
-                </div>
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" name="date" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Time</label>
+                        <input type="time" name="time" class="form-control" required>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select name="status" class="form-control">
-                        <option value="upcoming">Upcoming</option>
-                        <option value="complete">Complete</option>
-                        <option value="cancel">Cancelled</option>
-                    </select>
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" name="location" class="form-control" placeholder="Main Sanctuary, Fellowship Hall, etc.">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-control">
+                            <option value="upcoming">Upcoming</option>
+                            <option value="complete">Complete</option>
+                            <option value="cancel">Cancelled</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <div class="mt-4 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addEventModal').classList.remove('active')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Schedule Event</button>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('addEventModal').classList.remove('active')">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class='bx bx-calendar-check'></i> Schedule Event</button>
                 </div>
             </form>
         </div>
@@ -382,7 +388,7 @@ include __DIR__ . '/layout/sidebar.php';
 <div class="modal-overlay" id="editEventModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="mb-0">Edit Event</h3>
+            <h3 class="mb-0"><i class='bx bx-edit' style="color:var(--cms-blue); margin-right:8px;"></i>Edit Event</h3>
             <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('editEventModal').classList.remove('active')">&times;</button>
         </div>
         <div class="modal-body">
@@ -391,43 +397,50 @@ include __DIR__ . '/layout/sidebar.php';
                 <input type="hidden" name="action" value="update">
                 <input type="hidden" name="event_id" id="edit_event_id" value="">
 
-                <div class="form-group">
-                    <label class="form-label">Event Title</label>
-                    <input type="text" name="title" id="edit_event_title" class="form-control" required>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">Event Title</label>
+                        <input type="text" name="title" id="edit_event_title" class="form-control" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" id="edit_event_description" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" name="date" id="edit_event_date" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Time</label>
+                        <input type="time" name="time" id="edit_event_time" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" name="location" id="edit_event_location" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select name="status" id="edit_event_status" class="form-control">
+                            <option value="upcoming">Upcoming</option>
+                            <option value="complete">Complete</option>
+                            <option value="cancel">Cancelled</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea name="description" id="edit_event_description" class="form-control" rows="3"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Date</label>
-                    <input type="date" name="date" id="edit_event_date" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Time</label>
-                    <input type="time" name="time" id="edit_event_time" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Location</label>
-                    <input type="text" name="location" id="edit_event_location" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select name="status" id="edit_event_status" class="form-control">
-                        <option value="upcoming">Upcoming</option>
-                        <option value="complete">Complete</option>
-                        <option value="cancel">Cancelled</option>
-                    </select>
-                </div>
-
-                <div class="mt-4 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('editEventModal').classList.remove('active')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                <div class="form-actions d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-outline-danger" onclick="confirmDeleteFromEditModal()">
+                        <i class='bx bx-trash'></i> Delete Event
+                    </button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('editEventModal').classList.remove('active')">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class='bx bx-save'></i> Save Changes</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -535,7 +548,7 @@ function openDayModal(dateString) {
                     html += `<button type="button" class="btn btn-sm btn-outline-primary" onclick="openEditEventModal(${Number(event.event_id)})">
                                 <i class='bx bx-edit'></i> Edit
                             </button>
-                            <form method="POST" class="event-inline-form" onsubmit="event.preventDefault(); var form = this; confirmAction(\'Delete this event? This cannot be undone.\', function() { form.submit(); });">
+                            <form method="POST" class="event-inline-form" onsubmit="event.preventDefault(); var form = this; confirmAction('Are you sure you want to delete this event? This action cannot be undone.', function() { form.submit(); }, 'Delete Event?', '📅 ' + escapeHtml(event.title) + (event.date ? ' &bull; ' + escapeHtml(event.date) : ''), 'Delete Event', 'Keep Event');">
                                 <input type="hidden" name="csrf_token" value="${escapeHtml(csrfToken)}">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="event_id" value="${escapeHtml(event.event_id)}">
@@ -553,6 +566,32 @@ function openDayModal(dateString) {
     }
 
     toggleModal('dayViewModal');
+}
+
+function confirmDeleteFromEditModal() {
+    const eventId = document.getElementById('edit_event_id').value;
+    const title = document.getElementById('edit_event_title').value;
+    const date = document.getElementById('edit_event_date').value;
+    if (!eventId) return;
+
+    confirmAction(
+        'Are you sure you want to delete this event? This action cannot be undone.',
+        function() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="csrf_token" value="${escapeHtml(csrfToken)}">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="event_id" value="${escapeHtml(eventId)}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        },
+        'Delete Event?',
+        '📅 ' + escapeHtml(title) + (date ? ' &bull; ' + escapeHtml(date) : ''),
+        'Delete Event',
+        'Keep Event'
+    );
 }
 
 // Close modals when clicking outside

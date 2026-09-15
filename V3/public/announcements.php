@@ -180,7 +180,7 @@ include __DIR__ . '/layout/sidebar.php';
                     <p class="text-muted small">System Updates and Communications Feed</p>
                 </div>
                 <?php if ($canManageAnnouncements): ?>
-                    <button type="button" onclick="document.getElementById('addAnnouncementModal').classList.add('active')" class="btn btn-primary">
+                    <button type="button" onclick="document.getElementById('addAnnouncementModal').classList.add('active')" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; font-weight: 600;">
                         <i class='bx bx-plus-circle'></i> Publish Announcement
                     </button>
                 <?php endif; ?>
@@ -260,11 +260,11 @@ include __DIR__ . '/layout/sidebar.php';
 <div class="modal-overlay" id="addAnnouncementModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="mb-0">New Announcement</h3>
-            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('addAnnouncementModal').classList.remove('active')">&times;</button>
+            <h3 class="mb-0"><i class='bx bx-megaphone' style="color:var(--cms-red); margin-right:8px;"></i>New Announcement</h3>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('addAnnouncementModal').classList.remove('active')">&times;</button>
         </div>
         <div class="modal-body">
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" id="createAnnouncementForm" onsubmit="return handleAnnouncementSubmit(this)">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                 <input type="hidden" name="action" value="create">
                 
@@ -275,25 +275,27 @@ include __DIR__ . '/layout/sidebar.php';
                 
                 <div class="form-group">
                     <label class="form-label">Message Content</label>
-                    <textarea name="content" class="form-control" rows="5" required></textarea>
+                    <textarea name="content" class="form-control" rows="5" placeholder="Write announcement details here..." required></textarea>
                 </div>
 
-                <div class="form-group mt-3">
+                <div class="form-group">
                     <label class="form-label">Attach Picture (Optional)</label>
                     <input type="file" name="announcement_image" class="form-control" accept="image/*">
-                    <small class="text-muted">Max size: 2MB. Format: JPG, PNG, GIF</small>
+                    <small class="text-muted mt-1">Max size: 2MB. Format: JPG, PNG, GIF</small>
                 </div>
 
-                <div class="form-check mt-3">
-                    <input class="form-check-input" type="checkbox" id="sendEmailNotification" name="send_email_notification" value="1" checked>
-                    <label class="form-check-label" for="sendEmailNotification">
-                        Send email notification to registered users
-                    </label>
+                <div class="form-group mb-0">
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="checkbox" id="sendEmailNotification" name="send_email_notification" value="1" checked style="width: 16px; height: 16px;">
+                        <label class="small text-muted mb-0" for="sendEmailNotification" style="cursor:pointer;">
+                            Send email notification to registered users
+                        </label>
+                    </div>
                 </div>
                 
-                <div class="mt-4 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addAnnouncementModal').classList.remove('active')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Publish Announcement</button>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('addAnnouncementModal').classList.remove('active')">Cancel</button>
+                    <button type="submit" id="publishSubmitBtn" class="btn btn-primary"><i class='bx bx-send'></i> Publish Announcement</button>
                 </div>
             </form>
         </div>
@@ -304,7 +306,7 @@ include __DIR__ . '/layout/sidebar.php';
 <div class="modal-overlay" id="editAnnouncementModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="mb-0">Edit Announcement</h3>
+            <h3 class="mb-0"><i class='bx bx-edit' style="color:var(--cms-blue); margin-right:8px;"></i>Edit Announcement</h3>
             <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('editAnnouncementModal').classList.remove('active')">&times;</button>
         </div>
         <div class="modal-body">
@@ -323,15 +325,15 @@ include __DIR__ . '/layout/sidebar.php';
                     <textarea name="content" id="edit_content" class="form-control" rows="5" required></textarea>
                 </div>
 
-                <div class="form-group mt-3">
+                <div class="form-group">
                     <label class="form-label">Change Picture (Optional)</label>
                     <input type="file" name="announcement_image" class="form-control" accept="image/*">
-                    <small class="text-muted">Leaving this blank will keep the existing picture.</small>
+                    <small class="text-muted mt-1">Leaving this blank will keep the existing picture.</small>
                 </div>
 
-                <div class="mt-4 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('editAnnouncementModal').classList.remove('active')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('editAnnouncementModal').classList.remove('active')">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class='bx bx-save'></i> Save Changes</button>
                 </div>
             </form>
         </div>
@@ -377,6 +379,21 @@ function filterAnnouncements() {
         const content = cards[i].querySelector('.announcement-content').textContent.toLowerCase();
         cards[i].style.display = (title.includes(filter) || content.includes(filter)) ? "" : "none";
     }
+}
+
+function handleAnnouncementSubmit(form) {
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) {
+        if (btn.dataset.submitted === 'true') {
+            return false;
+        }
+        btn.dataset.submitted = 'true';
+        setTimeout(() => {
+            btn.disabled = true;
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Publishing...";
+        }, 10);
+    }
+    return true;
 }
 </script>
 

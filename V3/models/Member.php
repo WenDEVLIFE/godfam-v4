@@ -45,7 +45,7 @@ class Member {
 
     public function create($data) {
         $qrToken = bin2hex(random_bytes(16));
-        $stmt = $this->pdo->prepare("INSERT INTO members (full_name, photo_path, email, phone, contact_info, address, status, qr_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $this->pdo->prepare("INSERT INTO members (full_name, photo_path, email, phone, contact_info, address, birthday, status, qr_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if ($stmt->execute([
             $data['full_name'],
             $data['photo_path'] ?? null,
@@ -53,6 +53,7 @@ class Member {
             $data['phone'] ?? null,
             $data['contact_info'] ?? null,
             $data['address'] ?? null,
+            !empty($data['birthday']) ? $data['birthday'] : null,
             $data['status'] ?? 'active',
             $qrToken
         ])) {
@@ -62,7 +63,7 @@ class Member {
     }
 
     public function update($id, $data) {
-        $stmt = $this->pdo->prepare("UPDATE members SET full_name = ?, photo_path = ?, email = ?, phone = ?, contact_info = ?, address = ?, status = ? WHERE member_id = ?");
+        $stmt = $this->pdo->prepare("UPDATE members SET full_name = ?, photo_path = ?, email = ?, phone = ?, contact_info = ?, address = ?, birthday = ?, status = ? WHERE member_id = ?");
         return $stmt->execute([
             $data['full_name'],
             $data['photo_path'] ?? null,
@@ -70,6 +71,7 @@ class Member {
             $data['phone'] ?? null,
             $data['contact_info'] ?? null,
             $data['address'] ?? null,
+            !empty($data['birthday']) ? $data['birthday'] : null,
             $data['status'] ?? 'active',
             $id
         ]);
@@ -163,8 +165,40 @@ class Member {
      * Get all unique emails for announcement broadcasting.
      */
     public function getEmails() {
-        // We select the email directly from members, or link to users if they have an account
         $stmt = $this->pdo->query("SELECT DISTINCT email FROM members WHERE email IS NOT NULL AND email != ''");
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Get members whose birthday is today (ignores year).
+     */
+    public function getBirthdayCelebrantsToday(): array {
+        $stmt = $this->pdo->query(
+            "SELECT member_id, full_name, birthday, photo_path
+             FROM members
+             WHERE birthday IS NOT NULL
+               AND MONTH(birthday) = MONTH(CURDATE())
+               AND DAY(birthday)   = DAY(CURDATE())
+             ORDER BY full_name ASC"
+        );
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get new member registration counts per month for the last N months.
+     * Returns array of ['month_label' => 'Jan 2026', 'count' => 5].
+     */
+    public function getMembersGrowthByMonth(int $months = 12): array {
+        $stmt = $this->pdo->prepare(
+            "SELECT DATE_FORMAT(created_at, '%b %Y') AS month_label,
+                    DATE_FORMAT(created_at, '%Y-%m')  AS month_key,
+                    COUNT(*) AS count
+             FROM members
+             WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
+             GROUP BY month_key, month_label
+             ORDER BY month_key ASC"
+        );
+        $stmt->execute([$months]);
+        return $stmt->fetchAll();
     }
 }

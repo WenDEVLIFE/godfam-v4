@@ -18,9 +18,9 @@ class UserController {
     /**
      * Display a list of system users.
      */
-    public function index() {
+    public function index($excludeAdmin = true) {
         authorizeRoles(['Administrator']);
-        return $this->userModel->all();
+        return $this->userModel->all($excludeAdmin);
     }
 
     /**

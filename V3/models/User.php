@@ -9,14 +9,16 @@ class User {
         $this->pdo = $pdo;
     }
 
-    public function all() {
-        $stmt = $this->pdo->query(
-            "SELECT u.*, r.role_name, m.photo_path AS member_photo
+    public function all($excludeAdmin = false) {
+        $sql = "SELECT u.*, r.role_name, m.photo_path AS member_photo
              FROM users u
              JOIN roles r ON u.role_id = r.role_id
-             LEFT JOIN members m ON u.member_id = m.member_id
-             ORDER BY u.name ASC"
-        );
+             LEFT JOIN members m ON u.member_id = m.member_id";
+        if ($excludeAdmin) {
+            $sql .= " WHERE r.role_name != 'Administrator'";
+        }
+        $sql .= " ORDER BY u.name ASC";
+        $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll();
     }
 

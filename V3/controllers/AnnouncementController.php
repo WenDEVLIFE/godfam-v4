@@ -51,8 +51,20 @@ class AnnouncementController {
 
         $data['title'] = $title;
         $data['content'] = $content;
-        $data['created_by'] = (int)$_SESSION['user_id'];
+        $userId = (int)$_SESSION['user_id'];
+        $data['created_by'] = $userId;
         $sendEmailNotification = !empty($data['send_email_notification']);
+
+        // Double-click protection: Check if identical announcement was created in the last 15 seconds
+        $dupStmt = $this->pdo->prepare("SELECT announcement_id FROM announcements WHERE title = ? AND created_by = ? AND created_at >= (NOW() - INTERVAL 15 SECOND) LIMIT 1");
+        $dupStmt->execute([$title, $userId]);
+        if ($dupStmt->fetch()) {
+            return [
+                'announcement_saved' => true,
+                'notification_status' => 'not_sent',
+                'message' => 'Announcement published successfully.'
+            ];
+        }
 
         $image_path = null;
         if ($files && isset($files['announcement_image']) && $files['announcement_image']['error'] === UPLOAD_ERR_OK) {

@@ -104,8 +104,8 @@
 
 .id-member-role {
     font-size: 12px;
-    font-weight: 600;
-    color: #3182ce;
+    font-weight: 700;
+    color: var(--cms-blue);
     text-transform: uppercase;
     letter-spacing: 1.5px;
     margin-bottom: 24px;

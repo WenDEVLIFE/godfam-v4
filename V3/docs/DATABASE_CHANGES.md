@@ -1,6 +1,27 @@
 # DATABASE CHANGES
 
-## [v2.1.2] - 2026-04-06 - Member Contact Granularity
+## [v2.4.0] - 2026-07-29 - Complete Financial, Audit & Permission Schema Consolidation
+
+### Changes
+- Updated full schema dump (`database/churchgods.sql`) to consolidate all 16 active database tables and views:
+  - `collections`: Financial recording table (`member_id`, `amount`, `category`, `payment_method`, `collection_date`, `recorded_by`, `remarks`).
+  - `expenses`: Church expenditure records (`amount`, `category`, `expense_date`, `description`, `recorded_by`).
+  - `notifications`: Member notification & birthday alert tracking.
+  - `audit_logs`: User activity and security audit trail.
+  - `permissions`, `role_permissions`, `role_permission_matrix`: Dynamic role-based permission matrix infrastructure.
+- Retrofitted `members` schema in dump with `birthday`, `birthdate`, `gender`, and `role_id` fields.
+- Retrofitted `users` schema in dump with `status` and `is_deleted` flags.
+- Updated `database/migrate_birthday_collections.sql` to align `collections` table columns (`category`, `payment_method`, `remarks`) directly with `Collection.php`.
+
+### Security Impact Assessment
+- Eliminates schema drift and guarantees clean deployment on fresh database installations with zero missing table exceptions.
+- Establishes strict foreign key constraints across financial records, audit trails, and permission matrix tables.
+
+### Deployment Impact
+- Full database export consolidated in [`database/churchgods.sql`](file:///c:/xampp/htdocs/V3/database/churchgods.sql).
+- Migration script updated in [`database/migrate_birthday_collections.sql`](file:///c:/xampp/htdocs/V3/database/migrate_birthday_collections.sql).
+
+
 
 ### Changes
 - Updated `members` table to include `email VARCHAR(150)` and `phone VARCHAR(20)`.
