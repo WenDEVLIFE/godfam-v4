@@ -79,7 +79,7 @@ $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
                 <span>Financial Reports</span>
             </a>
             <a href="audit_logs.php" class="nav-link <?php echo $current_page === 'audit_logs.php' ? 'active' : ''; ?>">
-                <i class='bx bxs-shield-quarter'></i>
+                <i class='bx bxs-shield'></i>
                 <span>Audit &amp; Login Logs</span>
             </a>
         <?php endif; ?>
