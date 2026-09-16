@@ -70,8 +70,8 @@ function requestOTP($email, $name) {
         return "No account found with this email and name.";
     }
 
-    // Generate 6-digit OTP
-    $otp = sprintf("%06d", mt_rand(0, 999999));
+    // Generate 6-digit OTP using cryptographically secure random_int
+    $otp = sprintf("%06d", random_int(100000, 999999));
     $hashed_otp = password_hash($otp, PASSWORD_DEFAULT);
     $expires = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 

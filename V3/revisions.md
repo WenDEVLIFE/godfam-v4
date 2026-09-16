@@ -76,10 +76,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/audit_logs.php`, `models/AuditLog.php`.
 - **Status**: Planned.
 
-### 15. Security Hashing & CSRF Protection - TODO
-- **Description**: Maintain strong `PASSWORD_DEFAULT` (BCRYPT) hashing, secure random tokens for QR/OTP, and universal CSRF token verification across all POST forms.
+### 15. Security Hashing & CSRF Protection - DONE
+- **Description**: Maintain strong `PASSWORD_DEFAULT` (BCRYPT) hashing, secure random tokens for QR/OTP, timing-safe `hash_equals` comparison, and universal CSRF token verification across all POST forms.
 - **Affected Files**: `middleware/CSRF.php`, `controllers/AuthController.php`.
-- **Status**: Implemented / Active.
+- **Status**: Completed / Done.
  
 ### 16. Mobile Adaptive Design & PWA / App Manifest - DONE
 - **Description**: Ensure fully responsive layout across mobile screens, add web app manifest (`manifest.json`) and service worker (`sw.js`) for PWA installability on mobile devices.
