@@ -253,8 +253,8 @@ include __DIR__ . '/layout/sidebar.php';
 
                     <div class="form-group full-width">
                         <label class="form-label">Profile Photo (Optional)</label>
-                        <input type="file" name="photo" class="form-control" accept="image/*">
-                        <p class="text-muted small mt-1 mb-0">Recommended square image, max 2MB.</p>
+                        <input type="file" name="photo" class="form-control" accept="image/jpeg, image/png, image/jpg, image/webp">
+                        <p class="text-muted small mt-1 mb-0">Allowed formats: PNG, JPEG, JPG, WEBP. Maximum file size: 5MB.</p>
                     </div>
 
                     <div class="form-group full-width mb-0">
@@ -294,7 +294,8 @@ include __DIR__ . '/layout/sidebar.php';
                     <div class="d-flex align-items-center gap-3">
                         <div id="edit_photo_preview" class="user-avatar" style="width: 64px; height: 64px; font-size: 1.2rem;"></div>
                         <div class="flex-grow-1">
-                            <input type="file" name="photo" class="form-control mb-2" accept="image/*">
+                            <input type="file" name="photo" class="form-control mb-2" accept="image/jpeg, image/png, image/jpg, image/webp">
+                            <p class="text-muted small mb-2">Allowed formats: PNG, JPEG, JPG, WEBP. Max: 5MB.</p>
                             <label class="small text-danger mb-0" style="cursor:pointer;">
                                 <input type="checkbox" name="delete_photo" value="1"> Remove current photo
                             </label>

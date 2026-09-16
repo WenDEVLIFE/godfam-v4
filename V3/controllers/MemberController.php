@@ -8,6 +8,8 @@ require_once BASE_PATH . '/models/Member.php';
 require_once BASE_PATH . '/middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/middleware/CSRF.php';
 
+require_once BASE_PATH . '/utils/FileUpload.php';
+
 class MemberController {
     private $memberModel;
 
@@ -116,32 +118,14 @@ class MemberController {
     }
 
     /**
-     * Handle file upload securely.
+     * Handle file upload securely using FileUpload utility.
      */
     private function handleUpload($file) {
-        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
-        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        
-        if (!in_array($ext, $allowed)) {
-            return "Error: Invalid file type. Only JPG, PNG, WEBP allowed.";
+        $result = FileUpload::processImage($file, 'members', 5);
+        if ($result['success']) {
+            return $result['path'];
         }
-
-        if ($file['size'] > 2 * 1024 * 1024) {
-            return "Error: File too large. Max 2MB.";
-        }
-
-        $uploadDir = BASE_PATH . '/public/assets/uploads/members/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-
-        $newName = 'member_' . uniqid() . '.' . $ext;
-        $dest = $uploadDir . $newName;
-
-        if (move_uploaded_file($file['tmp_name'], $dest)) {
-            return 'assets/uploads/members/' . $newName;
-        }
-        return "Error: Failed to move uploaded file.";
+        return 'Error: ' . $result['error'];
     }
 
     /**

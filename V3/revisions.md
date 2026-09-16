@@ -26,10 +26,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/dashboard.php`.
 - **Status**: Completed / Done.
 
-### 5. File & Image Upload Validation (PNG, JPEG) - TODO
+### 5. File & Image Upload Validation (PNG, JPEG) - DONE
 - **Description**: Enforce strict server-side & client-side validation for photo uploads, accepting only valid image MIME types (`image/jpeg`, `image/png`, `image/jpg`) with maximum file size limits (e.g. 5MB).
 - **Affected Files**: `public/members.php`, `public/profile.php`, `utils/FileUpload.php`.
-- **Status**: Planned.
+- **Status**: Completed / Done.
 
 ### 6. Default Phone Number Prefix (+63) - TODO
 - **Description**: Set default Philippine phone number prefix `+63` with formatting helpers across all phone input fields.
