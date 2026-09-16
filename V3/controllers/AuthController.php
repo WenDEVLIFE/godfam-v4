@@ -166,3 +166,34 @@ function updatePassword($email, $otp, $new_password) {
         return "Error updating password: " . $e->getMessage();
     }
 }
+
+/**
+ * Look up user account/email by full name or phone number.
+ */
+function findEmailByNameOrPhone($searchTerm) {
+    global $pdo;
+
+    $term = trim($searchTerm);
+    if (empty($term)) return [];
+
+    $likeTerm = '%' . $term . '%';
+
+    try {
+        $stmt = $pdo->prepare("
+            SELECT DISTINCT u.email, u.name, m.phone 
+            FROM users u
+            LEFT JOIN members m ON u.member_id = m.member_id
+            WHERE u.name LIKE :likeTerm 
+               OR u.email LIKE :likeTerm 
+               OR m.full_name LIKE :likeTerm
+               OR m.phone LIKE :likeTerm
+               OR m.contact_info LIKE :likeTerm
+            LIMIT 10
+        ");
+        $stmt->execute(['likeTerm' => $likeTerm]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (\PDOException $e) {
+        return [];
+    }
+}
+

@@ -120,7 +120,10 @@ $csrf_token = generateCsrfToken();
                     <i class='bx bx-log-in-circle'></i> Sign In
                 </button>
                 
-                <div class="text-center mt-3">
+                <div class="text-center mt-3 d-flex justify-content-between align-items-center">
+                    <a href="forgot_email.php" class="text-muted small">
+                        Forgot Email?
+                    </a>
                     <a href="forgot_password.php" class="text-muted small">
                         Forgot Password?
                     </a>

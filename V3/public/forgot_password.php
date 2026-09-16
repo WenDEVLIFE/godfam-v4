@@ -15,8 +15,8 @@ require_once BASE_PATH . '/controllers/AuthController.php';
 
 redirectIfLogged();
 
-$error = '';
-$success = '';
+$prefill_email = trim($_GET['email'] ?? '');
+$prefill_name  = trim($_GET['name'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (validateCsrfToken($_POST['csrf_token'])) {
@@ -77,19 +77,25 @@ $csrf_token = generateCsrfToken();
                 
                 <div class="mb-4">
                     <label class="form-label">Full Name</label>
-                    <input type="text" name="name" class="form-control" placeholder="Enter your full name" required autofocus>
+                    <input type="text" name="name" class="form-control" placeholder="Enter your full name" value="<?php echo htmlspecialchars($prefill_name); ?>" required autofocus>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" name="email" class="form-control" placeholder="Enter your registered email" required>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label mb-0">Email Address</label>
+                        <a href="forgot_email.php" class="text-muted small" style="text-decoration: underline;">Forgot email?</a>
+                    </div>
+                    <input type="email" name="email" class="form-control" placeholder="Enter your registered email" value="<?php echo htmlspecialchars($prefill_email); ?>" required>
                 </div>
                 
                 <button type="submit" class="btn btn-primary w-100 py-3 mt-2">
                     Send OTP <i class='bx bx-paper-plane'></i>
                 </button>
                 
-                <div class="text-center mt-3">
+                <div class="text-center mt-3 d-flex justify-content-between align-items-center">
+                    <a href="forgot_email.php" class="text-muted small" style="text-decoration: none;">
+                        <i class='bx bx-search'></i> Find Email
+                    </a>
                     <a href="login.php" class="text-muted small" style="text-decoration: none;">
                         <i class='bx bx-left-arrow-alt'></i> Back to Login
                     </a>

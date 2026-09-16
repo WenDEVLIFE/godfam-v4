@@ -16,10 +16,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/login.php`, `public/members.php`, `public/assets/js/app.js`.
 - **Status**: Completed / Done.
 
-### 3. Forgot Email & OTP Recovery Flow - TODO
+### 3. Forgot Email & OTP Recovery Flow - DONE
 - **Description**: Provide account lookup by phone/name for forgotten emails, alongside the existing email OTP password reset flow.
 - **Affected Files**: `public/forgot_email.php`, `public/forgot_password.php`, `public/verify_otp.php`, `controllers/AuthController.php`.
-- **Status**: Planned.
+- **Status**: Completed / Done.
 
 ### 4. Interactive & Clickable Dashboard - TODO
 - **Description**: Make all dashboard stat cards (Total Members, Upcoming Events, Attended Today, Collection widgets) directly clickable to navigate to their corresponding detailed management views.
