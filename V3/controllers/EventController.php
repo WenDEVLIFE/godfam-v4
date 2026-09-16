@@ -91,14 +91,29 @@ class EventController {
 
     /**
      * Delete an event.
-     * Roles: Administrator, Secretary
+     * Roles: Administrator, Secretary.
+     * Requires password re-verification.
      */
-    public function delete($id) {
+    public function delete($id, $adminPassword = '') {
         authorizeRoles(['Administrator', 'Secretary']);
 
         $id = (int)$id;
         if ($id <= 0) {
-            return 'Invalid event.';
+            return 'Invalid event ID.';
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (!$userId) {
+            return 'Authentication required.';
+        }
+
+        // Verify Administrator / User Password
+        $stmt = $this->eventModel->getPDO()->prepare("SELECT password FROM users WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch();
+
+        if (!$user || empty($adminPassword) || !password_verify($adminPassword, $user['password'])) {
+            return 'Password verification failed. Incorrect password.';
         }
 
         if (!$this->eventModel->find($id)) {

@@ -9,6 +9,10 @@ class Event {
         $this->pdo = $pdo;
     }
 
+    public function getPDO() {
+        return $this->pdo;
+    }
+
     public function all() {
         $stmt = $this->pdo->query("SELECT * FROM events ORDER BY date DESC, time DESC");
         return $stmt->fetchAll();

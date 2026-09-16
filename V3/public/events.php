@@ -50,7 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         redirectToEventsPage();
     } elseif ($action === 'delete') {
-        $result = $controller->delete($_POST['event_id'] ?? 0);
+        $eventId = $_POST['event_id'] ?? 0;
+        $adminPassword = $_POST['admin_password'] ?? '';
+        $result = $controller->delete($eventId, $adminPassword);
         if (is_array($result) && !empty($result['event_saved'])) {
             $_SESSION['event_success'] = $result['message'] ?? 'Event deleted successfully.';
         } else {
@@ -548,14 +550,9 @@ function openDayModal(dateString) {
                     html += `<button type="button" class="btn btn-sm btn-outline-primary" onclick="openEditEventModal(${Number(event.event_id)})">
                                 <i class='bx bx-edit'></i> Edit
                             </button>
-                            <form method="POST" class="event-inline-form" onsubmit="event.preventDefault(); var form = this; confirmAction('Are you sure you want to delete this event? This action cannot be undone.', function() { form.submit(); }, 'Delete Event?', '📅 ' + escapeHtml(event.title) + (event.date ? ' &bull; ' + escapeHtml(event.date) : ''), 'Delete Event', 'Keep Event');">
-                                <input type="hidden" name="csrf_token" value="${escapeHtml(csrfToken)}">
-                                <input type="hidden" name="action" value="delete">
-                                <input type="hidden" name="event_id" value="${escapeHtml(event.event_id)}">
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    <i class='bx bx-trash'></i> Delete
-                                </button>
-                            </form>`;
+                            <button type="button" class="btn btn-danger btn-sm" onclick="openDeleteEventPasswordModal('${Number(event.event_id)}', '${escapeHtml(event.title)}')">
+                                <i class='bx bx-trash'></i> Delete
+                            </button>`;
                 }
                 html += `</div>`;
             }
@@ -571,27 +568,26 @@ function openDayModal(dateString) {
 function confirmDeleteFromEditModal() {
     const eventId = document.getElementById('edit_event_id').value;
     const title = document.getElementById('edit_event_title').value;
-    const date = document.getElementById('edit_event_date').value;
     if (!eventId) return;
 
-    confirmAction(
-        'Are you sure you want to delete this event? This action cannot be undone.',
-        function() {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.innerHTML = `
-                <input type="hidden" name="csrf_token" value="${escapeHtml(csrfToken)}">
-                <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="event_id" value="${escapeHtml(eventId)}">
-            `;
-            document.body.appendChild(form);
-            form.submit();
-        },
-        'Delete Event?',
-        '📅 ' + escapeHtml(title) + (date ? ' &bull; ' + escapeHtml(date) : ''),
-        'Delete Event',
-        'Keep Event'
-    );
+    toggleModal('editEventModal');
+    openDeleteEventPasswordModal(eventId, title);
+}
+
+function openDeleteEventPasswordModal(eventId, title) {
+    const modal = document.getElementById('deleteEventPasswordModal');
+    if (!modal) return;
+    document.getElementById('delete_event_id_input').value = eventId;
+    document.getElementById('delete_admin_password').value = '';
+    const summaryEl = document.getElementById('delete_event_summary_badge');
+    if (summaryEl) {
+        summaryEl.innerHTML = `<strong>Event:</strong> ${escapeHtml(title)}`;
+    }
+    modal.classList.add('active');
+    setTimeout(() => {
+        const pwdInput = document.getElementById('delete_admin_password');
+        if (pwdInput) pwdInput.focus();
+    }, 100);
 }
 
 // Close modals when clicking outside
@@ -601,6 +597,37 @@ window.onclick = function(event) {
     }
 }
 </script>
+
+<!-- Admin Password Verification Modal for Event Deletion -->
+<div class="modal-overlay" id="deleteEventPasswordModal" role="dialog" aria-modal="true" style="z-index: 9999 !important; backdrop-filter: blur(8px);">
+    <div class="modal-content" style="max-width: 440px !important; margin: auto !important; border-radius: 16px !important; text-align: center; padding: 2.25rem;">
+        <div style="width: 64px; height: 64px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.25rem auto;">
+            <i class='bx bx-shield-quarter'></i>
+        </div>
+        <h4 style="font-weight: 800; font-size: 1.3rem; color: #1e293b; margin-bottom: 0.5rem; margin-top:0;">Admin Password Required</h4>
+        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.25rem; line-height: 1.5;">High Security Action: Re-enter your administrator password to permanently delete this event.</p>
+        
+        <div id="delete_event_summary_badge" style="background: rgba(239, 68, 68, 0.06); border-left: 4px solid #ef4444; padding: 10px 14px; border-radius: 6px; text-align: left; margin-bottom: 1.25rem; font-size: 0.88rem; font-weight: 600; color: #1e293b;"></div>
+
+        <form method="POST" id="deleteEventConfirmForm">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="event_id" id="delete_event_id_input">
+            
+            <div class="form-group mb-4" style="text-align: left;">
+                <label class="form-label font-weight-600 small text-muted">Current Admin Password</label>
+                <input type="password" name="admin_password" id="delete_admin_password" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <div class="d-flex justify-content-center gap-3">
+                <button type="button" class="btn btn-outline-secondary px-4 py-2" onclick="document.getElementById('deleteEventPasswordModal').classList.remove('active')" style="font-weight: 600; border-radius: 8px;">Cancel</button>
+                <button type="submit" class="btn btn-danger px-4 py-2 shadow-sm" style="font-weight: 600; border-radius: 8px;">
+                    <i class='bx bx-trash'></i> Confirm Delete
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <?php 
 // Include Layout Footer

@@ -51,10 +51,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/members.php`, `public/events.php`.
 - **Status**: Planned.
 
-### 10. Event Delete Confirmation with Admin Password Re-verification - TODO
+### 10. Event Delete Confirmation with Admin Password Re-verification - DONE
 - **Description**: Require re-entering the logged-in administrator's password in a modal confirmation before permanently deleting any church event.
 - **Affected Files**: `public/events.php`, `controllers/EventController.php`.
-- **Status**: Planned.
+- **Status**: Completed / Done.
  
 ### 11. System Admin Name Display - TODO
 - **Description**: Dynamically render the authenticated administrator/user's full name across header banners, navigation bars, and generated PDF/Excel reports.
