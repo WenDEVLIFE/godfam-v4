@@ -11,10 +11,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/login.php`, `public/forgot_password.php`, `public/assets/css/style.css`.
 - **Status**: Planned.
 
-### 2. Privacy Statement Modal Before Submission - TODO
+### 2. Privacy Statement Modal Before Submission - DONE
 - **Description**: Display a mandatory Privacy Statement & Data Protection Consent modal before completing member registration, login checks, or data forms.
 - **Affected Files**: `public/login.php`, `public/members.php`, `public/assets/js/app.js`.
-- **Status**: Planned.
+- **Status**: Completed / Done.
 
 ### 3. Forgot Email & OTP Recovery Flow - TODO
 - **Description**: Provide account lookup by phone/name for forgotten emails, alongside the existing email OTP password reset flow.

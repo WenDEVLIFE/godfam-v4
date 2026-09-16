@@ -260,7 +260,9 @@ include __DIR__ . '/layout/sidebar.php';
                     <div class="form-group full-width mb-0">
                         <div class="d-flex align-items-center gap-2">
                             <input type="checkbox" id="member_agree" required style="width: 16px; height: 16px;">
-                            <label for="member_agree" class="small text-muted mb-0" style="cursor:pointer;">Member agrees to the Church Privacy Policy and Terms of Service.</label>
+                            <label for="member_agree" class="small text-muted mb-0" style="cursor:pointer;">
+                                Member agrees to the <a href="javascript:void(0)" onclick="openPrivacyModal('member_agree')">Church Privacy Policy &amp; Data Protection Consent</a>.
+                            </label>
                         </div>
                     </div>
                 </div>

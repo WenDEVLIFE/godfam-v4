@@ -111,12 +111,12 @@ $csrf_token = generateCsrfToken();
                     <div class="d-flex align-items-start gap-2">
                         <input type="checkbox" id="agree_terms" name="agree_terms" required style="margin-top: 4px;">
                         <label for="agree_terms" class="small text-muted" style="cursor: pointer;">
-                            I understand and agree to the <a href="javascript:void(0)" onclick="document.getElementById('policyModal').classList.add('active')">Church Privacy Policy & Terms of Service</a>.
+                            I understand and agree to the <a href="javascript:void(0)" onclick="openPrivacyModal('agree_terms')">Church Privacy Policy &amp; Data Protection Consent</a>.
                         </label>
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary w-100" style="padding: 12px; font-size: 15px;">
+                <button type="submit" id="loginSubmitBtn" class="btn btn-primary w-100" style="padding: 12px; font-size: 15px;">
                     <i class='bx bx-log-in-circle'></i> Sign In
                 </button>
                 
@@ -129,26 +129,42 @@ $csrf_token = generateCsrfToken();
         </div>
     </div>
 
-    <!-- Policy Modal -->
-    <div class="modal-overlay" id="policyModal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h3 class="mb-0">Privacy Policy & Terms</h3>
-                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('policyModal').classList.remove('active')">&times;</button>
+    <!-- Mandatory Privacy Statement & Data Protection Consent Modal -->
+    <div class="modal-overlay" id="privacyConsentModal" role="dialog" aria-modal="true" aria-labelledby="privacyConsentTitle" style="z-index: 9999 !important; backdrop-filter: blur(8px);">
+        <div class="modal-content" style="max-width: 540px !important; margin: auto !important; border-radius: 16px !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35) !important;">
+            <div class="modal-header" style="padding: 20px 24px; border-bottom: 1px solid #e2e8f0;">
+                <h4 id="privacyConsentTitle" style="font-weight: 800; color: #1e293b; margin: 0; font-size: 1.25rem;">
+                    <i class='bx bxs-shield-alt-2' style="color:#1565C0; margin-right: 8px;"></i> Data Privacy &amp; Protection Statement
+                </h4>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="closePrivacyModal()" style="border:none; font-size: 1.25rem;">&times;</button>
             </div>
-            <div class="modal-body" style="max-height: 400px; overflow-y: auto; font-size: 0.9rem; line-height: 1.6;">
-                <p><strong>1. Data Collection:</strong> We collect and store member information (name, contact, attendance) solely for church administration and communication purposes.</p>
-                <p><strong>2. Privacy:</strong> Your data is confidential and only accessible by authorized church staff/administrators. We do not sell or share your data with external parties.</p>
-                <p><strong>3. Usage:</strong> By using this system, you agree to provide accurate information and use the system in a respectful manner consistent with church values.</p>
-                <p><strong>4. Security:</strong> We implement security measures to protect your account. You are responsible for maintaining the confidentiality of your login credentials.</p>
-                <p><strong>5. Acceptance:</strong> Checking the agreement box and signing in constitutes your acceptance of these terms.</p>
+            <div class="modal-body" style="max-height: 420px; overflow-y: auto; font-size: 0.92rem; line-height: 1.65; color: #334155; padding: 24px;">
+                <div style="background: rgba(21, 101, 192, 0.06); border-left: 4px solid #1565C0; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-weight: 600; color: #1e293b;">
+                    God's Family United Methodist Church is committed to respecting and protecting your personal data privacy in compliance with Republic Act No. 10173 (Data Privacy Act of 2012).
+                </div>
+                
+                <h5 style="font-weight: 700; color: #0f172a; margin-top: 14px; margin-bottom: 6px;">1. Collection &amp; Use of Personal Information</h5>
+                <p style="margin-bottom: 12px;">We process your personal information (name, contact details, email address, attendance records, and church affiliation) exclusively for church administration, pastoral care, digital ID generation, notification of upcoming events, and financial collection record-keeping.</p>
+                
+                <h5 style="font-weight: 700; color: #0f172a; margin-top: 14px; margin-bottom: 6px;">2. Confidentiality &amp; Security</h5>
+                <p style="margin-bottom: 12px;">Your information is kept strictly confidential and stored securely in encrypted databases. Only authorized pastors, church staff, and system administrators have access to your records. We will never sell, rent, or share your data with third parties without your consent.</p>
+
+                <h5 style="font-weight: 700; color: #0f172a; margin-top: 14px; margin-bottom: 6px;">3. Data Subject Rights</h5>
+                <p style="margin-bottom: 12px;">As a data subject, you maintain the right to view, update, correct, or request deletion of your personal records in accordance with church record retention policies.</p>
+
+                <h5 style="font-weight: 700; color: #0f172a; margin-top: 14px; margin-bottom: 6px;">4. Declaration of Consent</h5>
+                <p style="margin-bottom: 0;">By checking the agreement box or clicking "I Accept &amp; Give Consent" below, you grant explicit consent for God's Family UM Church to collect, process, and retain your data as specified above.</p>
             </div>
-            <div class="modal-footer" style="text-align: right; padding: 15px;">
-                <button class="btn btn-primary btn-sm" onclick="document.getElementById('policyModal').classList.remove('active')">I Understand</button>
+            <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc;">
+                <button type="button" class="btn btn-outline-secondary" onclick="closePrivacyModal()" style="font-weight: 600;">Decline</button>
+                <button type="button" class="btn btn-primary" id="privacyAcceptBtn" onclick="openPrivacyModal('agree_terms')" style="font-weight: 600; background: #1565C0; border-color: #1565C0;">
+                    <i class='bx bx-check-shield'></i> I Accept &amp; Give Consent
+                </button>
             </div>
         </div>
     </div>
 
+    <script src="assets/js/app.js?v=1.0"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const togglePasswordBtn = document.getElementById('togglePassword');
@@ -162,6 +178,17 @@ $csrf_token = generateCsrfToken();
                 passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
                 toggleIcon.className = isPassword ? 'bx bx-show' : 'bx bx-hide';
                 togglePasswordBtn.setAttribute('title', isPassword ? 'Hide Password' : 'Show Password');
+            });
+        }
+
+        const loginForm = document.querySelector('form[action="login.php"]');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                const agreeChk = document.getElementById('agree_terms');
+                if (agreeChk && !agreeChk.checked) {
+                    e.preventDefault();
+                    openPrivacyModal('agree_terms');
+                }
             });
         }
     });
