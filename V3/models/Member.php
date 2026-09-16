@@ -79,24 +79,61 @@ class Member {
 
     /**
      * Automatically update member status based on attendance record.
-     * Rule: If 3 recorded 'Absent' entries exist, mark as inactive.
+     * Rule: If 3 or more consecutive 'Absent' entries exist (or 3+ total recorded absences), mark as inactive.
+     * If member attends service ('Present'), restore to 'active'.
      * Only auto-updates if not currently 'visiting'.
      */
     public function recalculateStatus($id) {
         $member = $this->find($id);
         if (!$member || $member['status'] === 'visiting') return false;
 
-        $stmt = $this->pdo->prepare("SELECT COUNT(DISTINCT event_id) FROM attendance WHERE member_id = ? AND status = 'Absent'");
+        // Fetch recent attendance entries for this member sorted by date DESC
+        $stmt = $this->pdo->prepare("
+            SELECT status FROM attendance 
+            WHERE member_id = ? 
+            ORDER BY date DESC, created_at DESC 
+            LIMIT 5
+        ");
         $stmt->execute([$id]);
-        $absences = $stmt->fetchColumn();
+        $recentLogs = $stmt->fetchAll(\PDO::FETCH_COLUMN);
 
-        $newStatus = ($absences >= 3) ? 'inactive' : 'active';
+        $consecutiveAbsences = 0;
+        foreach ($recentLogs as $logStatus) {
+            if (strtolower($logStatus) === 'absent') {
+                $consecutiveAbsences++;
+            } else if (strtolower($logStatus) === 'present') {
+                break;
+            }
+        }
+
+        // Total distinct absent count
+        $stmtCount = $this->pdo->prepare("SELECT COUNT(DISTINCT event_id) FROM attendance WHERE member_id = ? AND status = 'Absent'");
+        $stmtCount->execute([$id]);
+        $totalAbsences = (int)$stmtCount->fetchColumn();
+
+        $newStatus = ($consecutiveAbsences >= 3 || $totalAbsences >= 3) ? 'inactive' : 'active';
         
         if ($member['status'] !== $newStatus) {
-            $stmt = $this->pdo->prepare("UPDATE members SET status = ? WHERE member_id = ?");
-            return $stmt->execute([$newStatus, $id]);
+            $stmtUpdate = $this->pdo->prepare("UPDATE members SET status = ? WHERE member_id = ?");
+            return $stmtUpdate->execute([$newStatus, $id]);
         }
         return true;
+    }
+
+    /**
+     * Bulk recalculate status for all active/inactive members.
+     */
+    public function recalculateAllMembersStatus() {
+        $stmt = $this->pdo->query("SELECT member_id FROM members WHERE status != 'visiting'");
+        $members = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        
+        $updated = 0;
+        foreach ($members as $memberId) {
+            if ($this->recalculateStatus($memberId)) {
+                $updated++;
+            }
+        }
+        return $updated;
     }
 
     public function delete($id) {

@@ -25,7 +25,10 @@ class Attendance {
         if ($status === 'Time Out') {
             // Update existing record with time_out
             $stmt = $this->pdo->prepare("UPDATE attendance SET time_out = NOW() WHERE member_id = ? AND event_id = ? AND date = ?");
-            $stmt->execute([$data['member_id'], $data['event_id'], $data['date']]);
+            $result = $stmt->execute([$data['member_id'], $data['event_id'], $data['date']]);
+            if ($result) {
+                $this->autoRecalculateMemberStatus($data['member_id']);
+            }
             return $stmt->rowCount() > 0;
         }
 
@@ -35,12 +38,29 @@ class Attendance {
         }
 
         $stmt = $this->pdo->prepare("INSERT INTO attendance (member_id, event_id, date, status) VALUES (?, ?, ?, ?)");
-        return $stmt->execute([
+        $result = $stmt->execute([
             $data['member_id'],
             $data['event_id'],
             $data['date'],
             $status
         ]);
+
+        if ($result) {
+            $this->autoRecalculateMemberStatus($data['member_id']);
+        }
+        return $result;
+    }
+
+    /**
+     * Auto-trigger member status recalculation after attendance recording.
+     */
+    public function autoRecalculateMemberStatus($memberId) {
+        if (!$memberId) return false;
+        if (!class_exists('Member')) {
+            require_once __DIR__ . '/Member.php';
+        }
+        $memberModel = new Member($this->pdo);
+        return $memberModel->recalculateStatus($memberId);
     }
 
     /**

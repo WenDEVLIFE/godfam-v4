@@ -36,10 +36,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/members.php`, `public/profile.php`.
 - **Status**: Completed / Done.
 
-### 7. Automatic Member Status Recalculation - TODO
+### 7. Automatic Member Status Recalculation - DONE
 - **Description**: Recalculate member status (Active / Inactive) automatically based on consecutive event absences.
 - **Affected Files**: `models/Member.php`, `models/Attendance.php`.
-- **Status**: Planned.
+- **Status**: Completed / Done.
 
 ### 8. Full Digital Member ID Card Generator - TODO
 - **Description**: Generate printable and downloadable whole digital ID cards featuring member details, photo, QR token, and church branding.
