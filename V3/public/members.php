@@ -136,8 +136,8 @@ include __DIR__ . '/layout/sidebar.php';
                                         Edit
                                     </button>
                                     
-                                    <?php if (isAdmin()): ?>
-                                        <a href="profile.php?id=<?php echo $member['member_id']; ?>" class="btn btn-outline-secondary btn-sm">Digital ID</a>
+                                    <?php if (isAdmin() || isStaff()): ?>
+                                        <a href="generate_id_card.php?id=<?php echo $member['member_id']; ?>" class="btn btn-outline-secondary btn-sm"><i class='bx bxs-id-card'></i> Digital ID</a>
                                         <button type="button" class="btn btn-danger btn-sm delete-member-btn" data-id="<?php echo $member['member_id']; ?>" data-name="<?php echo htmlspecialchars($member['full_name']); ?>">Delete</button>
                                     <?php endif; ?>
                                 </div>
