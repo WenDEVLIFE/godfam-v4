@@ -23,9 +23,9 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     
     <!-- Main & Theme CSS -->
-    <link rel="stylesheet" href="assets/css/theme.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <link rel="stylesheet" href="assets/css/enhanced.css">
+    <link rel="stylesheet" href="assets/css/theme.css?v=1.2">
+    <link rel="stylesheet" href="assets/css/main.css?v=1.2">
+    <link rel="stylesheet" href="assets/css/enhanced.css?v=1.2">
 
     <!-- Register PWA Service Worker -->
     <script>

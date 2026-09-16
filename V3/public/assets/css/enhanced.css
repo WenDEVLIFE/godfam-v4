@@ -3,7 +3,8 @@
 /* Modern ID Card */
 .id-card-modern {
     width: 420px;
-    height: 600px; /* Vertical Orientation looks more professional */
+    height: 600px;
+    /* Vertical Orientation looks more professional */
     background: white;
     border-radius: 16px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -164,14 +165,24 @@
 }
 
 /* Modal Enhancements */
-.modal-lg { max-width: 800px; }
+.modal-lg {
+    max-width: 800px;
+}
 
 /* Status Styles */
-.status-active { color: #38a169; }
-.status-inactive { color: #e53e3e; }
+.status-active {
+    color: #38a169;
+}
+
+.status-inactive {
+    color: #e53e3e;
+}
 
 /* Searchable Select Utility */
-.search-select-container { position: relative; }
+.search-select-container {
+    position: relative;
+}
+
 .search-results-dropdown {
     position: absolute;
     top: 100%;
@@ -185,13 +196,20 @@
     overflow-y: auto;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
+
 .search-result-item {
     padding: 10px 15px;
     cursor: pointer;
     border-bottom: 1px solid #f7fafc;
 }
-.search-result-item:hover { background: #ebf8ff; }
-.search-result-item:last-child { border-bottom: none; }
+
+.search-result-item:hover {
+    background: #ebf8ff;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
 
 /* Print Optimization */
 @media print {
@@ -290,19 +308,27 @@
    Mobile Adaptive Design & Responsive Utilities (PWA-Ready)
    ============================================================ */
 @media (max-width: 768px) {
+
     /* Touch-friendly interactive targets */
-    .btn, .form-control, .form-select, .nav-link {
+    .btn,
+    .form-control,
+    .form-select,
+    .nav-link {
         min-height: 44px;
         font-size: 14px;
     }
 
     /* Page container padding adjustments */
-    .flat-dashboard, .container-fluid, .content-area {
+    .flat-dashboard,
+    .container-fluid,
+    .content-area {
         padding: 12px !important;
     }
 
     /* Grid responsiveness */
-    .stats-grid, .financial-grid, .row.g-3 {
+    .stats-grid,
+    .financial-grid,
+    .row.g-3 {
         grid-template-columns: 1fr !important;
         gap: 14px !important;
     }
@@ -351,7 +377,10 @@
 }
 
 @media (max-width: 480px) {
-    .page-title, h1, h2 {
+
+    .page-title,
+    h1,
+    h2 {
         font-size: 1.35rem !important;
     }
 
@@ -359,13 +388,68 @@
         flex: 1 1 100%;
     }
 
-    .birthday-banner {
-        flex-direction: column;
-        align-items: flex-start !important;
+
+    /* ============================================================
+   Logout & Custom Dialog Modal Enhancements
+   ============================================================ */
+    .logout-modal-content {
+        max-width: 440px !important;
+        text-align: center !important;
+        padding: 2.25rem !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(0, 0, 0, 0.06) !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
+        background: #ffffff !important;
+        margin: auto !important;
     }
 
-    .birthday-banner #btn-send-bday-reminders {
-        width: 100%;
-        margin-top: 8px;
+    .logout-modal-icon {
+        width: 64px !important;
+        height: 64px !important;
+        background: rgba(239, 68, 68, 0.1) !important;
+        color: #ef4444 !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 2rem !important;
+        margin: 0 auto 1.25rem auto !important;
     }
+
+    .logout-modal-title {
+        font-weight: 800 !important;
+        font-size: 1.35rem !important;
+        color: #1e293b !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .logout-modal-message {
+        color: #64748b !important;
+        font-size: 0.95rem !important;
+        margin-bottom: 1.5rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .logout-modal-actions {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 12px !important;
+    }
+
+    .logout-modal-actions form {
+        display: flex !important;
+        margin: 0 !important;
+    }
+
+    .logout-modal-actions .btn {
+        padding: 10px 24px !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+    }
+
 }

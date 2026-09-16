@@ -119,18 +119,18 @@ $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
     <div class="content-area">
 
 <!-- ===== LOGOUT CONFIRMATION MODAL ===== -->
-<div class="modal-overlay" id="logoutModal" role="dialog" aria-modal="true" aria-labelledby="logoutModalTitle">
-    <div class="modal-content logout-modal-content">
-        <div class="logout-modal-icon">
+<div class="modal-overlay" id="logoutModal" role="dialog" aria-modal="true" aria-labelledby="logoutModalTitle" style="z-index: 9999 !important; backdrop-filter: blur(8px);">
+    <div class="modal-content" style="max-width: 440px !important; text-align: center !important; padding: 2.25rem !important; border-radius: 16px !important; border: 1px solid rgba(0,0,0,0.06) !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35) !important; margin: auto !important; background: #ffffff !important;">
+        <div style="width: 64px; height: 64px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.25rem auto;">
             <i class='bx bxs-log-out'></i>
         </div>
-        <h3 id="logoutModalTitle" class="logout-modal-title">Sign Out?</h3>
-        <p class="logout-modal-message">You are about to sign out of the system. Any unsaved changes will be lost.</p>
-        <div class="logout-modal-actions">
-            <button class="btn btn-outline-secondary" id="logoutCancelBtn" onclick="closeLogoutModal()">Cancel</button>
-            <form method="POST" action="logout.php" style="margin:0;">
+        <h4 id="logoutModalTitle" style="font-weight: 800; font-size: 1.35rem; color: #1e293b; margin-bottom: 0.5rem; margin-top: 0;">Sign Out?</h4>
+        <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.5;">You are about to sign out of the system. Any unsaved changes will be lost.</p>
+        <div style="display: flex !important; justify-content: center !important; align-items: center !important; gap: 12px !important;">
+            <button type="button" class="btn btn-outline-secondary px-4 py-2" id="logoutCancelBtn" style="font-weight: 600; border-radius: 8px; cursor: pointer;" onclick="closeLogoutModal()">Cancel</button>
+            <form method="POST" action="logout.php" style="margin: 0 !important; display: inline-block !important;">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-                <button type="submit" class="btn btn-danger" id="logoutConfirmBtn">
+                <button type="submit" class="btn btn-danger px-4 py-2 shadow-sm" id="logoutConfirmBtn" style="font-weight: 600; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
                     <i class='bx bxs-log-out'></i> Yes, Sign Out
                 </button>
             </form>
