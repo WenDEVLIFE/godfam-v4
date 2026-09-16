@@ -4,9 +4,9 @@ This document details the pending revision tasks for the God's Family United Met
 
 ---
 
-## Task Breakdown & Implementation Roadmap - TODO
+## Task Breakdown & Implementation Roadmap
 
-### 1. Church Background Image
+### 1. Church Background Image  - TODO
 - **Description**: Add a responsive, high-resolution church background image with modern dark overlay/glassmorphism styling on authentication screens (login, forgot password, reset password) and dashboard headers.
 - **Affected Files**: `public/login.php`, `public/forgot_password.php`, `public/assets/css/style.css`.
 - **Status**: Planned.
@@ -71,10 +71,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `utils/birthday_reminder.php`, `public/api/trigger_birthday_reminder.php`, `models/Notification.php`.
 - **Status**: In Progress / Enhanced.
 
-### 14. Comprehensive Audit Log & Login Reports - TODO
+### 14. Comprehensive Audit Log & Login Reports - DONE
 - **Description**: Track all authentication attempts (logins, logouts, failed attempts), IP addresses, user agents, and administrative actions with detailed audit log reporting views.
 - **Affected Files**: `public/audit_logs.php`, `models/AuditLog.php`.
-- **Status**: Planned.
+- **Status**: Completed / Done.
 
 ### 15. Security Hashing & CSRF Protection - DONE
 - **Description**: Maintain strong `PASSWORD_DEFAULT` (BCRYPT) hashing, secure random tokens for QR/OTP, timing-safe `hash_equals` comparison, and universal CSRF token verification across all POST forms.

@@ -7,7 +7,7 @@
 require_once BASE_PATH . '/config/database.php';
 require_once BASE_PATH . '/middleware/CSRF.php';
 require_once BASE_PATH . '/middleware/AuthMiddleware.php';
-
+require_once BASE_PATH . '/models/AuditLog.php';
 require_once BASE_PATH . '/utils/MailService.php';
 
 /**
@@ -26,16 +26,21 @@ function login($email, $password) {
         if ($user && password_verify($password, $user['password'])) {
             // Password matches, create session
             session_regenerate_id(true);
-            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['user_id']   = $user['user_id'];
             $_SESSION['member_id'] = $user['member_id'];
-            $_SESSION['name'] = $user['name'];
-            $_SESSION['email'] = $user['email'];
+            $_SESSION['name']      = $user['name'];
+            $_SESSION['email']     = $user['email'];
             $_SESSION['role_name'] = $user['role_name'];
+
+            // Log successful login
+            AuditLog::record($pdo, $user['user_id'], 'LOGIN', "User '{$user['email']}' logged in successfully.");
             return true;
         }
+
+        // Log failed login
+        AuditLog::record($pdo, null, 'FAILED_LOGIN', "Failed login attempt for email '{$email}'.");
         return false;
     } catch (\PDOException $e) {
-        // Log the error
         return false;
     }
 }
@@ -44,6 +49,10 @@ function login($email, $password) {
  * Handle user logout.
  */
 function logout() {
+    global $pdo;
+    if (!empty($_SESSION['user_id'])) {
+        AuditLog::record($pdo, $_SESSION['user_id'], 'LOGOUT', "User '" . ($_SESSION['email'] ?? '') . "' logged out.");
+    }
     $_SESSION = [];
     session_destroy();
     if (ini_get("session.use_cookies")) {

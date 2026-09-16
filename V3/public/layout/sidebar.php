@@ -78,6 +78,10 @@ $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
                 <i class='bx bxs-bank'></i>
                 <span>Financial Reports</span>
             </a>
+            <a href="audit_logs.php" class="nav-link <?php echo $current_page === 'audit_logs.php' ? 'active' : ''; ?>">
+                <i class='bx bxs-shield-quarter'></i>
+                <span>Audit &amp; Login Logs</span>
+            </a>
         <?php endif; ?>
 
         <a href="#" class="nav-link" id="logoutTrigger" onclick="openLogoutModal(event)" style="margin-top: auto;">
