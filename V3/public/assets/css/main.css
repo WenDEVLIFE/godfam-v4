@@ -1242,14 +1242,25 @@ textarea.form-control {
 @media (max-width: 992px) {
     .sidebar {
         transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 10000;
     }
 
     .sidebar.active {
-        transform: translateX(0);
+        transform: translateX(0) !important;
+    }
+
+    .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 9999;
     }
 
     .sidebar-backdrop.active {
-        display: block;
+        display: block !important;
     }
 
     .main-content {
@@ -1257,7 +1268,11 @@ textarea.form-control {
     }
 
     .mobile-toggle-btn {
-        display: block;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer !important;
+        z-index: 1001;
     }
 }
 

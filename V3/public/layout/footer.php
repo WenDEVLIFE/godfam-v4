@@ -86,6 +86,7 @@
     });
 </script>
 
+<script src="assets/js/main.js"></script>
 <script src="assets/js/enhanced-select.js"></script>
 </body>
 </html>

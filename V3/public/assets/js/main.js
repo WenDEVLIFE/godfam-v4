@@ -1,43 +1,65 @@
 // Church Management System - Main JavaScript
 
 // Mobile sidebar toggle
-document.addEventListener('DOMContentLoaded', function() {
-    const mobileToggle = document.getElementById('mobileToggle');
-    const sidebar = document.getElementById('sidebar');
-    const backdrop = document.getElementById('sidebarBackdrop');
-    
-    function toggleSidebar() {
-        if (sidebar) sidebar.classList.toggle('active');
-        if (backdrop) backdrop.classList.toggle('active');
-    }
+(function initSidebarToggle() {
+    function setup() {
+        const mobileToggle = document.getElementById('mobileToggle');
+        const sidebar      = document.getElementById('sidebar');
+        const backdrop     = document.getElementById('sidebarBackdrop');
 
-    function closeSidebar() {
-        if (sidebar) sidebar.classList.remove('active');
-        if (backdrop) backdrop.classList.remove('active');
-    }
-    
-    if (mobileToggle) {
-        mobileToggle.addEventListener('click', toggleSidebar);
-    }
+        if (!mobileToggle || !sidebar) return;
 
-    if (backdrop) {
-        backdrop.addEventListener('click', closeSidebar);
-    }
-
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', function(event) {
-        if (window.innerWidth <= 992 && sidebar && !sidebar.contains(event.target) && mobileToggle && !mobileToggle.contains(event.target) && sidebar.classList.contains('active')) {
-            closeSidebar();
+        function toggleSidebar(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            const isActive = sidebar.classList.contains('active');
+            if (isActive) {
+                sidebar.classList.remove('active');
+                if (backdrop) backdrop.classList.remove('active');
+            } else {
+                sidebar.classList.add('active');
+                if (backdrop) backdrop.classList.add('active');
+            }
         }
-    });
 
-    // Handle window resize
-    window.addEventListener('resize', function() {
-        if (sidebar && window.innerWidth > 992) {
-            closeSidebar();
+        function closeSidebar(e) {
+            if (e) e.stopPropagation();
+            sidebar.classList.remove('active');
+            if (backdrop) backdrop.classList.remove('active');
         }
-    });
-});
+
+        // Assign clean single onclick handlers
+        mobileToggle.onclick = toggleSidebar;
+
+        if (backdrop) {
+            backdrop.onclick = closeSidebar;
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            if (sidebar.classList.contains('active')) {
+                if (!sidebar.contains(event.target) && !mobileToggle.contains(event.target)) {
+                    closeSidebar();
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992 && sidebar.classList.contains('active')) {
+                closeSidebar();
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setup);
+    } else {
+        setup();
+    }
+})();
 
 // Form validation
 function validateForm(formId) {
