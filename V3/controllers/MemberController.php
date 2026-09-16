@@ -48,7 +48,7 @@ class MemberController {
         $sanitizedData = [
             'full_name'    => htmlspecialchars(trim($data['full_name'])),
             'email'        => trim($data['email']),
-            'phone'        => htmlspecialchars(trim($data['phone'] ?? '')),
+            'phone'        => $this->formatPhone($data['phone'] ?? ''),
             'address'      => htmlspecialchars(trim($data['address'] ?? '')),
             'contact_info' => htmlspecialchars(trim($data['contact_info'] ?? '')),
             'status'       => $data['status'] ?? 'active',
@@ -102,7 +102,7 @@ class MemberController {
         $sanitizedData = [
             'full_name'    => htmlspecialchars(trim($data['full_name'])),
             'email'        => trim($data['email'] ?? ''),
-            'phone'        => htmlspecialchars(trim($data['phone'] ?? '')),
+            'phone'        => $this->formatPhone($data['phone'] ?? ''),
             'address'      => htmlspecialchars(trim($data['address'] ?? '')),
             'contact_info' => htmlspecialchars(trim($data['contact_info'] ?? '')),
             'status'       => $data['status'] ?? 'active',
@@ -115,6 +115,26 @@ class MemberController {
             return true;
         }
         return "Failed to update member.";
+    }
+
+    /**
+     * Format Philippine phone numbers into standard +639XXXXXXXXX format.
+     */
+    private function formatPhone($phone) {
+        $phone = trim($phone);
+        if (empty($phone)) return '';
+        
+        $digits = preg_replace('/[^\d]/', '', $phone);
+        if (empty($digits)) return '';
+
+        if (strpos($digits, '09') === 0) {
+            return '+63' . substr($digits, 1);
+        } elseif (strpos($digits, '9') === 0 && strlen($digits) === 10) {
+            return '+63' . $digits;
+        } elseif (strpos($digits, '639') === 0) {
+            return '+' . $digits;
+        }
+        return '+' . $digits;
     }
 
     /**

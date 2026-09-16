@@ -31,10 +31,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/members.php`, `public/profile.php`, `utils/FileUpload.php`.
 - **Status**: Completed / Done.
 
-### 6. Default Phone Number Prefix (+63) - TODO
+### 6. Default Phone Number Prefix (+63) - DONE
 - **Description**: Set default Philippine phone number prefix `+63` with formatting helpers across all phone input fields.
 - **Affected Files**: `public/members.php`, `public/profile.php`.
-- **Status**: Planned.
+- **Status**: Completed / Done.
 
 ### 7. Automatic Member Status Recalculation - TODO
 - **Description**: Recalculate member status (Active / Inactive) automatically based on consecutive event absences.

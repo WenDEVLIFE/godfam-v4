@@ -219,7 +219,7 @@ include __DIR__ . '/layout/sidebar.php';
 
                     <div class="form-group">
                         <label class="form-label">Phone Number</label>
-                        <input type="text" name="phone" class="form-control" placeholder="09123456789">
+                        <input type="text" name="phone" class="form-control" placeholder="+639171234567">
                     </div>
 
                     <div class="form-group full-width">
