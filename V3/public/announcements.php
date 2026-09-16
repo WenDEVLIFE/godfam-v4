@@ -143,25 +143,65 @@ include __DIR__ . '/layout/sidebar.php';
     background: #f8fafc;
     border-top: 1px solid #f1f5f9;
     padding: 12px 16px;
+    margin-top: auto;
 }
 
 .announcement-author-info {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .announcement-author-avatar {
-    width: 24px;
-    height: 24px;
-    background: var(--accent);
+    width: 28px;
+    height: 28px;
+    background: var(--primary-color, #1565C0);
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
+}
+
+.announcement-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+}
+
+.announcement-inline-form {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.announcement-card-actions .btn {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1.2;
+    transition: all 0.2s ease;
+}
+
+.announcement-card-actions .btn-outline-danger {
+    color: #dc2626;
+    border-color: #fca5a5;
+    background: #fff;
+}
+
+.announcement-card-actions .btn-outline-danger:hover {
+    color: #fff;
+    background: #dc2626;
+    border-color: #dc2626;
 }
 
 @media (min-width: 1200px) {
@@ -227,26 +267,30 @@ include __DIR__ . '/layout/sidebar.php';
                             <div class="announcement-author-avatar">
                                 <?php echo strtoupper(substr($ann['author'] ?? 'A', 0, 1)); ?>
                             </div>
-                            <span class="small font-weight-600"><?php echo htmlspecialchars($ann['author'] ?? 'Admin'); ?></span>
+                            <div class="d-flex flex-column" style="line-height: 1.2;">
+                                <span class="small font-weight-600 text-dark"><?php echo htmlspecialchars($ann['author'] ?? 'Admin'); ?></span>
+                                <span class="text-muted" style="font-size: 11px;"><?php echo date('h:i A', strtotime($ann['created_at'])); ?></span>
+                            </div>
                         </div>
-                        <div class="d-flex align-items-center announcement-card-actions">
-                            <span class="small text-muted"><?php echo date('h:i A', strtotime($ann['created_at'])); ?></span>
-                            <?php if ($canManageAnnouncements): ?>
+                        <?php if ($canManageAnnouncements): ?>
+                            <div class="announcement-card-actions">
                                 <button type="button"
                                     class="btn btn-outline-primary btn-sm edit-announcement-btn"
                                     data-id="<?php echo (int)$ann['announcement_id']; ?>"
                                     data-title="<?php echo htmlspecialchars($ann['title'], ENT_QUOTES, 'UTF-8'); ?>"
                                     data-content="<?php echo htmlspecialchars($ann['content'], ENT_QUOTES, 'UTF-8'); ?>">
-                                    Edit
+                                    <i class='bx bx-edit-alt'></i> Edit
                                 </button>
                                 <form method="post" class="announcement-inline-form" onsubmit="event.preventDefault(); var form = this; confirmAction('Delete this announcement? This cannot be undone.', function() { form.submit(); });">
                                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="announcement_id" value="<?php echo (int)$ann['announcement_id']; ?>">
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class='bx bx-trash'></i> Delete
+                                    </button>
                                 </form>
-                            <?php endif; ?>
-                        </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php endforeach; ?>
