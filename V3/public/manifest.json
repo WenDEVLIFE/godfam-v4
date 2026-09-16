@@ -1,0 +1,25 @@
+{
+  "short_name": "GodsFam CMS",
+  "name": "God's Family United Methodist Church",
+  "icons": [
+    {
+      "src": "assets/images/logo.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "dashboard.php",
+  "background_color": "#ffffff",
+  "theme_color": "#1565C0",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "description": "God's Family United Methodist Church Web & Mobile Management System"
+}

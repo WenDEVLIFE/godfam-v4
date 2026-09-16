@@ -285,3 +285,87 @@
     color: #3182ce !important;
     text-decoration: none !important;
 }
+
+/* ============================================================
+   Mobile Adaptive Design & Responsive Utilities (PWA-Ready)
+   ============================================================ */
+@media (max-width: 768px) {
+    /* Touch-friendly interactive targets */
+    .btn, .form-control, .form-select, .nav-link {
+        min-height: 44px;
+        font-size: 14px;
+    }
+
+    /* Page container padding adjustments */
+    .flat-dashboard, .container-fluid, .content-area {
+        padding: 12px !important;
+    }
+
+    /* Grid responsiveness */
+    .stats-grid, .financial-grid, .row.g-3 {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    /* Card styling on mobile */
+    .card {
+        border-radius: 10px;
+        margin-bottom: 16px;
+    }
+
+    .card-header {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    /* Tables horizontal scrolling wrapper */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        min-width: 600px;
+    }
+
+    /* Quick Action buttons wrap */
+    .card-body .d-flex.gap-2 {
+        gap: 8px !important;
+    }
+
+    .card-body .d-flex.gap-2 .btn {
+        flex: 1 1 calc(50% - 8px);
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* ID Card responsive scale */
+    .id-card-modern {
+        width: 100%;
+        max-width: 360px;
+        height: auto;
+        min-height: 540px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title, h1, h2 {
+        font-size: 1.35rem !important;
+    }
+
+    .card-body .d-flex.gap-2 .btn {
+        flex: 1 1 100%;
+    }
+
+    .birthday-banner {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .birthday-banner #btn-send-bday-reminders {
+        width: 100%;
+        margin-top: 8px;
+    }
+}

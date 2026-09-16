@@ -81,10 +81,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `middleware/CSRF.php`, `controllers/AuthController.php`.
 - **Status**: Implemented / Active.
  
-### 16. Mobile Adaptive Design & PWA / App Manifest - TODO
+### 16. Mobile Adaptive Design & PWA / App Manifest - DONE
 - **Description**: Ensure fully responsive layout across mobile screens, add web app manifest (`manifest.json`) and service worker (`sw.js`) for PWA installability on mobile devices.
-- **Affected Files**: `public/manifest.json`, `public/sw.js`, `public/assets/css/style.css`, `public/layout/header.php`.
-- **Status**: Planned.
+- **Affected Files**: `public/manifest.json`, `public/sw.js`, `public/assets/css/enhanced.css`, `public/layout/header.php`.
+- **Status**: Completed / Done.
 
 ### 17. CAPTCHA Protection   - TODO
 - **Description**: Integrate visual/algebraic CAPTCHA verification on login and public authentication forms to prevent automated brute-force attacks.
