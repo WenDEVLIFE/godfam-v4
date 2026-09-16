@@ -21,10 +21,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/forgot_email.php`, `public/forgot_password.php`, `public/verify_otp.php`, `controllers/AuthController.php`.
 - **Status**: Completed / Done.
 
-### 4. Interactive & Clickable Dashboard - TODO
+### 4. Interactive & Clickable Dashboard - DONE
 - **Description**: Make all dashboard stat cards (Total Members, Upcoming Events, Attended Today, Collection widgets) directly clickable to navigate to their corresponding detailed management views.
 - **Affected Files**: `public/dashboard.php`.
-- **Status**: Planned.
+- **Status**: Completed / Done.
 
 ### 5. File & Image Upload Validation (PNG, JPEG) - TODO
 - **Description**: Enforce strict server-side & client-side validation for photo uploads, accepting only valid image MIME types (`image/jpeg`, `image/png`, `image/jpg`) with maximum file size limits (e.g. 5MB).

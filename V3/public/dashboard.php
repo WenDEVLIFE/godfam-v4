@@ -165,35 +165,35 @@ include __DIR__ . '/layout/sidebar.php';
 
 <!-- ===== ADMIN STATS ===== -->
 <div class="stats-grid">
-    <div class="stat-card">
+    <a href="members.php" class="stat-card" style="text-decoration:none; color:inherit; cursor:pointer;" title="View Member Directory">
         <div class="stat-icon"><i class='bx bxs-group'></i></div>
         <div>
             <div class="stat-label">Total Members</div>
             <div class="stat-number"><?php echo number_format($total_members); ?></div>
         </div>
-    </div>
-    <div class="stat-card">
+    </a>
+    <a href="events.php" class="stat-card" style="text-decoration:none; color:inherit; cursor:pointer;" title="View Church Events">
         <div class="stat-icon"><i class='bx bxs-calendar'></i></div>
         <div>
             <div class="stat-label">Upcoming Events</div>
             <div class="stat-number"><?php echo number_format($upcoming_events_count); ?></div>
         </div>
-    </div>
-    <div class="stat-card">
+    </a>
+    <a href="reports.php?start_date=<?php echo date('Y-m-d'); ?>&end_date=<?php echo date('Y-m-d'); ?>" class="stat-card" style="text-decoration:none; color:inherit; cursor:pointer;" title="View Today's Attendance Reports">
         <div class="stat-icon"><i class='bx bxs-check-square'></i></div>
         <div>
             <div class="stat-label">Attended Today</div>
             <div class="stat-number"><?php echo number_format($today_attendance); ?></div>
         </div>
-    </div>
-    <div class="stat-card" style="cursor:pointer;" onclick="window.location='financial_reports.php'">
+    </a>
+    <a href="financial_reports.php" class="stat-card" style="text-decoration:none; color:inherit; cursor:pointer;" title="View Financial Reports">
         <div class="stat-icon" style="background:#f0fff4;color:#38a169;"><i class='bx bx-peso'></i></div>
         <div>
             <div class="stat-label">Today's Collection</div>
             <div class="stat-number" style="color:#38a169;">₱<?php echo number_format($today_collection, 2); ?></div>
             <div class="stat-sublabel">This month: ₱<?php echo number_format($month_collection, 2); ?></div>
         </div>
-    </div>
+    </a>
 </div>
 
 <!-- ===== QUICK ACTIONS ===== -->
@@ -245,21 +245,21 @@ include __DIR__ . '/layout/sidebar.php';
 <?php if (isMember()): ?>
 <!-- ===== MEMBER DASHBOARD ===== -->
 <div class="stats-grid">
-    <div class="stat-card">
+    <a href="profile.php" class="stat-card" style="text-decoration:none; color:inherit; cursor:pointer;" title="View My Attendance Log">
         <div class="stat-icon"><i class='bx bxs-check-circle'></i></div>
         <div>
             <div class="stat-label">Services Attended</div>
             <div class="stat-number"><?php echo number_format($my_attendance_count); ?></div>
         </div>
-    </div>
-    <div class="stat-card">
+    </a>
+    <a href="events.php" class="stat-card" style="text-decoration:none; color:inherit; cursor:pointer;" title="View Church Events">
         <div class="stat-icon" style="background:#fef2f2;color:#dc2626;"><i class='bx bxs-x-circle'></i></div>
         <div>
             <div class="stat-label">Missed Services</div>
             <div class="stat-number text-danger"><?php echo number_format($missed_sessions); ?></div>
         </div>
-    </div>
-    <a href="profile.php" class="stat-card" style="text-decoration:none;color:inherit;">
+    </a>
+    <a href="profile.php" class="stat-card" style="text-decoration:none; color:inherit; cursor:pointer;" title="View My Digital ID Card">
         <div class="stat-icon"><i class='bx bxs-id-card'></i></div>
         <div>
             <div class="stat-label">My Digital ID</div>
