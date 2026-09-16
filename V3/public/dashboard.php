@@ -7,6 +7,7 @@
 $page_title = 'Dashboard Overview';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
+require_once __DIR__ . '/../middleware/CSRF.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../models/Member.php';
 require_once __DIR__ . '/../models/Event.php';
@@ -15,6 +16,8 @@ require_once __DIR__ . '/../models/Collection.php';
 
 // Ensure user is logged in
 requireLogin();
+
+$csrf_token = generateCsrfToken();
 
 $memberModel     = new Member($pdo);
 $eventModel      = new Event($pdo);
@@ -140,15 +143,22 @@ include __DIR__ . '/layout/sidebar.php';
 
 <!-- ===== BIRTHDAY CELEBRANTS ===== -->
 <?php if (!empty($birthday_celebrants)): ?>
-<div class="birthday-banner mb-4">
-    <div class="birthday-banner-icon"><i class='bx bxs-cake'></i></div>
-    <div class="birthday-banner-body">
-        <div class="birthday-banner-title">🎂 Birthday Celebrants Today &mdash; <?php echo date('F j'); ?></div>
-        <div class="birthday-names">
-            <?php foreach ($birthday_celebrants as $b): ?>
-            <span class="birthday-pill"><?php echo htmlspecialchars($b['full_name']); ?></span>
-            <?php endforeach; ?>
+<div class="birthday-banner mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-3">
+        <div class="birthday-banner-icon"><i class='bx bxs-cake'></i></div>
+        <div class="birthday-banner-body">
+            <div class="birthday-banner-title">🎂 Birthday Celebrants Today &mdash; <?php echo date('F j'); ?></div>
+            <div class="birthday-names">
+                <?php foreach ($birthday_celebrants as $b): ?>
+                <span class="birthday-pill"><?php echo htmlspecialchars($b['full_name']); ?></span>
+                <?php endforeach; ?>
+            </div>
         </div>
+    </div>
+    <div>
+        <button id="btn-send-bday-reminders" class="btn btn-sm btn-light text-primary font-weight-600 shadow-sm" onclick="sendBirthdayReminders()" style="border-radius: 20px; padding: 6px 16px;">
+            <i class='bx bx-send'></i> Send Auto Reminders
+        </button>
     </div>
 </div>
 <?php endif; ?>
@@ -466,6 +476,37 @@ function showMonthly() {
     buildAttendanceChart('monthly');
     document.getElementById('btn-monthly').classList.add('active');
     document.getElementById('btn-weekly').classList.remove('active');
+}
+
+function sendBirthdayReminders() {
+    const btn = document.getElementById('btn-send-bday-reminders');
+    if (!btn) return;
+    const origText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Sending...";
+
+    fetch('api/trigger_birthday_reminder.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ csrf_token: '<?php echo $csrf_token; ?>' })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message || 'Birthday reminders triggered successfully!');
+            btn.innerHTML = "<i class='bx bx-check'></i> Sent!";
+            btn.classList.replace('btn-light', 'btn-success');
+        } else {
+            alert('Error: ' + (data.error || 'Failed to send reminders.'));
+            btn.disabled = false;
+            btn.innerHTML = origText;
+        }
+    })
+    .catch(err => {
+        alert('An error occurred while sending reminders.');
+        btn.disabled = false;
+        btn.innerHTML = origText;
+    });
 }
 </script>
 <?php endif; ?>
