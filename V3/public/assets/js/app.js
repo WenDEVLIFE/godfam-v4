@@ -53,7 +53,58 @@ document.addEventListener('DOMContentLoaded', function () {
             validateImageInput(e.target);
         }
     });
+
+    // Auto-wire phone input helpers
+    initPhoneInputHelpers();
 });
+
+/**
+ * Auto-format Philippine Phone Numbers (+639XXXXXXXXX)
+ */
+function formatPhPhone(value) {
+    if (!value) return '+63';
+    
+    let digits = value.replace(/[^\d]/g, '');
+    
+    if (digits.startsWith('09')) {
+        digits = '63' + digits.substring(1);
+    } else if (digits.startsWith('9')) {
+        digits = '63' + digits;
+    } else if (!digits.startsWith('63')) {
+        digits = '63' + digits;
+    }
+
+    digits = digits.substring(0, 12);
+    return '+' + digits;
+}
+
+function initPhoneInputHelpers() {
+    const phoneInputs = document.querySelectorAll('input[name="phone"], input[type="tel"], .phone-input');
+    
+    phoneInputs.forEach(input => {
+        if (!input.placeholder || input.placeholder === '09123456789') {
+            input.placeholder = '+639171234567';
+        }
+
+        input.addEventListener('focus', function() {
+            if (!this.value || this.value.trim() === '') {
+                this.value = '+63';
+            }
+        });
+
+        input.addEventListener('input', function() {
+            if (this.value.length > 0) {
+                this.value = formatPhPhone(this.value);
+            }
+        });
+
+        input.addEventListener('blur', function() {
+            if (this.value.trim() === '+63' || this.value.trim() === '+') {
+                this.value = '';
+            }
+        });
+    });
+}
 
 /**
  * Validate Image Uploads (PNG, JPEG, JPG, WEBP <= 5MB)
