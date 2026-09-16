@@ -6,10 +6,10 @@ This document details the pending revision tasks for the God's Family United Met
 
 ## Task Breakdown & Implementation Roadmap
 
-### 1. Church Background Image  - TODO
+### 1. Church Background Image - DONE
 - **Description**: Add a responsive, high-resolution church background image with modern dark overlay/glassmorphism styling on authentication screens (login, forgot password, reset password) and dashboard headers.
-- **Affected Files**: `public/login.php`, `public/forgot_password.php`, `public/assets/css/style.css`.
-- **Status**: Planned.
+- **Affected Files**: `public/login.php`, `public/forgot_password.php`, `public/assets/css/enhanced.css`, `public/dashboard.php`.
+- **Status**: Completed / Done.
 
 ### 2. Privacy Statement Modal Before Submission - DONE
 - **Description**: Display a mandatory Privacy Statement & Data Protection Consent modal before completing member registration, login checks, or data forms.

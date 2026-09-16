@@ -453,3 +453,58 @@
     }
 
 }
+
+
+/* ============================================================
+   Church Background Image & Glassmorphism Styling
+   ============================================================ */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.82) 0%, rgba(15, 17, 21, 0.88) 100%), url('../images/background.jpg') no-repeat center center / cover !important;
+    padding: 20px;
+    position: relative;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    padding: 40px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Dashboard Hero Banner */
+.dashboard-hero-banner {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.78) 0%, rgba(30, 41, 59, 0.85) 100%), url('../images/dashboard.jpg') no-repeat center center / cover !important;
+    border-radius: 16px !important;
+    color: #ffffff !important;
+    overflow: hidden !important;
+    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.dashboard-hero-overlay {
+    padding: 2.25rem 2.5rem !important;
+    backdrop-filter: blur(2px) !important;
+}
+
+.dashboard-hero-title {
+    font-size: 1.75rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    margin: 4px 0 6px 0 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dashboard-hero-sub {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 0 !important;
+}

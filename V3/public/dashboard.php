@@ -122,10 +122,16 @@ include __DIR__ . '/layout/sidebar.php';
 ?>
 
 <div class="flat-dashboard">
-<div class="mb-4 d-flex justify-content-between align-items-center">
-    <div>
-        <h1 class="page-title" style="margin:0;">Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?></h1>
-        <p class="text-muted small">System Management Console &mdash; <?php echo date('l, F j, Y'); ?></p>
+<!-- ===== DASHBOARD HERO BANNER ===== -->
+<div class="dashboard-hero-banner mb-4">
+    <div class="dashboard-hero-overlay">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <span class="badge bg-white text-primary font-weight-700 px-3 py-1 mb-2 shadow-sm" style="border-radius: 20px; font-size: 11px; letter-spacing: 0.5px;">GOD'S FAMILY UM CHURCH</span>
+                <h1 class="dashboard-hero-title">Welcome back, <?php echo htmlspecialchars($_SESSION['name']); ?></h1>
+                <p class="dashboard-hero-sub"><?php echo date('l, F j, Y'); ?> &bull; System Management &amp; Pastoral Portal</p>
+            </div>
+        </div>
     </div>
 </div>
 
