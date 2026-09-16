@@ -272,6 +272,7 @@ include __DIR__ . '/layout/sidebar.php';
                                 <span class="text-muted" style="font-size: 11px;"><?php echo date('h:i A', strtotime($ann['created_at'])); ?></span>
                             </div>
                         </div>
+                        <br>
                         <?php if ($canManageAnnouncements): ?>
                             <div class="announcement-card-actions">
                                 <button type="button"
