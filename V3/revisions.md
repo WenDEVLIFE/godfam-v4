@@ -56,10 +56,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/events.php`, `controllers/EventController.php`.
 - **Status**: Completed / Done.
  
-### 11. System Admin Name Display - TODO
+### 11. System Admin Name Display - DONE
 - **Description**: Dynamically render the authenticated administrator/user's full name across header banners, navigation bars, and generated PDF/Excel reports.
-- **Affected Files**: `public/layout/header.php`, `public/dashboard.php`, `public/attendance_export.php`.
-- **Status**: Planned.
+- **Affected Files**: `public/layout/sidebar.php`, `public/dashboard.php`, `public/attendance_export.php`.
+- **Status**: Completed / Done.
 
 ### 12. Protected System Roles (Secretary & Core Roles) - DONE
 - **Description**: Prevent editing, deleting, or modifying system-defined roles (Administrator, Pastor, Secretary, Staff) in role management settings.

@@ -113,6 +113,11 @@ $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
             <h2 class="page-title"><?php echo isset($page_title) ? $page_title : 'Dashboard'; ?></h2>
         </div>
         <div class="header-actions">
+            <div class="user-header-badge d-none d-sm-flex align-items-center gap-2 px-3 py-1 border rounded-pill shadow-sm" style="background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.25) !important;">
+                <i class='bx bxs-user-circle' style="font-size: 1.25rem;"></i>
+                <span class="font-weight-600" style="font-size: 0.85rem;"><?php echo htmlspecialchars($user_name); ?></span>
+                <span class="badge bg-primary text-white" style="font-size: 10px; font-weight: 700; border-radius: 12px;"><?php echo htmlspecialchars($role); ?></span>
+            </div>
             <div class="clock-badge">
                 <i class='bx bx-time-five'></i>
                 <span id="currentTime"></span>
