@@ -134,11 +134,11 @@ include __DIR__ . '/layout/sidebar.php';
 
 <!-- Summary Widgets -->
 <div class="row g-3 mb-4" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-    <div class="stat-card border-0 shadow-sm" style="border-radius: 12px; border-left: 4px solid #38a169 !important;">
-        <div class="stat-icon" style="background:#f0fff4;color:#38a169;"><i class='bx bx-peso'></i></div>
+    <div class="stat-card border-0 shadow-sm" style="border-radius: 12px; border-left: 4px solid #059669 !important;">
+        <div class="stat-icon" style="background:#d1fae5;color:#059669;font-weight:800;font-size:1.5rem;">₱</div>
         <div>
             <div class="stat-label">Today's Total</div>
-            <div class="stat-number" style="color:#38a169;">₱<?php echo number_format($collectionModel->getTodayTotal(),2); ?></div>
+            <div class="stat-number" style="color:#059669;">₱<?php echo number_format($collectionModel->getTodayTotal(),2); ?></div>
         </div>
     </div>
     <div class="stat-card border-0 shadow-sm" style="border-radius: 12px; border-left: 4px solid #3182ce !important;">

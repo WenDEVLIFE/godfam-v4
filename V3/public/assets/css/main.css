@@ -152,14 +152,14 @@ a:hover {
 }
 
 .nav-link.active {
-    background: linear-gradient(135deg, var(--cms-red) 0%, var(--cms-red-dark) 100%);
+    background: linear-gradient(135deg, var(--cms-blue) 0%, var(--cms-blue-dark) 100%);
     color: var(--cms-white);
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(198, 40, 40, 0.35);
+    box-shadow: 0 4px 14px rgba(21, 101, 192, 0.35);
 }
 
 .nav-link.active i {
-    color: var(--cms-gold);
+    color: var(--liturgical-gold);
 }
 
 /* User Info at Bottom of Sidebar */
@@ -443,32 +443,32 @@ a:hover {
     transform: scale(0.98);
 }
 
-/* Primary Button (Church Red) */
+/* Primary Button (Church Royal Blue) */
 .btn-primary {
-    background-color: var(--cms-red);
-    color: var(--cms-white);
-    border-color: var(--cms-red);
-}
-
-.btn-primary:hover {
-    background-color: var(--cms-red-dark);
-    border-color: var(--cms-red-dark);
-    color: var(--cms-white);
-    box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
-}
-
-/* Secondary Button (Royal Blue) */
-.btn-secondary {
     background-color: var(--cms-blue);
     color: var(--cms-white);
     border-color: var(--cms-blue);
 }
 
-.btn-secondary:hover {
+.btn-primary:hover {
     background-color: var(--cms-blue-dark);
     border-color: var(--cms-blue-dark);
     color: var(--cms-white);
     box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+}
+
+/* Secondary Button (Slate Neutral) */
+.btn-secondary {
+    background-color: #475569;
+    color: var(--cms-white);
+    border-color: #475569;
+}
+
+.btn-secondary:hover {
+    background-color: #334155;
+    border-color: #334155;
+    color: var(--cms-white);
+    box-shadow: 0 4px 12px rgba(71, 85, 105, 0.3);
 }
 
 /* Success Button (Green) */

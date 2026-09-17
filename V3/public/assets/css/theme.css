@@ -2,38 +2,54 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    /* Color Palette */
-    --cms-white: #FFFFFF;
-    --cms-red: #C62828;
-    --cms-red-dark: #A71D1D;
-    --cms-red-light: #FFEBEE;
-    --cms-gold: #D4AF37;
-    --cms-gold-dark: #B59226;
-    --cms-gold-light: #FFFBEB;
+    /* Primary System Color (Church Royal Blue) */
+    --cms-primary: #1565C0;
+    --cms-primary-dark: #0D47A1;
+    --cms-primary-light: #E3F2FD;
     --cms-blue: #1565C0;
     --cms-blue-dark: #0D47A1;
     --cms-blue-light: #E3F2FD;
     
+    /* Liturgical Accent Colors */
+    --liturgical-red: #DC2626;         /* Holy Spirit / Martyrdom / Urgent */
+    --liturgical-red-light: #FEE2E2;
+    --liturgical-violet: #7C3AED;      /* Advent & Lent / Penance & Royalty */
+    --liturgical-violet-light: #F3E8FF;
+    --liturgical-white: #FFFFFF;       /* Easter & Christmas / Purity */
+    --liturgical-green: #059669;       /* Ordinary Time / Growth & Hope */
+    --liturgical-green-light: #D1FAE5;
+    --liturgical-gold: #D4AF37;        /* Celebration / Gold Accent */
+    --liturgical-gold-light: #FEF3C7;
+
+    /* Legacy compatibility mappings */
+    --cms-white: #FFFFFF;
+    --cms-red: #DC2626;
+    --cms-red-dark: #B91C1C;
+    --cms-red-light: #FEE2E2;
+    --cms-gold: #D4AF37;
+    --cms-gold-dark: #B59226;
+    --cms-gold-light: #FFFBEB;
+    
     /* System & Status Colors */
-    --cms-bg: #F5F7FA;
+    --cms-bg: #F8FAFC;
     --cms-surface: #FFFFFF;
-    --cms-border: #E5E7EB;
-    --cms-text: #1F2937;
-    --cms-muted: #6B7280;
-    --cms-success: #2E7D32;
-    --cms-success-light: #E8F5E9;
-    --cms-warning: #F9A825;
-    --cms-warning-light: #FFF8E1;
-    --cms-error: #D32F2F;
-    --cms-error-light: #FFEBEE;
+    --cms-border: #E2E8F0;
+    --cms-text: #0F172A;
+    --cms-muted: #64748B;
+    --cms-success: #059669;
+    --cms-success-light: #D1FAE5;
+    --cms-warning: #D97706;
+    --cms-warning-light: #FEF3C7;
+    --cms-error: #DC2626;
+    --cms-error-light: #FEE2E2;
 
     /* Dark Sidebar Variables */
-    --sidebar-bg: #1C1F26;
-    --sidebar-surface: #252932;
-    --sidebar-text: #9CA3AF;
+    --sidebar-bg: #0F172A;
+    --sidebar-surface: #1E293B;
+    --sidebar-text: #94A3B8;
     --sidebar-text-active: #FFFFFF;
-    --sidebar-hover: rgba(255, 255, 255, 0.06);
-    --sidebar-active-bg: #C62828;
+    --sidebar-hover: rgba(255, 255, 255, 0.08);
+    --sidebar-active-bg: #1565C0;
     --sidebar-width: 260px;
     --sidebar-collapsed-width: 70px;
     
@@ -46,10 +62,10 @@
     --radius-full: 9999px;
     
     /* Shadows */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
-    --shadow-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.12);
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+    --shadow-hover: 0 12px 28px -4px rgba(21, 101, 192, 0.2);
     
     /* Transitions */
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);

@@ -194,10 +194,10 @@ include __DIR__ . '/layout/sidebar.php';
         </div>
     </a>
     <a href="financial_reports.php" class="stat-card" style="text-decoration:none; color:inherit; cursor:pointer;" title="View Financial Reports">
-        <div class="stat-icon" style="background:#f0fff4;color:#38a169;"><i class='bx bx-peso'></i></div>
+        <div class="stat-icon" style="background:#d1fae5;color:#059669;font-weight:800;font-size:1.5rem;">₱</div>
         <div>
             <div class="stat-label">Today's Collection</div>
-            <div class="stat-number" style="color:#38a169;">₱<?php echo number_format($today_collection, 2); ?></div>
+            <div class="stat-number" style="color:#059669;">₱<?php echo number_format($today_collection, 2); ?></div>
             <div class="stat-sublabel">This month: ₱<?php echo number_format($month_collection, 2); ?></div>
         </div>
     </a>
@@ -414,8 +414,8 @@ function buildGrowthChart(growth) {
 
     // Gradient fill beneath the line
     const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight || 220);
-    gradient.addColorStop(0, 'rgba(198,40,40,0.25)');
-    gradient.addColorStop(1, 'rgba(198,40,40,0.00)');
+    gradient.addColorStop(0, 'rgba(21, 101, 192, 0.25)');
+    gradient.addColorStop(1, 'rgba(21, 101, 192, 0.00)');
 
     new Chart(ctx, {
         type: 'line',
@@ -426,10 +426,10 @@ function buildGrowthChart(growth) {
                 data: growth.data.length ? growth.data : [0],
                 fill: true,
                 backgroundColor: gradient,
-                borderColor: '#C62828',
+                borderColor: '#1565C0',
                 borderWidth: 2.5,
                 pointBackgroundColor: '#fff',
-                pointBorderColor: '#C62828',
+                pointBorderColor: '#1565C0',
                 pointBorderWidth: 2,
                 pointRadius: 4,
                 pointHoverRadius: 6,

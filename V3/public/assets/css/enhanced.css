@@ -484,11 +484,10 @@
 }
 
 /* ============================================================
-   Church Dashboard Whole Body Background Image
+   Global Church Background Image & Glassmorphism Styling
    ============================================================ */
-html:has(body.dashboard-page),
-body.dashboard-page {
-    background-image: url('../images/dashboard.jpg') !important;
+body {
+    background-image: linear-gradient(rgba(248, 250, 252, 0.88), rgba(248, 250, 252, 0.93)), url('../images/background.jpg') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
@@ -496,12 +495,35 @@ body.dashboard-page {
     min-height: 100vh !important;
 }
 
-body.dashboard-page .sidebar-layout,
-body.dashboard-page .main-content,
-body.dashboard-page .content-area,
-body.dashboard-page .flat-dashboard {
+html:has(body.dashboard-page),
+body.dashboard-page {
+    background-image: linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.70)), url('../images/dashboard.jpg') !important;
+}
+
+.sidebar-layout,
+.main-content,
+.content-area,
+.flat-dashboard {
     background: transparent !important;
     background-color: transparent !important;
+}
+
+/* Glassmorphism Cards across system pages */
+.card,
+.stat-card,
+.flat-dashboard .card,
+.flat-dashboard .stat-card,
+.data-table-container,
+.table-responsive,
+.modal-content,
+.bible-verse-card,
+.birthday-banner {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04) !important;
 }
 
 body.dashboard-page .top-header {
@@ -521,22 +543,7 @@ body.dashboard-page .top-header .clock-badge {
     border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Glassmorphism Cards on Dashboard Page (Same as Login) */
-body.dashboard-page .card,
-body.dashboard-page .stat-card,
-body.dashboard-page .flat-dashboard .card,
-body.dashboard-page .flat-dashboard .stat-card,
-body.dashboard-page .bible-verse-card,
-body.dashboard-page .birthday-banner {
-    background: rgba(255, 255, 255, 0.94) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border-radius: 16px !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
-}
-
-/* Dashboard Hero Header (Clean text header directly over whole-body background) */
+/* Dashboard Hero Header */
 body.dashboard-page .dashboard-hero-banner,
 .dashboard-hero-banner {
     background: transparent !important;
@@ -569,4 +576,43 @@ body.dashboard-page .dashboard-hero-overlay,
     color: rgba(255, 255, 255, 0.9) !important;
     font-size: 0.95rem !important;
     margin-bottom: 0 !important;
+}
+
+/* ============================================================
+   Liturgical Color Accents & Badges
+   ============================================================ */
+.badge-liturgical-red {
+    background-color: var(--liturgical-red-light) !important;
+    color: var(--liturgical-red) !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    font-weight: 600;
+}
+
+.badge-liturgical-violet {
+    background-color: var(--liturgical-violet-light) !important;
+    color: var(--liturgical-violet) !important;
+    border: 1px solid rgba(124, 58, 237, 0.25) !important;
+    font-weight: 600;
+}
+
+.badge-liturgical-green {
+    background-color: var(--liturgical-green-light) !important;
+    color: var(--liturgical-green) !important;
+    border: 1px solid rgba(5, 150, 105, 0.25) !important;
+    font-weight: 600;
+}
+
+.badge-liturgical-white {
+    background-color: var(--liturgical-white) !important;
+    color: var(--cms-primary) !important;
+    border: 1px solid var(--cms-border) !important;
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+}
+
+.badge-liturgical-gold {
+    background-color: var(--liturgical-gold-light) !important;
+    color: #B59226 !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    font-weight: 600;
 }
