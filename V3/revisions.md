@@ -46,10 +46,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/generate_id_card.php`, `models/Member.php`.
 - **Status**: Completed / Done.
 
-### 9. Decouple Events & Member Management - TODO
+### 9. Decouple Events & Member Management - DONE
 - **Description**: Ensure complete separation between member directory features and event scheduling/management logic.
-- **Affected Files**: `public/members.php`, `public/events.php`.
-- **Status**: Planned.
+- **Affected Files**: `public/members.php`, `public/events.php`, `controllers/MemberController.php`, `controllers/EventController.php`.
+- **Status**: Completed / Done.
 
 ### 10. Event Delete Confirmation with Admin Password Re-verification - DONE
 - **Description**: Require re-entering the logged-in administrator's password in a modal confirmation before permanently deleting any church event.
@@ -86,7 +86,7 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/manifest.json`, `public/sw.js`, `public/assets/css/enhanced.css`, `public/layout/header.php`.
 - **Status**: Completed / Done.
 
-### 17. CAPTCHA Protection   - TODO
+### 17. CAPTCHA Protection - DONE
 - **Description**: Integrate visual/algebraic CAPTCHA verification on login and public authentication forms to prevent automated brute-force attacks.
-- **Affected Files**: `public/captcha.php`, `public/login.php`, `public/forgot_password.php`.
-- **Status**: Planned.
+- **Affected Files**: `public/captcha.php`, `utils/CaptchaService.php`, `public/login.php`, `public/forgot_password.php`.
+- **Status**: Completed / Done.

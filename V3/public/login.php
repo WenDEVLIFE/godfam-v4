@@ -12,6 +12,7 @@ require_once BASE_PATH . '/config/database.php';
 require_once BASE_PATH . '/middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/middleware/CSRF.php';
 require_once BASE_PATH . '/controllers/AuthController.php';
+require_once BASE_PATH . '/utils/CaptchaService.php';
 
 // Redirect if already logged in
 redirectIfLogged();
@@ -24,21 +25,27 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate CSRF token
     if (validateCsrfToken($_POST['csrf_token'])) {
-        $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
+        $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
 
-        if (login($email, $password)) {
-            header("Location: dashboard.php");
-            exit;
+        if (!CaptchaService::verifyReCaptcha($recaptchaResponse)) {
+            $error = "reCAPTCHA verification failed. Please check the 'I'm not a robot' box.";
         } else {
-            $error = "Invalid email or password.";
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+
+            if (login($email, $password)) {
+                header("Location: dashboard.php");
+                exit;
+            } else {
+                $error = "Invalid email or password.";
+            }
         }
     }
 }
 
-// Generate new CSRF token
+// Generate new CSRF token & CAPTCHA question
 $csrf_token = generateCsrfToken();
-
+$captcha_phrase = CaptchaService::generateLocalCaptcha();
 ?>
 
 <!DOCTYPE html>
@@ -57,6 +64,8 @@ $csrf_token = generateCsrfToken();
     <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/enhanced.css">
+    <!-- Google reCAPTCHA API Script -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body class="login-container">
     <div class="login-card">
@@ -106,6 +115,11 @@ $csrf_token = generateCsrfToken();
                             <i class='bx bx-hide' id="toggleIcon"></i>
                         </button>
                     </div>
+                </div>
+
+                <!-- Security Verification (Google reCAPTCHA v2) -->
+                <div class="form-group mb-3 d-flex justify-content-center">
+                    <div class="g-recaptcha" data-sitekey="<?php echo htmlspecialchars(CaptchaService::getSiteKey()); ?>"></div>
                 </div>
 
                 <div class="form-group" style="margin-top: 15px;">

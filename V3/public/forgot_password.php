@@ -12,6 +12,7 @@ require_once BASE_PATH . '/config/database.php';
 require_once BASE_PATH . '/middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/middleware/CSRF.php';
 require_once BASE_PATH . '/controllers/AuthController.php';
+require_once BASE_PATH . '/utils/CaptchaService.php';
 
 redirectIfLogged();
 
@@ -21,21 +22,28 @@ $prefill_name  = trim($_GET['name'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (validateCsrfToken($_POST['csrf_token'])) {
-        $email = $_POST['email'] ?? '';
-        $name = $_POST['name'] ?? '';
-        $result = requestOTP($email, $name);
-        
-        if ($result === true) {
-            $_SESSION['reset_email'] = $email;
-            header("Location: verify_otp.php");
-            exit;
+        $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
+
+        if (!CaptchaService::verifyReCaptcha($recaptchaResponse)) {
+            $error = "reCAPTCHA verification failed. Please check the 'I'm not a robot' box.";
         } else {
-            $error = $result;
+            $email = $_POST['email'] ?? '';
+            $name = $_POST['name'] ?? '';
+            $result = requestOTP($email, $name);
+            
+            if ($result === true) {
+                $_SESSION['reset_email'] = $email;
+                header("Location: verify_otp.php");
+                exit;
+            } else {
+                $error = $result;
+            }
         }
     }
 }
 
 $csrf_token = generateCsrfToken();
+$captcha_phrase = CaptchaService::generateLocalCaptcha();
 ?>
 
 <!DOCTYPE html>
@@ -54,6 +62,8 @@ $csrf_token = generateCsrfToken();
     <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/enhanced.css">
+    <!-- Google reCAPTCHA API Script -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body class="login-container">
     <div class="login-card fade-in">
@@ -88,6 +98,11 @@ $csrf_token = generateCsrfToken();
                         <a href="forgot_email.php" class="text-muted small" style="text-decoration: underline;">Forgot email?</a>
                     </div>
                     <input type="email" name="email" class="form-control" placeholder="Enter your registered email" value="<?php echo htmlspecialchars($prefill_email); ?>" required>
+                </div>
+
+                <!-- Security Verification (Google reCAPTCHA v2) -->
+                <div class="form-group mb-3 d-flex justify-content-center">
+                    <div class="g-recaptcha" data-sitekey="<?php echo htmlspecialchars(CaptchaService::getSiteKey()); ?>"></div>
                 </div>
                 
                 <button type="submit" class="btn btn-primary w-100 py-3 mt-2">

@@ -12,6 +12,7 @@ require_once BASE_PATH . '/config/database.php';
 require_once BASE_PATH . '/middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/middleware/CSRF.php';
 require_once BASE_PATH . '/controllers/AuthController.php';
+require_once BASE_PATH . '/utils/CaptchaService.php';
 
 redirectIfLogged();
 
@@ -21,16 +22,22 @@ $searched = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (validateCsrfToken($_POST['csrf_token'])) {
-        $searchTerm = trim($_POST['search_term'] ?? '');
-        $searched = true;
+        $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
 
-        if (!empty($searchTerm)) {
-            $results = findEmailByNameOrPhone($searchTerm);
-            if (empty($results)) {
-                $error = "No matching account found for '{$searchTerm}'. Please check your spelling or contact your church administrator.";
-            }
+        if (!CaptchaService::verifyReCaptcha($recaptchaResponse)) {
+            $error = "reCAPTCHA verification failed. Please check the 'I'm not a robot' box.";
         } else {
-            $error = "Please enter your full name or phone number.";
+            $searchTerm = trim($_POST['search_term'] ?? '');
+            $searched = true;
+
+            if (!empty($searchTerm)) {
+                $results = findEmailByNameOrPhone($searchTerm);
+                if (empty($results)) {
+                    $error = "No matching account found for '{$searchTerm}'. Please check your spelling or contact your church administrator.";
+                }
+            } else {
+                $error = "Please enter your full name or phone number.";
+            }
         }
     }
 }
@@ -71,6 +78,8 @@ $csrf_token = generateCsrfToken();
     <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/enhanced.css">
+    <!-- Google reCAPTCHA API Script -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body class="login-container">
     <div class="login-card fade-in" style="max-width: 480px;">
@@ -100,6 +109,11 @@ $csrf_token = generateCsrfToken();
                         <i class='bx bx-search'></i>
                         <input type="text" name="search_term" class="form-control" placeholder="e.g. John Doe or +639171234567" value="<?php echo htmlspecialchars($_POST['search_term'] ?? ''); ?>" required autofocus>
                     </div>
+                </div>
+
+                <!-- Security Verification (Google reCAPTCHA v2) -->
+                <div class="form-group mb-3 d-flex justify-content-center">
+                    <div class="g-recaptcha" data-sitekey="<?php echo htmlspecialchars(CaptchaService::getSiteKey()); ?>"></div>
                 </div>
                 
                 <button type="submit" class="btn btn-primary w-100 py-3 mt-1">
