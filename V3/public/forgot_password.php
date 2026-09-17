@@ -15,6 +15,7 @@ require_once BASE_PATH . '/controllers/AuthController.php';
 
 redirectIfLogged();
 
+$error = '';
 $prefill_email = trim($_GET['email'] ?? '');
 $prefill_name  = trim($_GET['name'] ?? '');
 
