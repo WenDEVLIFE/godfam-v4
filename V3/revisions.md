@@ -58,15 +58,15 @@ This document details the pending revision tasks for the God's Family United Met
  
 ### 11. System Admin Name Display - DONE
 - **Description**: Dynamically render the authenticated administrator/user's full name across header banners, navigation bars, and generated PDF/Excel reports.
-- **Affected Files**: `public/layout/sidebar.php`, `public/dashboard.php`, `public/attendance_export.php`.
-- **Status**: Completed / Done.
+- **Affected Files**: `public/layout/header.php`, `public/dashboard.php`, `public/attendance_export.php`.
+- **Status**: Planned.
 
 ### 12. Protected System Roles (Secretary & Core Roles) - DONE
 - **Description**: Prevent editing, deleting, or modifying system-defined roles (Administrator, Pastor, Secretary, Staff) in role management settings.
 - **Affected Files**: `public/roles.php`, `models/Role.php`, `controllers/RoleController.php`.
 - **Status**: Completed / Done.
 
-### 13. Birthday, Anniversary & Church Event Reminders / Greetings - TODO
+### 13. Birthday, Anniversary & Church Event Reminders / Greetings - DONE
 - **Description**: Automated & manual trigger for birthday greetings, wedding anniversary reminders, and upcoming church event notifications.
 - **Affected Files**: `utils/birthday_reminder.php`, `public/api/trigger_birthday_reminder.php`, `models/Notification.php`.
 - **Status**: In Progress / Enhanced.
