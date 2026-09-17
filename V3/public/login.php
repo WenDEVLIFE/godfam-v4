@@ -56,6 +56,7 @@ $csrf_token = generateCsrfToken();
     <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/enhanced.css">
 </head>
 <body class="login-container">
     <div class="login-card">

@@ -463,7 +463,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.82) 0%, rgba(15, 17, 21, 0.88) 100%), url('../images/background.jpg') no-repeat center center / cover !important;
+    background-image: url('../images/background.jpg') !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
     padding: 20px;
     position: relative;
 }
@@ -480,19 +483,78 @@
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Dashboard Hero Banner */
-.dashboard-hero-banner {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.78) 0%, rgba(30, 41, 59, 0.85) 100%), url('../images/dashboard.jpg') no-repeat center center / cover !important;
-    border-radius: 16px !important;
-    color: #ffffff !important;
-    overflow: hidden !important;
-    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+/* ============================================================
+   Church Dashboard Whole Body Background Image
+   ============================================================ */
+html:has(body.dashboard-page),
+body.dashboard-page {
+    background-image: url('../images/dashboard.jpg') !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    min-height: 100vh !important;
 }
 
+body.dashboard-page .sidebar-layout,
+body.dashboard-page .main-content,
+body.dashboard-page .content-area,
+body.dashboard-page .flat-dashboard {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+body.dashboard-page .top-header {
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dashboard-page .top-header .page-title,
+body.dashboard-page .top-header .clock-badge {
+    color: #ffffff !important;
+}
+
+body.dashboard-page .top-header .clock-badge {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Glassmorphism Cards on Dashboard Page (Same as Login) */
+body.dashboard-page .card,
+body.dashboard-page .stat-card,
+body.dashboard-page .flat-dashboard .card,
+body.dashboard-page .flat-dashboard .stat-card,
+body.dashboard-page .bible-verse-card,
+body.dashboard-page .birthday-banner {
+    background: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Dashboard Hero Header (Clean text header directly over whole-body background) */
+body.dashboard-page .dashboard-hero-banner,
+.dashboard-hero-banner {
+    background: transparent !important;
+    background-image: none !important;
+    border-radius: 0 !important;
+    color: #ffffff !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin-bottom: 1.5rem !important;
+}
+
+body.dashboard-page .dashboard-hero-overlay,
 .dashboard-hero-overlay {
-    padding: 2.25rem 2.5rem !important;
-    backdrop-filter: blur(2px) !important;
+    padding: 0 !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 .dashboard-hero-title {

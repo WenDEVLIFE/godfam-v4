@@ -59,6 +59,7 @@ $csrf_token = generateCsrfToken();
     <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/enhanced.css">
     <style>
         .otp-input {
             letter-spacing: 12px;
