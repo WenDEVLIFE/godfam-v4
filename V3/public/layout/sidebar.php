@@ -44,6 +44,10 @@ $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
                 <i class='bx bxs-user-account'></i>
                 <span>User Accounts</span>
             </a>
+            <a href="roles.php" class="nav-link <?php echo $current_page === 'roles.php' ? 'active' : ''; ?>">
+                <i class='bx bxs-shield-quarter'></i>
+                <span>System Roles</span>
+            </a>
         <?php endif; ?>
 
         <?php if ($is_admin || $is_staff): ?>

@@ -61,10 +61,10 @@ This document details the pending revision tasks for the God's Family United Met
 - **Affected Files**: `public/layout/header.php`, `public/dashboard.php`, `public/attendance_export.php`.
 - **Status**: Planned.
 
-### 12. Protected System Roles (Secretary & Core Roles) - TODO
+### 12. Protected System Roles (Secretary & Core Roles) - DONE
 - **Description**: Prevent editing, deleting, or modifying system-defined roles (Administrator, Pastor, Secretary, Staff) in role management settings.
-- **Affected Files**: `public/roles.php`, `models/Role.php`.
-- **Status**: Planned.
+- **Affected Files**: `public/roles.php`, `models/Role.php`, `controllers/RoleController.php`.
+- **Status**: Completed / Done.
 
 ### 13. Birthday, Anniversary & Church Event Reminders / Greetings - TODO
 - **Description**: Automated & manual trigger for birthday greetings, wedding anniversary reminders, and upcoming church event notifications.
