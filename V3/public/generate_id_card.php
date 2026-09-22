@@ -179,46 +179,6 @@ include __DIR__ . '/layout/sidebar.php';
                 <div style="margin-top: 4px; opacity: 0.8; font-size: 10px;">"Therefore go, grow in love, mission and service."</div>
             </div>
         </div>
-
-        <!-- BACK CARD -->
-        <div class="id-card-modern shadow-lg no-print-mobile" style="background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); position: relative;">
-            <div class="id-card-top-header d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
-                <div class="id-church-titles text-center">
-                    <div class="id-church-name" style="letter-spacing: 1.5px;">TERMS &amp; CONDITIONS</div>
-                    <div class="id-church-sub">God's Family UM Church</div>
-                </div>
-            </div>
-
-            <div class="id-card-content text-left" style="padding: 24px; font-size: 11px; line-height: 1.6; color: #334155;">
-                <div class="mb-3">
-                    <strong>1. Membership Verification:</strong> This digital ID card serves as an official identification pass for church services, events, and ministry activities.
-                </div>
-                <div class="mb-3">
-                    <strong>2. Non-Transferable:</strong> This pass is strictly non-transferable and issued solely to the designated member.
-                </div>
-                <div class="mb-3">
-                    <strong>3. QR Scanner Access:</strong> Present the front QR code at scanner kiosks for automated attendance logging.
-                </div>
-                <?php if (!empty($member['address'])): ?>
-                    <div class="mb-3">
-                        <strong>Address:</strong> <?php echo htmlspecialchars($member['address']); ?>
-                    </div>
-                <?php endif; ?>
-                <?php if (!empty($member['contact_info'])): ?>
-                    <div class="mb-3">
-                        <strong>Emergency Info:</strong> <?php echo htmlspecialchars($member['contact_info']); ?>
-                    </div>
-                <?php endif; ?>
-                <div class="mt-4 pt-3 border-top text-center">
-                    <div style="font-family: 'Playfair Display', serif; font-size: 14px; font-style: italic; color: #0f172a;">Rev. Benjamin Santos</div>
-                    <div style="font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700;">Resident Pastor</div>
-                </div>
-            </div>
-
-            <div class="id-card-footer-modern" style="position: absolute; bottom: 0; left: 0; right: 0;">
-                <div style="font-size: 10px; color: #64748b;">Property of God's Family UMC. If found, please return to Church Administration.</div>
-            </div>
-        </div>
     </div>
 </div>
 
