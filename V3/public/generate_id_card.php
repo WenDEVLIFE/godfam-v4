@@ -64,19 +64,26 @@ if (!isAdmin() && !isStaff() && (int)($_SESSION['member_id'] ?? 0) !== (int)$mem
     die("Unauthorized Access: You can only view your own Digital ID Card.");
 }
 
-// Generate QR Code SVG
+// Generate QR Code SVG or Fallback URL
 $qrSvgContent = '';
-$qrError = '';
+$qrImageUrl   = '';
+$qrError      = '';
+
 if (!empty($member['qr_token'])) {
-    try {
-        $qrCode = new QrCode($member['qr_token']);
-        $qrCode->setSize(200);
-        $qrCode->setMargin(8);
-        $qrCode->setWriterByName('svg');
-        $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::MEDIUM());
-        $qrSvgContent = $qrCode->writeString();
-    } catch (\Throwable $e) {
-        $qrError = 'QR Generation Error: ' . $e->getMessage();
+    if (class_exists('Endroid\QrCode\QrCode')) {
+        try {
+            $qrCode = new QrCode($member['qr_token']);
+            $qrCode->setSize(200);
+            $qrCode->setMargin(8);
+            $qrCode->setWriterByName('svg');
+            $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::MEDIUM());
+            $qrSvgContent = $qrCode->writeString();
+        } catch (\Throwable $e) {
+            $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($member['qr_token']);
+        }
+    } else {
+        // Fallback for environments where vendor/ directory was omitted
+        $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($member['qr_token']);
     }
 } else {
     $qrError = 'No QR token assigned. Please regenerate token.';
@@ -159,6 +166,8 @@ include __DIR__ . '/layout/sidebar.php';
                 <div class="id-qr-box">
                     <?php if ($qrSvgContent): ?>
                         <?php echo $qrSvgContent; ?>
+                    <?php elseif ($qrImageUrl): ?>
+                        <img src="<?php echo htmlspecialchars($qrImageUrl); ?>" alt="QR Code" style="width: 170px; height: 170px; object-fit: contain;">
                     <?php else: ?>
                         <p style="color:#dc2626; font-size:11px; text-align:center;"><?php echo htmlspecialchars($qrError); ?></p>
                     <?php endif; ?>

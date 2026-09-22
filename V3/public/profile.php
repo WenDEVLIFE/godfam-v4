@@ -98,22 +98,24 @@ if (!$member) {
 // Generate QR SVG inline — avoids a separate HTTP sub-request and any
 // cross-PHP-environment issues with the generate_qr.php endpoint.
 $qrSvgContent = '';
-$qrError = '';
-if (!class_exists('Endroid\QrCode\QrCode')) {
-    $qrError = 'Vendor library missing. Please copy the "vendor" folder to C:\xampp\htdocs\V3\vendor or run "composer install".';
-} elseif (!empty($member['qr_token'])) {
-    try {
-        // Using endroid/qr-code v3.x fluent API for maximum PHP 8.0 compatibility.
-        // This version does not use the Builder pattern.
-        $qrCode = new QrCode($member['qr_token']);
-        $qrCode->setSize(200);
-        $qrCode->setMargin(8);
-        $qrCode->setWriterByName('svg');
-        $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::MEDIUM());
-        
-        $qrSvgContent = $qrCode->writeString();
-    } catch (\Throwable $e) {
-        $qrError = 'QR Error: ' . $e->getMessage();
+$qrImageUrl   = '';
+$qrError      = '';
+
+if (!empty($member['qr_token'])) {
+    if (class_exists('Endroid\QrCode\QrCode')) {
+        try {
+            $qrCode = new QrCode($member['qr_token']);
+            $qrCode->setSize(200);
+            $qrCode->setMargin(8);
+            $qrCode->setWriterByName('svg');
+            $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::MEDIUM());
+            $qrSvgContent = $qrCode->writeString();
+        } catch (\Throwable $e) {
+            $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($member['qr_token']);
+        }
+    } else {
+        // Fallback for environments where vendor/ directory was omitted
+        $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($member['qr_token']);
     }
 } else {
     $qrError = 'No QR token assigned. Please contact an administrator.';
@@ -177,6 +179,8 @@ include __DIR__ . '/layout/sidebar.php';
             <div class="id-qr-box">
                 <?php if ($qrSvgContent): ?>
                     <?php echo $qrSvgContent; ?>
+                <?php elseif ($qrImageUrl): ?>
+                    <img src="<?php echo htmlspecialchars($qrImageUrl); ?>" alt="QR Code" style="width: 170px; height: 170px; object-fit: contain;">
                 <?php else: ?>
                     <p style="color:#c53030;font-size:10px;text-align:center;"><?php echo htmlspecialchars($qrError); ?></p>
                 <?php endif; ?>
