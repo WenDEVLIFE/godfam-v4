@@ -526,6 +526,25 @@ body.dashboard-page {
     box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04) !important;
 }
 
+/* White background Bible Verse Card with dark text */
+.bible-verse-card {
+    border-left: 5px solid #d97706 !important;
+}
+
+.bible-verse-card .bible-verse-label,
+.bible-verse-card .bible-verse-icon {
+    color: #d97706 !important;
+}
+
+.bible-verse-card .bible-verse-text {
+    color: #0f172a !important;
+    font-weight: 500 !important;
+}
+
+.bible-verse-card .bible-verse-ref {
+    color: #0284c7 !important;
+}
+
 body.dashboard-page .top-header {
     background: rgba(15, 23, 42, 0.75) !important;
     backdrop-filter: blur(10px) !important;
