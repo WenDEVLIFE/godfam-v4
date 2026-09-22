@@ -3,9 +3,28 @@
  * Mail Service - Handles PHPMailer integration and email broadcasting.
  */
 
-require_once __DIR__ . '/../vendor/PHPMailer/src/Exception.php';
-require_once __DIR__ . '/../vendor/PHPMailer/src/PHPMailer.php';
-require_once __DIR__ . '/../vendor/PHPMailer/src/SMTP.php';
+// Support Composer autoloader or manual folder structures (PHPMailer / phpmailer)
+if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    $autoloader = __DIR__ . '/../vendor/autoload.php';
+    if (file_exists($autoloader)) {
+        require_once $autoloader;
+    }
+}
+
+if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    $possiblePaths = [
+        __DIR__ . '/../vendor/PHPMailer/src/',
+        __DIR__ . '/../vendor/phpmailer/phpmailer/src/',
+    ];
+    foreach ($possiblePaths as $basePath) {
+        if (file_exists($basePath . 'Exception.php')) {
+            require_once $basePath . 'Exception.php';
+            require_once $basePath . 'PHPMailer.php';
+            require_once $basePath . 'SMTP.php';
+            break;
+        }
+    }
+}
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
