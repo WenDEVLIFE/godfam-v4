@@ -2,7 +2,10 @@
 require_once BASE_PATH . '/config/database.php';
 require_once BASE_PATH . '/models/Member.php';
 require_once BASE_PATH . '/middleware/AuthMiddleware.php';
-require_once BASE_PATH . '/vendor/autoload.php';
+$autoloader = BASE_PATH . '/vendor/autoload.php';
+if (file_exists($autoloader)) {
+    require_once $autoloader;
+}
 
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\ErrorCorrectionLevel;

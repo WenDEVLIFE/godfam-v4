@@ -7,7 +7,10 @@ $page_title = 'My Digital ID Card';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../models/Member.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+$autoloader = __DIR__ . '/../vendor/autoload.php';
+if (file_exists($autoloader)) {
+    require_once $autoloader;
+}
 
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -96,7 +99,9 @@ if (!$member) {
 // cross-PHP-environment issues with the generate_qr.php endpoint.
 $qrSvgContent = '';
 $qrError = '';
-if (!empty($member['qr_token'])) {
+if (!class_exists('Endroid\QrCode\QrCode')) {
+    $qrError = 'Vendor library missing. Please copy the "vendor" folder to C:\xampp\htdocs\V3\vendor or run "composer install".';
+} elseif (!empty($member['qr_token'])) {
     try {
         // Using endroid/qr-code v3.x fluent API for maximum PHP 8.0 compatibility.
         // This version does not use the Builder pattern.
