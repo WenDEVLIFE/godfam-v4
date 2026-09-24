@@ -150,7 +150,7 @@ include __DIR__ . '/layout/sidebar.php';
                                 <td class="text-right" style="padding-right: 24px;">
                                     <div class="d-flex justify-content-end align-items-center gap-2">
                                         <button type="button" class="btn btn-sm btn-outline-primary" style="display: inline-flex; align-items: center; gap: 4px;"
-                                                onclick="openEditUserModal(<?php echo (int)$u['user_id']; ?>, '<?php echo htmlspecialchars(addslashes($u['name'])); ?>', '<?php echo htmlspecialchars(addslashes($u['email'])); ?>', <?php echo (int)$u['role_id']; ?>)" 
+                                                onclick="openEditUserModal(<?php echo (int)$u['user_id']; ?>, '<?php echo htmlspecialchars(addslashes($u['name'])); ?>', '<?php echo htmlspecialchars(addslashes($u['email'])); ?>', <?php echo (int)$u['role_id']; ?>, '<?php echo htmlspecialchars($u['birthday'] ?? ''); ?>', '<?php echo htmlspecialchars($u['wedding_anniversary'] ?? ''); ?>')" 
                                                 title="Edit User Account">
                                             <i class='bx bx-edit'></i> Edit
                                         </button>
@@ -216,6 +216,16 @@ include __DIR__ . '/layout/sidebar.php';
                             <input type="password" name="password" class="form-control" placeholder="••••••••" required>
                         </div>
 
+                        <div class="form-group">
+                            <label class="form-label">Birthday (Optional)</label>
+                            <input type="date" name="birthday" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Wedding Anniversary (Optional)</label>
+                            <input type="date" name="wedding_anniversary" class="form-control">
+                        </div>
+
                         <div class="form-group full-width mb-0">
                             <div class="d-flex align-items-center gap-2">
                                 <input type="checkbox" id="user_agree" required style="width: 16px; height: 16px;">
@@ -269,6 +279,16 @@ include __DIR__ . '/layout/sidebar.php';
                         <div class="form-group">
                             <label class="form-label">New Password (Optional)</label>
                             <input type="password" name="password" class="form-control" placeholder="Leave blank to keep unchanged">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Birthday</label>
+                            <input type="date" name="birthday" id="edit_user_birthday" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Wedding Anniversary</label>
+                            <input type="date" name="wedding_anniversary" id="edit_user_wedding_anniversary" class="form-control">
                         </div>
                     </div>
                     
@@ -334,11 +354,13 @@ include __DIR__ . '/layout/sidebar.php';
         }
     }
 
-    function openEditUserModal(id, name, email, roleId) {
+    function openEditUserModal(id, name, email, roleId, birthday, weddingAnniversary) {
         document.getElementById('edit_user_id').value = id;
         document.getElementById('edit_user_name').value = name;
         document.getElementById('edit_user_email').value = email;
         document.getElementById('edit_user_role_id').value = roleId;
+        document.getElementById('edit_user_birthday').value = birthday || '';
+        document.getElementById('edit_user_wedding_anniversary').value = weddingAnniversary || '';
         toggleModal('editUserModal');
     }
 

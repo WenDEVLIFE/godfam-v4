@@ -41,6 +41,48 @@ class UserController {
             return "Name, email, and password are required.";
         }
 
+        require_once BASE_PATH . '/models/Member.php';
+        $memberModel = new Member($this->pdo);
+
+        $existingMember = $memberModel->findByEmail($data['email']);
+        $memberId = null;
+
+        $birthday = !empty($data['birthday']) ? trim($data['birthday']) : null;
+        $weddingAnniversary = !empty($data['wedding_anniversary']) ? trim($data['wedding_anniversary']) : null;
+
+        if ($existingMember) {
+            $memberId = $existingMember['member_id'];
+            $updateData = [
+                'full_name'           => $data['name'],
+                'photo_path'          => $existingMember['photo_path'],
+                'email'               => $data['email'],
+                'phone'               => $existingMember['phone'],
+                'contact_info'        => $existingMember['contact_info'],
+                'address'             => $existingMember['address'],
+                'birthday'            => $birthday ?: $existingMember['birthday'],
+                'wedding_anniversary' => $weddingAnniversary ?: $existingMember['wedding_anniversary'],
+                'status'              => $existingMember['status'] ?? 'active'
+            ];
+            $memberModel->update($memberId, $updateData);
+        } else {
+            $newMemberData = [
+                'full_name'           => htmlspecialchars(trim($data['name'])),
+                'email'               => trim($data['email']),
+                'phone'               => null,
+                'address'             => null,
+                'contact_info'        => null,
+                'birthday'            => $birthday,
+                'wedding_anniversary' => $weddingAnniversary,
+                'status'              => 'active'
+            ];
+            $createdId = $memberModel->create($newMemberData);
+            if ($createdId) {
+                $memberId = $createdId;
+            }
+        }
+
+        $data['member_id'] = $memberId;
+
         if ($this->userModel->create($data)) {
             return true;
         }
@@ -58,6 +100,28 @@ class UserController {
         }
 
         if ($this->userModel->update($id, $data)) {
+            $user = $this->userModel->findWithRole($id);
+            if (!empty($user['member_id'])) {
+                require_once BASE_PATH . '/models/Member.php';
+                $memberModel = new Member($this->pdo);
+                $existingMember = $memberModel->find($user['member_id']);
+                if ($existingMember) {
+                    $birthday = !empty($data['birthday']) ? trim($data['birthday']) : $existingMember['birthday'];
+                    $weddingAnniversary = !empty($data['wedding_anniversary']) ? trim($data['wedding_anniversary']) : $existingMember['wedding_anniversary'];
+                    $updateData = [
+                        'full_name'           => $data['name'],
+                        'photo_path'          => $existingMember['photo_path'],
+                        'email'               => $data['email'],
+                        'phone'               => $existingMember['phone'],
+                        'contact_info'        => $existingMember['contact_info'],
+                        'address'             => $existingMember['address'],
+                        'birthday'            => $birthday,
+                        'wedding_anniversary' => $weddingAnniversary,
+                        'status'              => $existingMember['status'] ?? 'active'
+                    ];
+                    $memberModel->update($existingMember['member_id'], $updateData);
+                }
+            }
             return true;
         }
         return "Failed to update user.";

@@ -10,7 +10,7 @@ class User {
     }
 
     public function all($excludeAdmin = false) {
-        $sql = "SELECT u.*, r.role_name, m.photo_path AS member_photo
+        $sql = "SELECT u.*, r.role_name, m.photo_path AS member_photo, m.birthday, m.wedding_anniversary
              FROM users u
              JOIN roles r ON u.role_id = r.role_id
              LEFT JOIN members m ON u.member_id = m.member_id";
@@ -57,7 +57,7 @@ class User {
 
     public function findWithRole($id) {
         $stmt = $this->pdo->prepare(
-            "SELECT u.user_id, u.name, u.email, u.role_id, r.role_name
+            "SELECT u.user_id, u.member_id, u.name, u.email, u.role_id, r.role_name
              FROM users u
              JOIN roles r ON u.role_id = r.role_id
              WHERE u.user_id = ?"

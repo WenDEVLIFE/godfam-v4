@@ -119,6 +119,8 @@ include __DIR__ . '/layout/sidebar.php';
                                             data-contact="<?php echo htmlspecialchars($member['contact_info'] ?? ''); ?>"
                                             data-status="<?php echo htmlspecialchars($member['status']); ?>"
                                             data-photo="<?php echo htmlspecialchars($member['photo_path'] ?? ''); ?>"
+                                            data-birthday="<?php echo htmlspecialchars($member['birthday'] ?? ''); ?>"
+                                            data-wedding-anniversary="<?php echo htmlspecialchars($member['wedding_anniversary'] ?? ''); ?>"
                                             data-role="<?php echo htmlspecialchars($member['role_name'] ?? 'Member'); ?>">
                                         View
                                     </button>
@@ -178,6 +180,14 @@ include __DIR__ . '/layout/sidebar.php';
             <div class="row mb-3">
                 <div class="col-4 text-muted small uppercase font-weight-bold">Address</div>
                 <div class="col-8" id="view_address"></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4 text-muted small uppercase font-weight-bold">Birthday</div>
+                <div class="col-8" id="view_birthday"></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4 text-muted small uppercase font-weight-bold">Wedding Anniversary</div>
+                <div class="col-8" id="view_wedding_anniversary"></div>
             </div>
             <div class="row mb-3">
                 <div class="col-4 text-muted small uppercase font-weight-bold">Role</div>
@@ -398,6 +408,8 @@ document.querySelectorAll('.view-member-btn').forEach(btn => {
         document.getElementById('view_email').textContent = d.email;
         document.getElementById('view_phone').textContent = d.phone || '---';
         document.getElementById('view_address').textContent = d.address || '---';
+        document.getElementById('view_birthday').textContent = d.birthday ? new Date(d.birthday + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '---';
+        document.getElementById('view_wedding_anniversary').textContent = d.weddingAnniversary ? new Date(d.weddingAnniversary + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '---';
         document.getElementById('view_role').textContent = d.role;
         
         const badge = document.getElementById('view_status_badge');
