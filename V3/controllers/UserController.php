@@ -10,8 +10,10 @@ require_once BASE_PATH . '/middleware/CSRF.php';
 
 class UserController {
     private $userModel;
+    private $pdo;
 
     public function __construct($pdo) {
+        $this->pdo = $pdo;
         $this->userModel = new User($pdo);
     }
 
