@@ -156,16 +156,16 @@ include __DIR__ . '/layout/sidebar.php';
 
 <?php if (isAdmin() || isStaff()): ?>
 
-<!-- ===== REMINDERS & GREETINGS WIDGET ===== -->
-<div class="card mb-4 border-0 shadow-sm" style="border-radius: 20px; overflow: hidden; background: #ffffff; border: 1px solid #e2e8f0;">
-    <!-- Top Widget Header -->
-    <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div class="d-flex align-items-start gap-3">
-            <div class="rounded-3 p-2.5 d-flex align-items-center justify-content-center" style="background: #eff6ff; color: #2563eb; width: 46px; height: 46px; flex-shrink: 0;">
-                <i class='bx bxs-bell-ring' style="font-size: 1.5rem;"></i>
+<!-- ===== REMINDERS & GREETINGS CENTER WIDGET ===== -->
+<div class="reminders-widget-card mb-4">
+    <!-- Top Header -->
+    <div class="reminders-widget-header">
+        <div class="d-flex align-items-center gap-3">
+            <div class="reminders-bell-icon">
+                <i class='bx bxs-bell-ring'></i>
             </div>
             <div>
-                <h4 class="mb-1 font-weight-800 text-dark" style="font-size: 1.2rem; letter-spacing: -0.3px;">Reminders &amp; Greetings Center</h4>
+                <h4 class="mb-0 font-weight-800 text-dark" style="font-size: 1.2rem; letter-spacing: -0.3px;">Reminders &amp; Greetings Center</h4>
                 <p class="text-muted small mb-0 font-weight-500">Stay updated with upcoming events and celebrate the special moments of our church family.</p>
             </div>
         </div>
@@ -174,200 +174,195 @@ include __DIR__ . '/layout/sidebar.php';
         </button>
     </div>
 
-    <div class="card-body p-4 pt-0">
-        <div class="row g-4">
-            <!-- LEFT COLUMN: UPCOMING REMINDERS (Blue Theme) -->
-            <div class="col-lg-6">
-                <div class="p-4 rounded-4 h-100" style="background: #f0f9ff; border: 1px solid #e0f2fe; border-radius: 16px;">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="rounded-2 p-1.5 d-flex align-items-center justify-content-center" style="background: #0284c7; color: white; width: 32px; height: 32px;">
-                                <i class='bx bxs-calendar' style="font-size: 1.1rem;"></i>
-                            </div>
-                            <h6 class="mb-0 font-weight-800 text-dark" style="font-size: 1.05rem;">Upcoming Reminders</h6>
+    <!-- Grid Container: 2 Equal Columns -->
+    <div class="reminders-grid-container">
+        <!-- LEFT COLUMN: UPCOMING REMINDERS (Blue Theme) -->
+        <div class="reminders-blue-panel">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="reminders-blue-header-icon">
+                            <i class='bx bxs-calendar'></i>
                         </div>
-                        <a href="events.php" class="text-primary font-weight-700 small text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 12px;">
-                            View All <i class='bx bx-right-arrow-alt'></i>
-                        </a>
+                        <h6 class="mb-0 font-weight-800 text-dark" style="font-size: 1.05rem;">Upcoming Reminders</h6>
                     </div>
+                    <a href="events.php" class="text-primary font-weight-700 small text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 12px;">
+                        View All <i class='bx bx-right-arrow-alt'></i>
+                    </a>
+                </div>
 
-                    <div class="d-flex flex-column gap-3">
-                        <?php 
-                        $display_events = !empty($recent_events) ? array_slice($recent_events, 0, 4) : [];
-                        if (!empty($display_events)):
-                            $badge_colors = [
-                                ['bg' => '#e0f2fe', 'text' => '#0369a1'],
-                                ['bg' => '#d1fae5', 'text' => '#047857'],
-                                ['bg' => '#fef3c7', 'text' => '#b45309'],
-                                ['bg' => '#ffe4e6', 'text' => '#be123c']
-                            ];
-                            $idx = 0;
-                            foreach ($display_events as $ev):
-                                $color = $badge_colors[$idx % count($badge_colors)];
-                                $idx++;
-                                $event_date = strtotime($ev['date']);
-                                $month_str  = strtoupper(date('M', $event_date));
-                                $day_str    = date('d', $event_date);
-                        ?>
-                            <a href="events.php" class="text-decoration-none text-dark">
-                                <div class="p-3 bg-white rounded-3 border d-flex align-items-center justify-content-between shadow-xs" style="border-color: #e2e8f0 !important; border-radius: 12px !important;">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="text-center rounded-3 p-2 font-weight-800 d-flex flex-column align-items-center justify-content-center" style="width: 50px; height: 50px; background: <?php echo $color['bg']; ?>; color: <?php echo $color['text']; ?>; flex-shrink: 0; border-radius: 10px !important;">
-                                            <span style="font-size: 10px; line-height: 1; letter-spacing: 0.5px;"><?php echo $month_str; ?></span>
-                                            <span style="font-size: 17px; line-height: 1.1; font-weight: 900;"><?php echo $day_str; ?></span>
-                                        </div>
-                                        <div>
-                                            <div class="font-weight-700 text-dark mb-1" style="font-size: 13.5px;"><?php echo htmlspecialchars($ev['title']); ?></div>
-                                            <div class="text-muted extra-small font-weight-500 d-flex align-items-center gap-2">
-                                                <span><i class='bx bx-time-five me-1 text-primary'></i><?php echo !empty($ev['time']) ? date('h:i A', strtotime($ev['time'])) : 'All Day'; ?></span>
-                                                <?php if (!empty($ev['location'])): ?>
-                                                    <span>&bull; <i class='bx bx-map me-1 text-muted'></i><?php echo htmlspecialchars($ev['location']); ?></span>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <i class='bx bx-chevron-right text-muted fs-4'></i>
+                <div class="d-flex flex-column">
+                    <?php 
+                    $display_events = !empty($recent_events) ? array_slice($recent_events, 0, 4) : [];
+                    if (!empty($display_events)):
+                        $badge_colors = [
+                            ['bg' => '#e0f2fe', 'text' => '#0369a1'],
+                            ['bg' => '#d1fae5', 'text' => '#047857'],
+                            ['bg' => '#fef3c7', 'text' => '#b45309'],
+                            ['bg' => '#ffe4e6', 'text' => '#be123c']
+                        ];
+                        $idx = 0;
+                        foreach ($display_events as $ev):
+                            $color = $badge_colors[$idx % count($badge_colors)];
+                            $idx++;
+                            $event_date = strtotime($ev['date']);
+                            $month_str  = strtoupper(date('M', $event_date));
+                            $day_str    = date('d', $event_date);
+                    ?>
+                        <a href="events.php" class="reminder-item-card">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="reminder-date-badge" style="background: <?php echo $color['bg']; ?>; color: <?php echo $color['text']; ?>;">
+                                    <span class="reminder-date-month"><?php echo $month_str; ?></span>
+                                    <span class="reminder-date-day"><?php echo $day_str; ?></span>
                                 </div>
-                            </a>
-                        <?php 
-                            endforeach;
-                        else: 
-                        ?>
-                            <div class="text-center py-4 px-3 bg-white rounded-3 border border-dashed" style="border-radius: 12px !important;">
-                                <i class='bx bxs-calendar-x text-muted opacity-50 mb-2' style="font-size: 2rem;"></i>
-                                <div class="font-weight-700 text-dark small">No Upcoming Reminders</div>
-                                <div class="text-muted extra-small">Check back later for new church events and schedules.</div>
+                                <div>
+                                    <div class="font-weight-700 text-dark mb-1" style="font-size: 13.5px;"><?php echo htmlspecialchars($ev['title']); ?></div>
+                                    <div class="text-muted extra-small font-weight-500 d-flex align-items-center gap-2" style="font-size: 11px;">
+                                        <span><i class='bx bx-time-five me-1 text-primary'></i><?php echo !empty($ev['time']) ? date('h:i A', strtotime($ev['time'])) : 'All Day'; ?></span>
+                                        <?php if (!empty($ev['location'])): ?>
+                                            <span>&bull; <i class='bx bx-map me-1 text-muted'></i><?php echo htmlspecialchars($ev['location']); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
                             </div>
-                        <?php endif; ?>
+                            <i class='bx bx-chevron-right text-muted fs-5'></i>
+                        </a>
+                    <?php 
+                        endforeach;
+                    else: 
+                    ?>
+                        <div class="text-center py-4 px-3 bg-white rounded-3 border border-dashed" style="border-radius: 12px !important;">
+                            <i class='bx bxs-calendar-x text-muted opacity-50 mb-2' style="font-size: 2rem;"></i>
+                            <div class="font-weight-700 text-dark small">No Upcoming Reminders</div>
+                            <div class="text-muted extra-small">Check back later for new church events and schedules.</div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: BIRTHDAY & ANNIVERSARY GREETINGS (Purple Theme) -->
+        <div class="greetings-purple-panel">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="greetings-purple-header-icon">
+                            <i class='bx bxs-gift'></i>
+                        </div>
+                        <h6 class="mb-0 font-weight-800 text-dark" style="font-size: 1.05rem;">Birthday &amp; Anniversary Greetings</h6>
                     </div>
+                    <a href="members.php" class="font-weight-700 small text-decoration-none d-inline-flex align-items-center gap-1" style="color: #7c3aed; font-size: 12px;">
+                        View All <i class='bx bx-right-arrow-alt'></i>
+                    </a>
+                </div>
+
+                <!-- TAB CONTROLS -->
+                <div class="greetings-tab-bar">
+                    <button type="button" class="greetings-tab-btn active" id="tab-btn-birthdays" onclick="switchGreetingsTab('birthdays')">
+                        Birthdays
+                    </button>
+                    <button type="button" class="greetings-tab-btn" id="tab-btn-anniversaries" onclick="switchGreetingsTab('anniversaries')">
+                        Wedding Anniversaries
+                    </button>
+                </div>
+
+                <!-- BIRTHDAYS TAB CONTENT -->
+                <div id="tab-content-birthdays">
+                    <?php 
+                    $all_birthdays = array_merge($birthday_celebrants, $upcoming_birthdays);
+                    if (!empty($all_birthdays)):
+                        $wishes = [
+                            "May your new year be filled with God's endless blessings!",
+                            "God's favor and joy be with you always!",
+                            "Continue to shine for His glory! Happy Birthday!",
+                            "Wishing you abundant grace and peace on your special day!"
+                        ];
+                        $b_idx = 0;
+                        foreach (array_slice($all_birthdays, 0, 3) as $b_item):
+                            $wish = $wishes[$b_idx % count($wishes)];
+                            $b_idx++;
+                            $b_date = !empty($b_item['birthday']) ? date('F j', strtotime($b_item['birthday'])) : 'Today';
+                    ?>
+                        <div class="greeting-item-card">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="greeting-avatar">
+                                    <?php echo strtoupper(substr($b_item['full_name'], 0, 1)); ?>
+                                </div>
+                                <div>
+                                    <div class="font-weight-700 text-dark small mb-0.5"><?php echo htmlspecialchars($b_item['full_name']); ?></div>
+                                    <div class="text-muted extra-small" style="font-size: 11px;"><?php echo $b_date; ?></div>
+                                </div>
+                            </div>
+                            <div class="text-end ps-2" style="max-width: 48%;">
+                                <div class="text-muted extra-small italic" style="font-size: 11px;"><?php echo $wish; ?></div>
+                            </div>
+                            <i class='bx bxs-cake me-1 fs-5' style="color: #8b5cf6;"></i>
+                        </div>
+                    <?php 
+                        endforeach;
+                    else: 
+                    ?>
+                        <div class="text-center py-4 px-3 bg-white rounded-3 border border-dashed" style="border-color: #ddd6fe !important; border-radius: 12px !important;">
+                            <i class='bx bxs-cake text-purple opacity-40 mb-2' style="color: #a78bfa; font-size: 2rem;"></i>
+                            <div class="font-weight-700 text-dark small">No Birthday Celebrants</div>
+                            <div class="text-muted extra-small">No upcoming birthdays found in the next 7 days.</div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- ANNIVERSARIES TAB CONTENT -->
+                <div id="tab-content-anniversaries" style="display: none;">
+                    <?php 
+                    $all_anniversaries = array_merge($anniversary_celebrants, $upcoming_anniversaries);
+                    if (!empty($all_anniversaries)):
+                        $anniv_wishes = [
+                            "May God continue to bless your marriage and journey together!",
+                            "Celebrating your love and commitment in Christ!",
+                            "Wishing you many more years of joy, love, and unity!"
+                        ];
+                        $a_idx = 0;
+                        foreach (array_slice($all_anniversaries, 0, 3) as $a_item):
+                            $a_wish = $anniv_wishes[$a_idx % count($anniv_wishes)];
+                            $a_idx++;
+                            $a_date = !empty($a_item['wedding_anniversary']) ? date('F j', strtotime($a_item['wedding_anniversary'])) : 'Today';
+                    ?>
+                        <div class="greeting-item-card">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="greeting-avatar" style="background: #ffe4e6 !important; color: #e11d48 !important;">
+                                    <i class='bx bxs-heart'></i>
+                                </div>
+                                <div>
+                                    <div class="font-weight-700 text-dark small mb-0.5"><?php echo htmlspecialchars($a_item['full_name']); ?></div>
+                                    <div class="text-muted extra-small" style="font-size: 11px;"><?php echo $a_date; ?></div>
+                                </div>
+                            </div>
+                            <div class="text-end ps-2" style="max-width: 48%;">
+                                <div class="text-muted extra-small italic" style="font-size: 11px;"><?php echo $a_wish; ?></div>
+                            </div>
+                            <i class='bx bxs-heart text-danger me-1 fs-5'></i>
+                        </div>
+                    <?php 
+                        endforeach;
+                    else: 
+                    ?>
+                        <div class="text-center py-4 px-3 bg-white rounded-3 border border-dashed" style="border-color: #fecdd3 !important; border-radius: 12px !important;">
+                            <i class='bx bxs-heart text-danger opacity-40 mb-2' style="font-size: 2rem;"></i>
+                            <div class="font-weight-700 text-dark small">No Wedding Anniversaries</div>
+                            <div class="text-muted extra-small">No upcoming wedding anniversaries found.</div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: BIRTHDAY & ANNIVERSARY GREETINGS (Purple Theme) -->
-            <div class="col-lg-6">
-                <div class="p-4 rounded-4 h-100 d-flex flex-column justify-content-between" style="background: #faf5ff; border: 1px solid #f3e8ff; border-radius: 16px;">
-                    <div>
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-2 p-1.5 d-flex align-items-center justify-content-center" style="background: #7c3aed; color: white; width: 32px; height: 32px;">
-                                    <i class='bx bxs-gift' style="font-size: 1.1rem;"></i>
-                                </div>
-                                <h6 class="mb-0 font-weight-800 text-dark" style="font-size: 1.05rem;">Birthday &amp; Anniversary Greetings</h6>
-                            </div>
-                            <a href="members.php" class="font-weight-700 small text-decoration-none d-inline-flex align-items-center gap-1" style="color: #7c3aed; font-size: 12px;">
-                                View All <i class='bx bx-right-arrow-alt'></i>
-                            </a>
-                        </div>
-
-                        <!-- TAB CONTROLS -->
-                        <div class="p-1 rounded-pill mb-3 d-flex" style="background: #f3e8ff; border: 1px solid #e9d5ff;">
-                            <button type="button" class="btn btn-sm w-50 rounded-pill font-weight-700 py-1.5 tab-greetings-btn active" id="tab-btn-birthdays" onclick="switchGreetingsTab('birthdays')" style="font-size: 12px; transition: all 0.2s; background: #7c3aed; color: #ffffff;">
-                                Birthdays
-                            </button>
-                            <button type="button" class="btn btn-sm w-50 rounded-pill font-weight-700 py-1.5 tab-greetings-btn" id="tab-btn-anniversaries" onclick="switchGreetingsTab('anniversaries')" style="font-size: 12px; transition: all 0.2s; background: transparent; color: #6b21a8;">
-                                Wedding Anniversaries
-                            </button>
-                        </div>
-
-                        <!-- BIRTHDAYS TAB CONTENT -->
-                        <div id="tab-content-birthdays">
-                            <?php 
-                            $all_birthdays = array_merge($birthday_celebrants, $upcoming_birthdays);
-                            if (!empty($all_birthdays)):
-                                $wishes = [
-                                    "May your new year be filled with God's endless blessings!",
-                                    "God's favor and joy be with you always!",
-                                    "Continue to shine for His glory! Happy Birthday!",
-                                    "Wishing you abundant grace and peace on your special day!"
-                                ];
-                                $b_idx = 0;
-                                foreach (array_slice($all_birthdays, 0, 3) as $b_item):
-                                    $wish = $wishes[$b_idx % count($wishes)];
-                                    $b_idx++;
-                                    $b_date = !empty($b_item['birthday']) ? date('F j', strtotime($b_item['birthday'])) : 'Today';
-                            ?>
-                                <div class="p-3 bg-white rounded-3 border mb-2 d-flex align-items-center justify-content-between shadow-xs" style="border-color: #f3e8ff !important; border-radius: 12px !important;">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center font-weight-700" style="width: 38px; height: 38px; background: #f3e8ff; color: #7c3aed; font-size: 1rem; flex-shrink: 0;">
-                                            <?php echo strtoupper(substr($b_item['full_name'], 0, 1)); ?>
-                                        </div>
-                                        <div>
-                                            <div class="font-weight-700 text-dark small mb-0.5"><?php echo htmlspecialchars($b_item['full_name']); ?></div>
-                                            <div class="text-muted extra-small" style="font-size: 11px;"><?php echo $b_date; ?></div>
-                                        </div>
-                                    </div>
-                                    <div class="text-end ps-2" style="max-width: 48%;">
-                                        <div class="text-muted extra-small italic" style="font-size: 11px;"><?php echo $wish; ?></div>
-                                    </div>
-                                    <i class='bx bxs-cake ms-2 fs-5' style="color: #8b5cf6;"></i>
-                                </div>
-                            <?php 
-                                endforeach;
-                            else: 
-                            ?>
-                                <div class="text-center py-4 px-3 bg-white rounded-3 border border-dashed" style="border-color: #ddd6fe !important; border-radius: 12px !important;">
-                                    <i class='bx bxs-cake text-purple opacity-40 mb-2' style="color: #a78bfa; font-size: 2rem;"></i>
-                                    <div class="font-weight-700 text-dark small">No Birthday Celebrants</div>
-                                    <div class="text-muted extra-small">No upcoming birthdays found in the next 7 days.</div>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- ANNIVERSARIES TAB CONTENT -->
-                        <div id="tab-content-anniversaries" style="display: none;">
-                            <?php 
-                            $all_anniversaries = array_merge($anniversary_celebrants, $upcoming_anniversaries);
-                            if (!empty($all_anniversaries)):
-                                $anniv_wishes = [
-                                    "May God continue to bless your marriage and journey together!",
-                                    "Celebrating your love and commitment in Christ!",
-                                    "Wishing you many more years of joy, love, and unity!"
-                                ];
-                                $a_idx = 0;
-                                foreach (array_slice($all_anniversaries, 0, 3) as $a_item):
-                                    $a_wish = $anniv_wishes[$a_idx % count($anniv_wishes)];
-                                    $a_idx++;
-                                    $a_date = !empty($a_item['wedding_anniversary']) ? date('F j', strtotime($a_item['wedding_anniversary'])) : 'Today';
-                            ?>
-                                <div class="p-3 bg-white rounded-3 border mb-2 d-flex align-items-center justify-content-between shadow-xs" style="border-color: #f3e8ff !important; border-radius: 12px !important;">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center font-weight-700" style="width: 38px; height: 38px; background: #ffe4e6; color: #e11d48; font-size: 1rem; flex-shrink: 0;">
-                                            <i class='bx bxs-heart'></i>
-                                        </div>
-                                        <div>
-                                            <div class="font-weight-700 text-dark small mb-0.5"><?php echo htmlspecialchars($a_item['full_name']); ?></div>
-                                            <div class="text-muted extra-small" style="font-size: 11px;"><?php echo $a_date; ?></div>
-                                        </div>
-                                    </div>
-                                    <div class="text-end ps-2" style="max-width: 48%;">
-                                        <div class="text-muted extra-small italic" style="font-size: 11px;"><?php echo $a_wish; ?></div>
-                                    </div>
-                                    <i class='bx bxs-heart text-danger ms-2 fs-5'></i>
-                                </div>
-                            <?php 
-                                endforeach;
-                            else: 
-                            ?>
-                                <div class="text-center py-4 px-3 bg-white rounded-3 border border-dashed" style="border-color: #fecdd3 !important; border-radius: 12px !important;">
-                                    <i class='bx bxs-heart text-danger opacity-40 mb-2' style="font-size: 2rem;"></i>
-                                    <div class="font-weight-700 text-dark small">No Wedding Anniversaries</div>
-                                    <div class="text-muted extra-small">No upcoming wedding anniversaries found.</div>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-
-                    <!-- Scripture / Inspiration Footer Quote -->
-                    <div class="mt-3 p-3 rounded-3 d-flex align-items-center justify-content-between" style="background: rgba(237, 233, 254, 0.7); border: 1px solid #ddd6fe; border-radius: 12px !important;">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class='bx bxs-heart text-purple fs-5' style="color: #7c3aed;"></i>
-                            <span class="font-weight-600 extra-small" style="color: #5b21b6; font-size: 11.5px; line-height: 1.4;">
-                                Every celebration is a reminder of God's faithfulness and the beautiful people He has given us.
-                            </span>
-                        </div>
-                        <i class='bx bx-sparkles opacity-75 fs-5' style="color: #8b5cf6;"></i>
-                    </div>
+            <!-- Scripture / Inspiration Footer Quote -->
+            <div class="greetings-footer-banner">
+                <div class="d-flex align-items-center gap-2">
+                    <i class='bx bxs-heart text-purple fs-5' style="color: #7c3aed;"></i>
+                    <span class="font-weight-600 extra-small" style="color: #5b21b6; font-size: 11.5px; line-height: 1.4;">
+                        Every celebration is a reminder of God's faithfulness and the beautiful people He has given us.
+                    </span>
                 </div>
+                <i class='bx bx-sparkles opacity-75 fs-5' style="color: #8b5cf6;"></i>
             </div>
         </div>
     </div>

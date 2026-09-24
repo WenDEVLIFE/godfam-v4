@@ -649,6 +649,208 @@ body.dashboard-page {
     font-weight: 500 !important;
 }
 
+/* ============================================================
+   Reminders & Greetings Center (Exact Design Mockup)
+   ============================================================ */
+.reminders-widget-card {
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
+    overflow: hidden !important;
+}
+
+.reminders-widget-header {
+    background: #ffffff !important;
+    padding: 20px 24px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+}
+
+.reminders-bell-icon {
+    width: 44px !important;
+    height: 44px !important;
+    background: #eff6ff !important;
+    color: #2563eb !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.4rem !important;
+    flex-shrink: 0 !important;
+}
+
+.reminders-grid-container {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+    padding: 0 24px 24px 24px !important;
+}
+
+@media (max-width: 992px) {
+    .reminders-grid-container {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Left Panel: Upcoming Reminders (Blue Theme) */
+.reminders-blue-panel {
+    background: #f0f9ff !important;
+    border: 1px solid #e0f2fe !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+.reminders-blue-header-icon {
+    width: 32px !important;
+    height: 32px !important;
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.1rem !important;
+}
+
+.reminder-item-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 14px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    text-decoration: none !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+}
+
+.reminder-item-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.reminder-date-badge {
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    font-weight: 800 !important;
+}
+
+.reminder-date-month {
+    font-size: 10px !important;
+    line-height: 1 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+}
+
+.reminder-date-day {
+    font-size: 18px !important;
+    line-height: 1.1 !important;
+    font-weight: 900 !important;
+}
+
+/* Right Panel: Greetings (Purple Theme) */
+.greetings-purple-panel {
+    background: #faf5ff !important;
+    border: 1px solid #f3e8ff !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+.greetings-purple-header-icon {
+    width: 32px !important;
+    height: 32px !important;
+    background: #7c3aed !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.1rem !important;
+}
+
+.greetings-tab-bar {
+    background: #f3e8ff !important;
+    border: 1px solid #e9d5ff !important;
+    border-radius: 50px !important;
+    padding: 4px !important;
+    display: flex !important;
+    margin-bottom: 16px !important;
+}
+
+.greetings-tab-btn {
+    width: 50% !important;
+    border-radius: 50px !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    background: transparent !important;
+    color: #6b21a8 !important;
+}
+
+.greetings-tab-btn.active {
+    background: #7c3aed !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3) !important;
+}
+
+.greeting-item-card {
+    background: #ffffff !important;
+    border: 1px solid #f3e8ff !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 10px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+}
+
+.greeting-avatar {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
+    background: #f3e8ff !important;
+    color: #7c3aed !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    flex-shrink: 0 !important;
+}
+
+.greetings-footer-banner {
+    background: rgba(237, 233, 254, 0.8) !important;
+    border: 1px solid #ddd6fe !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-top: 16px !important;
+}
+
 .bible-verse-card .bible-verse-ref {
     color: #0284c7 !important;
 }
