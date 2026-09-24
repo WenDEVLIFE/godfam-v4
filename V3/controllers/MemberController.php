@@ -46,13 +46,15 @@ class MemberController {
 
         // Data Sanitization
         $sanitizedData = [
-            'full_name'    => htmlspecialchars(trim($data['full_name'])),
-            'email'        => trim($data['email']),
-            'phone'        => $this->formatPhone($data['phone'] ?? ''),
-            'address'      => htmlspecialchars(trim($data['address'] ?? '')),
-            'contact_info' => htmlspecialchars(trim($data['contact_info'] ?? '')),
-            'status'       => $data['status'] ?? 'active',
-            'photo_path'   => $photoPath
+            'full_name'           => htmlspecialchars(trim($data['full_name'])),
+            'email'               => trim($data['email']),
+            'phone'               => $this->formatPhone($data['phone'] ?? ''),
+            'address'             => htmlspecialchars(trim($data['address'] ?? '')),
+            'contact_info'        => htmlspecialchars(trim($data['contact_info'] ?? '')),
+            'birthday'            => !empty($data['birthday']) ? trim($data['birthday']) : null,
+            'wedding_anniversary' => !empty($data['wedding_anniversary']) ? trim($data['wedding_anniversary']) : null,
+            'status'              => $data['status'] ?? 'active',
+            'photo_path'          => $photoPath
         ];
 
         $result = $this->memberModel->create($sanitizedData);
@@ -100,13 +102,15 @@ class MemberController {
         }
 
         $sanitizedData = [
-            'full_name'    => htmlspecialchars(trim($data['full_name'])),
-            'email'        => trim($data['email'] ?? ''),
-            'phone'        => $this->formatPhone($data['phone'] ?? ''),
-            'address'      => htmlspecialchars(trim($data['address'] ?? '')),
-            'contact_info' => htmlspecialchars(trim($data['contact_info'] ?? '')),
-            'status'       => $data['status'] ?? 'active',
-            'photo_path'   => $photoPath
+            'full_name'           => htmlspecialchars(trim($data['full_name'])),
+            'email'               => trim($data['email'] ?? ''),
+            'phone'               => $this->formatPhone($data['phone'] ?? ''),
+            'address'             => htmlspecialchars(trim($data['address'] ?? '')),
+            'contact_info'        => htmlspecialchars(trim($data['contact_info'] ?? '')),
+            'birthday'            => !empty($data['birthday']) ? trim($data['birthday']) : null,
+            'wedding_anniversary' => !empty($data['wedding_anniversary']) ? trim($data['wedding_anniversary']) : null,
+            'status'              => $data['status'] ?? 'active',
+            'photo_path'          => $photoPath
         ];
 
         if ($this->memberModel->update($id, $sanitizedData)) {

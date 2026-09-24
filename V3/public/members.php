@@ -132,6 +132,7 @@ include __DIR__ . '/layout/sidebar.php';
                                             data-contact="<?php echo htmlspecialchars($member['contact_info'] ?? ''); ?>"
                                             data-photo="<?php echo htmlspecialchars($member['photo_path'] ?? ''); ?>"
                                             data-birthday="<?php echo htmlspecialchars($member['birthday'] ?? ''); ?>"
+                                            data-wedding-anniversary="<?php echo htmlspecialchars($member['wedding_anniversary'] ?? ''); ?>"
                                             data-status="<?php echo htmlspecialchars($member['status']); ?>">
                                         Edit
                                     </button>
@@ -238,6 +239,11 @@ include __DIR__ . '/layout/sidebar.php';
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">Wedding Anniversary</label>
+                        <input type="date" name="wedding_anniversary" class="form-control">
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">Initial Status</label>
                         <select name="status" class="form-control">
                             <option value="active">Active</option>
@@ -327,6 +333,11 @@ include __DIR__ . '/layout/sidebar.php';
                     <div class="form-group">
                         <label class="form-label">Birthday</label>
                         <input type="date" name="birthday" id="edit_birthday" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Wedding Anniversary</label>
+                        <input type="date" name="wedding_anniversary" id="edit_wedding_anniversary" class="form-control">
                     </div>
 
                     <div class="form-group">
@@ -422,6 +433,12 @@ document.querySelectorAll('.edit-member-btn').forEach(btn => {
             document.getElementById('edit_birthday').value = d.birthday;
         } else {
             document.getElementById('edit_birthday').value = '';
+        }
+
+        if (d.weddingAnniversary) {
+            document.getElementById('edit_wedding_anniversary').value = d.weddingAnniversary;
+        } else {
+            document.getElementById('edit_wedding_anniversary').value = '';
         }
         
         // Photo Preview

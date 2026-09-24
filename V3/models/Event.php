@@ -165,6 +165,21 @@ class Event {
         return (int)$stmt->fetchColumn();
     }
 
+    public function getTodayEvents() {
+        $stmt = $this->pdo->query("SELECT * FROM events WHERE date = CURDATE() ORDER BY time IS NULL ASC, time ASC");
+        return $stmt->fetchAll();
+    }
+
+    public function getUpcomingEventsWithinDays($days = 7) {
+        $stmt = $this->pdo->prepare(
+            "SELECT * FROM events
+             WHERE date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL ? DAY)
+             ORDER BY date ASC, time IS NULL ASC, time ASC"
+        );
+        $stmt->execute([(int)$days]);
+        return $stmt->fetchAll();
+    }
+
     public function getPast($limit = null) {
         $sql = "SELECT * FROM events WHERE date < CURDATE() ORDER BY date DESC, time DESC";
         if ($limit) $sql .= " LIMIT " . (int)$limit;

@@ -30,6 +30,10 @@ $today_attendance       = 0;
 $my_attendance_count    = 0;
 $my_qr_token            = '';
 $birthday_celebrants    = [];
+$anniversary_celebrants = [];
+$today_events           = [];
+$upcoming_birthdays     = [];
+$upcoming_anniversaries = [];
 $today_collection       = 0;
 $month_collection       = 0;
 
@@ -42,7 +46,11 @@ if (isAdmin() || isStaff()) {
     $stmt = $pdo->query("SELECT COUNT(*) FROM attendance WHERE date = CURDATE()");
     $today_attendance = $stmt->fetchColumn();
 
-    $birthday_celebrants = $memberModel->getBirthdayCelebrantsToday();
+    $birthday_celebrants    = $memberModel->getBirthdayCelebrantsToday();
+    $anniversary_celebrants = $memberModel->getWeddingAnniversariesToday();
+    $today_events           = $eventModel->getTodayEvents();
+    $upcoming_birthdays     = $memberModel->getBirthdayCelebrantsUpcoming(7);
+    $upcoming_anniversaries = $memberModel->getWeddingAnniversariesUpcoming(7);
 
     $collectionModel  = new Collection($pdo);
     $today_collection = $collectionModel->getTodayTotal();
@@ -148,27 +156,104 @@ include __DIR__ . '/layout/sidebar.php';
 
 <?php if (isAdmin() || isStaff()): ?>
 
-<!-- ===== BIRTHDAY CELEBRANTS ===== -->
-<?php if (!empty($birthday_celebrants)): ?>
-<div class="birthday-banner mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <div class="d-flex align-items-center gap-3">
-        <div class="birthday-banner-icon"><i class='bx bxs-cake'></i></div>
-        <div class="birthday-banner-body">
-            <div class="birthday-banner-title">🎂 Birthday Celebrants Today &mdash; <?php echo date('F j'); ?></div>
-            <div class="birthday-names">
-                <?php foreach ($birthday_celebrants as $b): ?>
-                <span class="birthday-pill"><?php echo htmlspecialchars($b['full_name']); ?></span>
-                <?php endforeach; ?>
+<!-- ===== REMINDERS & GREETINGS WIDGET ===== -->
+<div class="card mb-4 border-0 shadow-sm" style="border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
+    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3 px-4">
+        <div class="d-flex align-items-center gap-2">
+            <i class='bx bxs-bell-ring' style="font-size: 1.4rem; color: #3182ce;"></i>
+            <h5 class="mb-0 font-weight-700 text-dark">Reminders &amp; Greetings Center</h5>
+            <span class="badge bg-primary text-white font-weight-600 px-2 py-1" style="border-radius: 12px; font-size: 11px;"><?php echo date('F j, Y'); ?></span>
+        </div>
+        <button id="btn-send-daily-reminders" class="btn btn-sm btn-primary font-weight-600 px-3 py-1 shadow-sm" onclick="triggerDailyReminders()" style="border-radius: 20px;">
+            <i class='bx bx-paper-plane'></i> Trigger Reminders &amp; Send Greetings
+        </button>
+    </div>
+    <div class="card-body p-4">
+        <div class="row g-4">
+            <!-- Today's Birthdays -->
+            <div class="col-md-4">
+                <div class="p-3 bg-white border rounded-3 h-100 shadow-sm position-relative">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="d-inline-flex align-items-center justify-content-center bg-warning bg-opacity-20 text-warning p-2 rounded-circle" style="width: 36px; height: 36px; font-size: 1.2rem;">🎂</span>
+                        <h6 class="mb-0 font-weight-700 text-dark">Birthdays Today</h6>
+                        <span class="badge bg-warning text-dark ms-auto font-weight-700"><?php echo count($birthday_celebrants); ?></span>
+                    </div>
+                    <?php if (!empty($birthday_celebrants)): ?>
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            <?php foreach ($birthday_celebrants as $b): ?>
+                                <span class="badge bg-light text-dark border px-2 py-1 font-weight-600" style="font-size: 12px;"><i class='bx bxs-cake text-warning me-1'></i><?php echo htmlspecialchars($b['full_name']); ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted small mb-0">No member birthdays today.</p>
+                    <?php endif; ?>
+                    <?php if (!empty($upcoming_birthdays)): ?>
+                        <div class="mt-3 pt-2 border-top">
+                            <span class="text-muted extra-small uppercase font-weight-700 d-block mb-1" style="font-size: 10px;">Upcoming (Next 7 Days)</span>
+                            <div class="small text-secondary">
+                                <?php echo implode(', ', array_map(fn($item) => htmlspecialchars($item['full_name']) . ' (' . date('M d', strtotime($item['birthday'])) . ')', array_slice($upcoming_birthdays, 0, 3))); ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Today's Wedding Anniversaries -->
+            <div class="col-md-4">
+                <div class="p-3 bg-white border rounded-3 h-100 shadow-sm position-relative">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-20 text-danger p-2 rounded-circle" style="width: 36px; height: 36px; font-size: 1.2rem;">💍</span>
+                        <h6 class="mb-0 font-weight-700 text-dark">Wedding Anniversaries</h6>
+                        <span class="badge bg-danger text-white ms-auto font-weight-700"><?php echo count($anniversary_celebrants); ?></span>
+                    </div>
+                    <?php if (!empty($anniversary_celebrants)): ?>
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            <?php foreach ($anniversary_celebrants as $a): ?>
+                                <span class="badge bg-light text-dark border px-2 py-1 font-weight-600" style="font-size: 12px;"><i class='bx bxs-heart text-danger me-1'></i><?php echo htmlspecialchars($a['full_name']); ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted small mb-0">No wedding anniversaries today.</p>
+                    <?php endif; ?>
+                    <?php if (!empty($upcoming_anniversaries)): ?>
+                        <div class="mt-3 pt-2 border-top">
+                            <span class="text-muted extra-small uppercase font-weight-700 d-block mb-1" style="font-size: 10px;">Upcoming (Next 7 Days)</span>
+                            <div class="small text-secondary">
+                                <?php echo implode(', ', array_map(fn($item) => htmlspecialchars($item['full_name']) . ' (' . date('M d', strtotime($item['wedding_anniversary'])) . ')', array_slice($upcoming_anniversaries, 0, 3))); ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Today's Church Events -->
+            <div class="col-md-4">
+                <div class="p-3 bg-white border rounded-3 h-100 shadow-sm position-relative">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="d-inline-flex align-items-center justify-content-center bg-info bg-opacity-20 text-info p-2 rounded-circle" style="width: 36px; height: 36px; font-size: 1.2rem;">📅</span>
+                        <h6 class="mb-0 font-weight-700 text-dark">Church Events Today</h6>
+                        <span class="badge bg-info text-white ms-auto font-weight-700"><?php echo count($today_events); ?></span>
+                    </div>
+                    <?php if (!empty($today_events)): ?>
+                        <ul class="list-unstyled mb-0 small">
+                            <?php foreach ($today_events as $e): ?>
+                                <li class="mb-2 pb-1 border-bottom">
+                                    <strong class="d-block text-dark"><?php echo htmlspecialchars($e['title']); ?></strong>
+                                    <span class="text-muted" style="font-size: 11px;">
+                                        <i class='bx bx-time me-1'></i><?php echo !empty($e['time']) ? date('h:i A', strtotime($e['time'])) : 'All Day'; ?>
+                                        <?php if (!empty($e['location'])): ?> &bull; <i class='bx bx-map me-1'></i><?php echo htmlspecialchars($e['location']); ?><?php endif; ?>
+                                    </span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else: ?>
+                        <p class="text-muted small mb-0">No church events scheduled for today.</p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
-    <div>
-        <button id="btn-send-bday-reminders" class="btn btn-sm btn-light text-primary font-weight-600 shadow-sm" onclick="sendBirthdayReminders()" style="border-radius: 20px; padding: 6px 16px;">
-            <i class='bx bx-send'></i> Send Auto Reminders
-        </button>
-    </div>
 </div>
-<?php endif; ?>
 
 <!-- ===== ADMIN STATS ===== -->
 <div class="stats-grid">
@@ -485,12 +570,12 @@ function showMonthly() {
     document.getElementById('btn-weekly').classList.remove('active');
 }
 
-function sendBirthdayReminders() {
-    const btn = document.getElementById('btn-send-bday-reminders');
+function triggerDailyReminders() {
+    const btn = document.getElementById('btn-send-daily-reminders');
     if (!btn) return;
     const origText = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Sending...";
+    btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Dispatching Greetings & Reminders...";
 
     fetch('api/trigger_birthday_reminder.php', {
         method: 'POST',
@@ -500,9 +585,9 @@ function sendBirthdayReminders() {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            alert(data.message || 'Birthday reminders triggered successfully!');
-            btn.innerHTML = "<i class='bx bx-check'></i> Sent!";
-            btn.classList.replace('btn-light', 'btn-success');
+            alert(data.message || 'Reminders and greetings triggered successfully!');
+            btn.innerHTML = "<i class='bx bx-check-circle'></i> Processed & Dispatched!";
+            btn.classList.replace('btn-primary', 'btn-success');
         } else {
             alert('Error: ' + (data.error || 'Failed to send reminders.'));
             btn.disabled = false;
@@ -510,10 +595,14 @@ function sendBirthdayReminders() {
         }
     })
     .catch(err => {
-        alert('An error occurred while sending reminders.');
+        alert('An error occurred while dispatching reminders.');
         btn.disabled = false;
         btn.innerHTML = origText;
     });
+}
+
+function sendBirthdayReminders() {
+    triggerDailyReminders();
 }
 </script>
 <?php endif; ?>

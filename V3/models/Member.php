@@ -45,7 +45,7 @@ class Member {
 
     public function create($data) {
         $qrToken = bin2hex(random_bytes(16));
-        $stmt = $this->pdo->prepare("INSERT INTO members (full_name, photo_path, email, phone, contact_info, address, birthday, status, qr_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $this->pdo->prepare("INSERT INTO members (full_name, photo_path, email, phone, contact_info, address, birthday, wedding_anniversary, status, qr_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if ($stmt->execute([
             $data['full_name'],
             $data['photo_path'] ?? null,
@@ -54,6 +54,7 @@ class Member {
             $data['contact_info'] ?? null,
             $data['address'] ?? null,
             !empty($data['birthday']) ? $data['birthday'] : null,
+            !empty($data['wedding_anniversary']) ? $data['wedding_anniversary'] : null,
             $data['status'] ?? 'active',
             $qrToken
         ])) {
@@ -63,7 +64,7 @@ class Member {
     }
 
     public function update($id, $data) {
-        $stmt = $this->pdo->prepare("UPDATE members SET full_name = ?, photo_path = ?, email = ?, phone = ?, contact_info = ?, address = ?, birthday = ?, status = ? WHERE member_id = ?");
+        $stmt = $this->pdo->prepare("UPDATE members SET full_name = ?, photo_path = ?, email = ?, phone = ?, contact_info = ?, address = ?, birthday = ?, wedding_anniversary = ?, status = ? WHERE member_id = ?");
         return $stmt->execute([
             $data['full_name'],
             $data['photo_path'] ?? null,
@@ -72,6 +73,7 @@ class Member {
             $data['contact_info'] ?? null,
             $data['address'] ?? null,
             !empty($data['birthday']) ? $data['birthday'] : null,
+            !empty($data['wedding_anniversary']) ? $data['wedding_anniversary'] : null,
             $data['status'] ?? 'active',
             $id
         ]);
@@ -211,13 +213,65 @@ class Member {
      */
     public function getBirthdayCelebrantsToday(): array {
         $stmt = $this->pdo->query(
-            "SELECT member_id, full_name, birthday, photo_path
+            "SELECT member_id, full_name, email, phone, birthday, photo_path
              FROM members
              WHERE birthday IS NOT NULL
                AND MONTH(birthday) = MONTH(CURDATE())
                AND DAY(birthday)   = DAY(CURDATE())
              ORDER BY full_name ASC"
         );
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get members whose birthday is coming up in the next N days.
+     */
+    public function getBirthdayCelebrantsUpcoming(int $days = 7): array {
+        $stmt = $this->pdo->prepare(
+            "SELECT member_id, full_name, email, phone, birthday, photo_path,
+                    DATE_FORMAT(birthday, '%m-%d') as bday_mmdd
+             FROM members
+             WHERE birthday IS NOT NULL
+               AND (
+                    (DAYOFYEAR(DATE_FORMAT(birthday, CONCAT(YEAR(CURDATE()), '-%m-%d'))) - DAYOFYEAR(CURDATE()) BETWEEN 1 AND ?)
+                 OR (DAYOFYEAR(DATE_FORMAT(birthday, CONCAT(YEAR(CURDATE())+1, '-%m-%d'))) + 365 - DAYOFYEAR(CURDATE()) BETWEEN 1 AND ?)
+               )
+             ORDER BY MONTH(birthday) ASC, DAY(birthday) ASC"
+        );
+        $stmt->execute([$days, $days]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get members celebrating wedding anniversary today.
+     */
+    public function getWeddingAnniversariesToday(): array {
+        $stmt = $this->pdo->query(
+            "SELECT member_id, full_name, email, phone, wedding_anniversary, photo_path
+             FROM members
+             WHERE wedding_anniversary IS NOT NULL
+               AND MONTH(wedding_anniversary) = MONTH(CURDATE())
+               AND DAY(wedding_anniversary)   = DAY(CURDATE())
+             ORDER BY full_name ASC"
+        );
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get members celebrating wedding anniversary in the upcoming N days.
+     */
+    public function getWeddingAnniversariesUpcoming(int $days = 7): array {
+        $stmt = $this->pdo->prepare(
+            "SELECT member_id, full_name, email, phone, wedding_anniversary, photo_path
+             FROM members
+             WHERE wedding_anniversary IS NOT NULL
+               AND (
+                    (DAYOFYEAR(DATE_FORMAT(wedding_anniversary, CONCAT(YEAR(CURDATE()), '-%m-%d'))) - DAYOFYEAR(CURDATE()) BETWEEN 1 AND ?)
+                 OR (DAYOFYEAR(DATE_FORMAT(wedding_anniversary, CONCAT(YEAR(CURDATE())+1, '-%m-%d'))) + 365 - DAYOFYEAR(CURDATE()) BETWEEN 1 AND ?)
+               )
+             ORDER BY MONTH(wedding_anniversary) ASC, DAY(wedding_anniversary) ASC"
+        );
+        $stmt->execute([$days, $days]);
         return $stmt->fetchAll();
     }
 
