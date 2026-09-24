@@ -132,13 +132,13 @@ include __DIR__ . '/layout/sidebar.php';
 ?>
 
 <div class="mb-4">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <h1 class="page-title">Digital Member ID</h1>
-            <p class="text-muted small">Official identification</p>
+            <h1 class="page-title mb-0" style="font-size: 1.4rem; font-weight: 800;">Digital Member ID</h1>
+            <p class="text-muted small mb-0">Official membership identification &amp; access pass</p>
         </div>
-        <button onclick="window.print()" class="btn btn-outline-primary no-print">
-            Print ID Card
+        <button onclick="window.print()" class="btn btn-primary font-weight-600 no-print d-inline-flex align-items-center gap-2">
+            <i class='bx bx-printer'></i> Print ID Card
         </button>
     </div>
 </div>
@@ -180,7 +180,7 @@ include __DIR__ . '/layout/sidebar.php';
                 <?php if ($qrSvgContent): ?>
                     <?php echo $qrSvgContent; ?>
                 <?php elseif ($qrImageUrl): ?>
-                    <img src="<?php echo htmlspecialchars($qrImageUrl); ?>" alt="QR Code" style="width: 170px; height: 170px; object-fit: contain;">
+                    <img src="<?php echo htmlspecialchars($qrImageUrl); ?>" alt="QR Code" style="max-width: 140px; width: 100%; height: auto; object-fit: contain;">
                 <?php else: ?>
                     <p style="color:#c53030;font-size:10px;text-align:center;"><?php echo htmlspecialchars($qrError); ?></p>
                 <?php endif; ?>
