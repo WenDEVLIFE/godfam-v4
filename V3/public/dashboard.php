@@ -728,20 +728,28 @@ function triggerDailyReminders() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ csrf_token: '<?php echo $csrf_token; ?>' })
     })
-    .then(r => r.json())
+    .then(async r => {
+        const text = await r.text();
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            throw new Error("Server returned non-JSON response.");
+        }
+    })
     .then(data => {
         if (data.success) {
             alert(data.message || 'Reminders and greetings triggered successfully!');
             btn.innerHTML = "<i class='bx bx-check-circle'></i> Processed & Dispatched!";
-            btn.classList.replace('btn-primary', 'btn-success');
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-success');
         } else {
-            alert('Error: ' + (data.error || 'Failed to send reminders.'));
+            alert('Notice: ' + (data.error || 'Failed to dispatch reminders.'));
             btn.disabled = false;
             btn.innerHTML = origText;
         }
     })
     .catch(err => {
-        alert('An error occurred while dispatching reminders.');
+        alert('An error occurred while dispatching reminders: ' + err.message);
         btn.disabled = false;
         btn.innerHTML = origText;
     });

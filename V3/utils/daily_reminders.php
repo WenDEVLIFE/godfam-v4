@@ -68,18 +68,23 @@ function processDailyReminders(PDO $pdo): array {
         // Direct Email Greeting to Individual Celebrants if email available
         foreach ($bdayToday as $c) {
             if (!empty($c['email'])) {
-                $subject = "🎉 Happy Birthday from God's Family UMC, " . $c['full_name'] . "!";
-                $htmlBody = generateCelebrantEmailHtml(
-                    "🎂 Happy Birthday!",
-                    "Dear " . htmlspecialchars($c['full_name']) . ",",
-                    "On behalf of God's Family United Methodist Church, we wish you a blessed and wonderful birthday! May God grant you abundant peace, happiness, and prosperity in the year ahead.",
-                    "\"The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you.\" &mdash; Numbers 6:24-25"
-                );
-                $res = $mailer->sendAnnouncement($subject, strip_tags($htmlBody), $c['email'], date('M d, Y'), "God's Family UMC");
-                if (!empty($res['success'])) {
-                    $stats['emails_sent']++;
-                } else {
+                try {
+                    $subject = "🎉 Happy Birthday from God's Family UMC, " . $c['full_name'] . "!";
+                    $htmlBody = generateCelebrantEmailHtml(
+                        "🎂 Happy Birthday!",
+                        "Dear " . htmlspecialchars($c['full_name']) . ",",
+                        "On behalf of God's Family United Methodist Church, we wish you a blessed and wonderful birthday! May God grant you abundant peace, happiness, and prosperity in the year ahead.",
+                        "\"The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you.\" &mdash; Numbers 6:24-25"
+                    );
+                    $res = $mailer->sendAnnouncement($subject, strip_tags($htmlBody), $c['email'], date('M d, Y'), "God's Family UMC");
+                    if (!empty($res['success'])) {
+                        $stats['emails_sent']++;
+                    } else {
+                        $stats['emails_failed']++;
+                    }
+                } catch (\Throwable $te) {
                     $stats['emails_failed']++;
+                    error_log("Birthday email send error: " . $te->getMessage());
                 }
             }
         }
@@ -99,18 +104,23 @@ function processDailyReminders(PDO $pdo): array {
         // Direct Email Greeting to Individual Anniversary Celebrants
         foreach ($annivToday as $c) {
             if (!empty($c['email'])) {
-                $subject = "💖 Happy Wedding Anniversary from God's Family UMC!";
-                $htmlBody = generateCelebrantEmailHtml(
-                    "💍 Happy Wedding Anniversary!",
-                    "Dear " . htmlspecialchars($c['full_name']) . ",",
-                    "Congratulations on celebrating your wedding anniversary today! We thank God for your love and commitment to each other, and we pray for continuous blessings, joy, and grace upon your union.",
-                    "\"And over all these virtues put on love, which binds them all together in perfect unity.\" &mdash; Colossians 3:14"
-                );
-                $res = $mailer->sendAnnouncement($subject, strip_tags($htmlBody), $c['email'], date('M d, Y'), "God's Family UMC");
-                if (!empty($res['success'])) {
-                    $stats['emails_sent']++;
-                } else {
+                try {
+                    $subject = "💖 Happy Wedding Anniversary from God's Family UMC!";
+                    $htmlBody = generateCelebrantEmailHtml(
+                        "💍 Happy Wedding Anniversary!",
+                        "Dear " . htmlspecialchars($c['full_name']) . ",",
+                        "Congratulations on celebrating your wedding anniversary today! We thank God for your love and commitment to each other, and we pray for continuous blessings, joy, and grace upon your union.",
+                        "\"And over all these virtues put on love, which binds them all together in perfect unity.\" &mdash; Colossians 3:14"
+                    );
+                    $res = $mailer->sendAnnouncement($subject, strip_tags($htmlBody), $c['email'], date('M d, Y'), "God's Family UMC");
+                    if (!empty($res['success'])) {
+                        $stats['emails_sent']++;
+                    } else {
+                        $stats['emails_failed']++;
+                    }
+                } catch (\Throwable $te) {
                     $stats['emails_failed']++;
+                    error_log("Anniversary email send error: " . $te->getMessage());
                 }
             }
         }
@@ -137,11 +147,16 @@ function processDailyReminders(PDO $pdo): array {
         $digestHtml = generateStaffDigestHtml($todayStr, $bdayToday, $annivToday, $eventsToday, $bdayUpcoming, $annivUpcoming, $eventsUpcoming);
 
         foreach ($staffList as $staff) {
-            $res = $mailer->sendAnnouncement($digestSubject, strip_tags($digestHtml), $staff['email'], date('M d, Y'), "Church Reminder System");
-            if (!empty($res['success'])) {
-                $stats['emails_sent']++;
-            } else {
+            try {
+                $res = $mailer->sendAnnouncement($digestSubject, strip_tags($digestHtml), $staff['email'], date('M d, Y'), "Church Reminder System");
+                if (!empty($res['success'])) {
+                    $stats['emails_sent']++;
+                } else {
+                    $stats['emails_failed']++;
+                }
+            } catch (\Throwable $te) {
                 $stats['emails_failed']++;
+                error_log("Staff digest email send error: " . $te->getMessage());
             }
         }
     }

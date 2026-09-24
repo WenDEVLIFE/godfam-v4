@@ -33,16 +33,30 @@ if (!validateCsrfToken($csrfToken)) {
     exit;
 }
 
-$results = processDailyReminders($pdo);
+try {
+    $results = processDailyReminders($pdo);
 
-echo json_encode([
-    'success' => true,
-    'birthdays_today' => $results['birthdays_today'],
-    'anniversaries_today' => $results['anniversaries_today'],
-    'events_today' => $results['events_today'],
-    'emails_sent' => $results['emails_sent'],
-    'message' => "Reminders & Greetings processed successfully! (" .
-                 "Birthdays: {$results['birthdays_today']}, " .
-                 "Anniversaries: {$results['anniversaries_today']}, " .
-                 "Events: {$results['events_today']})"
-]);
+    $msg = "Reminders & Greetings processed successfully! (" .
+           "Birthdays: {$results['birthdays_today']}, " .
+           "Anniversaries: {$results['anniversaries_today']}, " .
+           "Events: {$results['events_today']})";
+    if ($results['emails_sent'] > 0) {
+        $msg .= " - Sent {$results['emails_sent']} emails.";
+    }
+
+    echo json_encode([
+        'success' => true,
+        'birthdays_today' => $results['birthdays_today'],
+        'anniversaries_today' => $results['anniversaries_today'],
+        'events_today' => $results['events_today'],
+        'emails_sent' => $results['emails_sent'],
+        'emails_failed' => $results['emails_failed'] ?? 0,
+        'message' => $msg
+    ]);
+} catch (\Throwable $e) {
+    http_response_code(200);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Error processing daily reminders: ' . $e->getMessage()
+    ]);
+}
