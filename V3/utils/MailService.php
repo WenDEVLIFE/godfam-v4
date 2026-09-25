@@ -15,12 +15,18 @@ if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
     $possiblePaths = [
         __DIR__ . '/../vendor/PHPMailer/src/',
         __DIR__ . '/../vendor/phpmailer/phpmailer/src/',
+        __DIR__ . '/../vendor/phpmailer/src/',
+        __DIR__ . '/../vendor/PHPMailer/PHPMailer/src/',
+        __DIR__ . '/../vendor/PHPMailer/',
+        __DIR__ . '/../vendor/phpmailer/',
     ];
     foreach ($possiblePaths as $basePath) {
-        if (file_exists($basePath . 'Exception.php')) {
+        if (file_exists($basePath . 'Exception.php') && file_exists($basePath . 'PHPMailer.php')) {
             require_once $basePath . 'Exception.php';
             require_once $basePath . 'PHPMailer.php';
-            require_once $basePath . 'SMTP.php';
+            if (file_exists($basePath . 'SMTP.php')) {
+                require_once $basePath . 'SMTP.php';
+            }
             break;
         }
     }
