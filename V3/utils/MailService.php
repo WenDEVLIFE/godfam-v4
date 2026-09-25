@@ -138,20 +138,37 @@ class MailService {
     }
 
     /**
+     * Check if PHPMailer is available and loaded.
+     */
+    public function isAvailable(): bool {
+        return class_exists('PHPMailer\PHPMailer\PHPMailer');
+    }
+
+    /**
      * Core Email Sending Logic (SMTP)
      */
     private function sendEmail($to, $subject, $body) {
-        $mail = new PHPMailer(true);
+        if (!$this->isAvailable()) {
+            $err = 'PHPMailer library is not available. Please run `composer install` to install dependencies.';
+            error_log("MailService Error: {$err}");
+            return [
+                'success' => false,
+                'error' => 'Email service is currently unavailable.',
+                'internal_error' => $err
+            ];
+        }
 
         try {
+            $mail = new PHPMailer(true);
+
             // Server settings
             $mail->isSMTP();
             $mail->Host       = $this->config['host'];
             $mail->SMTPAuth   = true;
             $mail->Username   = $this->config['username'];
             $mail->Password   = $this->config['password'];
-            $mail->SMTPSecure = $this->config['encryption'] === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = $this->config['port'];
+            $mail->SMTPSecure = ($this->config['encryption'] ?? '') === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = (int)($this->config['port'] ?? 587);
 
             // Bypass SSL certificate verification for local environments (XAMPP)
             $mail->SMTPOptions = array(
@@ -177,11 +194,19 @@ class MailService {
                 'success' => true
             ];
         } catch (Exception $e) {
-            error_log("Mail Error: {$mail->ErrorInfo}");
+            $errorInfo = isset($mail) && !empty($mail->ErrorInfo) ? $mail->ErrorInfo : $e->getMessage();
+            error_log("Mail Error: {$errorInfo}");
             return [
                 'success' => false,
                 'error' => 'Message could not be sent.',
-                'internal_error' => $mail->ErrorInfo
+                'internal_error' => $errorInfo
+            ];
+        } catch (\Throwable $e) {
+            error_log("Mail Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => 'An unexpected error occurred while sending email.',
+                'internal_error' => $e->getMessage()
             ];
         }
     }
