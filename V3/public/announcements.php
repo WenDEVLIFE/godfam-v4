@@ -115,6 +115,99 @@ include __DIR__ . '/layout/sidebar.php';
     color: var(--accent);
     backdrop-filter: blur(4px);
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 2;
+}
+
+.announcement-placeholder-container {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 55%, #1565C0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.announcement-placeholder-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 35%, rgba(212, 175, 55, 0.16), transparent 70%);
+    pointer-events: none;
+}
+
+.announcement-placeholder-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 12px;
+}
+
+.church-logo-ring {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid var(--cms-gold);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px;
+    margin-bottom: 8px;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.announcement-card:hover .church-logo-ring {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+}
+
+.announcement-placeholder-logo {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.church-placeholder-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.church-placeholder-info .church-name {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.church-placeholder-info .announcement-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.3px;
+}
+
+.announcement-badge.placeholder-badge {
+    background: rgba(15, 23, 42, 0.75);
+    color: #F8FAFC;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+}
+
+.announcement-badge.placeholder-badge i {
+    color: var(--cms-gold);
 }
 
 .announcement-content {
@@ -243,10 +336,26 @@ include __DIR__ . '/layout/sidebar.php';
             <div id="announcementFeed" class="announcement-grid">
                 <?php foreach ($announcements as $ann): ?>
                 <div class="card announcement-card">
-                    <?php if (!empty($ann['image_path'])): ?>
+                    <?php 
+                        $has_image = !empty($ann['image_path']) && (file_exists(__DIR__ . '/' . ltrim($ann['image_path'], '/')) || file_exists($ann['image_path']));
+                    ?>
+                    <?php if ($has_image): ?>
                         <div class="announcement-image-container" onclick="viewAnnouncementPicture('<?php echo htmlspecialchars($ann['image_path']); ?>')" style="cursor: pointer;">
                             <span class="announcement-badge">NEW</span>
                             <img src="<?php echo htmlspecialchars($ann['image_path']); ?>" alt="Announcement Image">
+                        </div>
+                    <?php else: ?>
+                        <div class="announcement-image-container announcement-placeholder-container">
+                            <span class="announcement-badge placeholder-badge"><i class='bx bxs-megaphone'></i> BULLETIN</span>
+                            <div class="announcement-placeholder-content">
+                                <div class="church-logo-ring">
+                                    <img src="assets/images/logo.png" alt="Church Logo" class="announcement-placeholder-logo">
+                                </div>
+                                <div class="church-placeholder-info">
+                                    <span class="church-name">God's Family UMC</span>
+                                    <span class="announcement-label">Church Bulletin &amp; Notice</span>
+                                </div>
+                            </div>
                         </div>
                     <?php endif; ?>
                     <div class="card-header d-none">
