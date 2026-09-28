@@ -172,7 +172,7 @@ include __DIR__ . '/layout/sidebar.php';
                             echo '<div class="event-indicator">';
                             foreach($events_by_date[$date] as $idx => $e) {
                                 if($idx < 1) {
-                                    echo '<div class="event-brief">' . htmlspecialchars($e['title']) . '</div>';
+                                    echo '<div class="event-brief" title="' . htmlspecialchars($e['title']) . '">' . htmlspecialchars($e['title']) . '</div>';
                                 }
                             }
                             if(count($events_by_date[$date]) > 1) {

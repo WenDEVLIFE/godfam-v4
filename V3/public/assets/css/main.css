@@ -1125,11 +1125,12 @@ textarea.form-control {
 
 .calendar-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     background-color: var(--cms-border);
     gap: 1px;
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     overflow: hidden;
+    width: 100%;
 }
 
 .calendar-day-name {
@@ -1141,10 +1142,16 @@ textarea.form-control {
     color: var(--cms-muted);
     text-transform: uppercase;
     letter-spacing: 1px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .calendar-day {
     min-height: 115px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
     background-color: var(--cms-surface);
     padding: 10px;
     transition: var(--transition-fast);
@@ -1153,6 +1160,7 @@ textarea.form-control {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    overflow: hidden;
 }
 
 .calendar-day:hover {
@@ -1209,6 +1217,8 @@ textarea.form-control {
     flex-direction: column;
     gap: 4px;
     margin-top: 4px;
+    min-width: 0;
+    width: 100%;
 }
 
 .event-brief {
@@ -1222,6 +1232,10 @@ textarea.form-control {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
