@@ -137,9 +137,19 @@ include __DIR__ . '/layout/sidebar.php';
             <h1 class="page-title mb-0" style="font-size: 1.4rem; font-weight: 800;">Digital Member ID</h1>
             <p class="text-muted small mb-0">Official membership identification &amp; access pass</p>
         </div>
-        <button onclick="window.print()" class="btn btn-primary font-weight-600 no-print d-inline-flex align-items-center gap-2">
-            <i class='bx bx-printer'></i> Print ID Card
-        </button>
+        <div class="d-flex gap-2 no-print">
+            <?php if (!empty($member['phone'])): 
+                $clean_phone = preg_replace('/[^0-9+]/', '', $member['phone']);
+                $body = urlencode("Hello " . $member['full_name'] . ", peace be with you from God's Family UMC.");
+            ?>
+                <a href="sms:<?php echo $clean_phone; ?>?&body=<?php echo $body; ?>" class="btn btn-outline-success font-weight-600 d-inline-flex align-items-center gap-2">
+                    <i class='bx bx-message-rounded-dots'></i> Send SMS
+                </a>
+            <?php endif; ?>
+            <button onclick="window.print()" class="btn btn-primary font-weight-600 d-inline-flex align-items-center gap-2">
+                <i class='bx bx-printer'></i> Print ID Card
+            </button>
+        </div>
     </div>
 </div>
 
@@ -171,7 +181,16 @@ include __DIR__ . '/layout/sidebar.php';
             <div class="id-stats-grid">
                 <div class="id-stat-item" style="grid-column: span 2;">
                     <div class="id-stat-label">Contact</div>
-                    <div class="id-stat-value"><?php echo htmlspecialchars($member['phone']); ?></div>
+                    <div class="id-stat-value d-flex align-items-center justify-content-center gap-2">
+                        <span><?php echo htmlspecialchars($member['phone']); ?></span>
+                        <?php 
+                            $clean_phone = preg_replace('/[^0-9+]/', '', $member['phone']);
+                            $body = urlencode("Hello " . $member['full_name'] . ", peace be with you from God's Family UMC.");
+                        ?>
+                        <a href="sms:<?php echo $clean_phone; ?>?&body=<?php echo $body; ?>" class="no-print btn btn-xs btn-outline-success" style="font-size: 10px; padding: 1px 6px; border-radius: 4px; text-decoration: none;" title="Send SMS">
+                            <i class='bx bx-message-rounded-dots'></i> SMS
+                        </a>
+                    </div>
                 </div>
             </div>
             <?php endif; ?>

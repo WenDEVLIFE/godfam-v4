@@ -165,6 +165,14 @@ include __DIR__ . '/layout/sidebar.php';
                                                     <?php echo strtoupper(substr($attendee['full_name'], 0, 1)); ?>
                                                 </div>
                                                 <strong><?php echo htmlspecialchars($attendee['full_name']); ?></strong>
+                                                <?php if (!empty($attendee['phone'])): ?>
+                                                    <a href="sms:<?php echo preg_replace('/[^0-9+]/', '', $attendee['phone']); ?>?&body=<?php echo rawurlencode("Hello " . $attendee['full_name'] . ", thanks for attending " . $event_data['title'] . " at God's Family UMC!"); ?>" 
+                                                       class="btn btn-sm btn-outline-success py-0 px-2 ms-2 no-print" 
+                                                       title="Send SMS" 
+                                                       style="font-size: 10px; border-radius: 4px; display: inline-flex; align-items: center; gap: 2px;">
+                                                        <i class='bx bx-message-rounded-dots'></i> SMS
+                                                    </a>
+                                                <?php endif; ?>
                                             </div>
                                         </td>
                                         <td>

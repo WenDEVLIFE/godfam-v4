@@ -539,12 +539,16 @@ function openDayModal(dateString) {
                         `;
              
             if (canUseEventTools) {
-                html += `<div class="d-flex gap-2" style="margin-top:10px;">
+                const smsEventMsg = encodeURIComponent(`Church Event: ${event.title} on ${event.date || dateString} at ${timeStr} (${eventLocation}). From God's Family UMC`);
+                html += `<div class="d-flex gap-2 flex-wrap" style="margin-top:10px;">
                             <a href="attendance.php?event_id=${eventId}" class="btn btn-sm btn-outline-primary" style="margin-right: 5px;">
                                 <i class='bx bx-list-check'></i> Logs
                             </a>
                             <a href="scan_attendance.php?event_id=${eventId}" class="btn btn-sm btn-outline-success" style="margin-right: 5px;">
                                 <i class='bx bx-scan'></i> Scanner
+                            </a>
+                            <a href="sms:?&body=${smsEventMsg}" class="btn btn-sm btn-outline-info" style="margin-right: 5px;" title="Send SMS Notice">
+                                <i class='bx bx-message-rounded-dots'></i> SMS Notice
                             </a>`;
                 if (canEditDeleteEvents) {
                     html += `<button type="button" class="btn btn-sm btn-outline-primary" onclick="openEditEventModal(${Number(event.event_id)})">

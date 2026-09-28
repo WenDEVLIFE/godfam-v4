@@ -10,7 +10,7 @@ class Attendance {
     }
 
     public function getByEvent($eventId) {
-        $stmt = $this->pdo->prepare("SELECT a.*, m.full_name FROM attendance a JOIN members m ON a.member_id = m.member_id WHERE a.event_id = ? ORDER BY m.full_name ASC");
+        $stmt = $this->pdo->prepare("SELECT a.*, m.full_name, m.phone FROM attendance a JOIN members m ON a.member_id = m.member_id WHERE a.event_id = ? ORDER BY m.full_name ASC");
         $stmt->execute([$eventId]);
         return $stmt->fetchAll();
     }

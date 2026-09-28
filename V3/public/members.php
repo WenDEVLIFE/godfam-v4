@@ -95,7 +95,20 @@ include __DIR__ . '/layout/sidebar.php';
                             <td class="font-weight-600"><?php echo htmlspecialchars($member['full_name']); ?></td>
                             <td class="small">
                                 <div><?php echo htmlspecialchars($member['email'] ?? ''); ?></div>
-                                <div class="text-muted"><?php echo htmlspecialchars($member['phone'] ?? ''); ?></div>
+                                <div class="text-muted d-flex align-items-center gap-1">
+                                    <span><?php echo htmlspecialchars($member['phone'] ?? ''); ?></span>
+                                    <?php if (!empty($member['phone'])): 
+                                        $clean_phone = preg_replace('/[^0-9+]/', '', $member['phone']);
+                                        $default_body = urlencode("Hello " . $member['full_name'] . ", peace be with you from God's Family UMC.");
+                                    ?>
+                                        <a href="sms:<?php echo $clean_phone; ?>?&body=<?php echo $default_body; ?>" 
+                                           class="btn btn-outline-success py-0 px-1 font-weight-700" 
+                                           style="font-size: 10px; line-height: 1.4; border-radius: 4px;"
+                                           title="Send SMS">
+                                            <i class='bx bx-message-rounded-dots'></i> SMS
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                             <td class="small text-muted">
                                 <?php echo htmlspecialchars($member['contact_info'] ?? '---'); ?>
@@ -175,7 +188,12 @@ include __DIR__ . '/layout/sidebar.php';
             </div>
             <div class="row mb-3">
                 <div class="col-4 text-muted small uppercase font-weight-bold">Phone</div>
-                <div class="col-8" id="view_phone"></div>
+                <div class="col-8 d-flex align-items-center justify-content-between">
+                    <span id="view_phone"></span>
+                    <a href="#" id="view_sms_btn" class="btn btn-outline-success btn-xs" style="display:none; font-size:11px; padding:2px 8px; border-radius:4px;" title="Send SMS">
+                        <i class='bx bx-message-rounded-dots'></i> SMS
+                    </a>
+                </div>
             </div>
             <div class="row mb-3">
                 <div class="col-4 text-muted small uppercase font-weight-bold">Address</div>
@@ -199,6 +217,9 @@ include __DIR__ . '/layout/sidebar.php';
             </div>
             <div class="mt-4 pt-3 border-top d-flex gap-2">
                 <a href="#" id="view_id_btn" class="btn btn-primary btn-sm">View ID Card</a>
+                <a href="#" id="view_modal_sms_btn" class="btn btn-outline-success btn-sm" style="display:none;">
+                    <i class='bx bx-message-rounded-dots'></i> Text Member
+                </a>
                 <button class="btn btn-secondary btn-sm" onclick="document.getElementById('viewMemberModal').classList.remove('active')">Close</button>
             </div>
         </div>
@@ -415,6 +436,26 @@ document.querySelectorAll('.view-member-btn').forEach(btn => {
         const badge = document.getElementById('view_status_badge');
         badge.textContent = d.status.toUpperCase();
         document.getElementById('view_id_btn').href = 'profile.php?id=' + d.id;
+        
+        // SMS triggers in modal
+        const viewSmsBtn = document.getElementById('view_sms_btn');
+        const viewModalSmsBtn = document.getElementById('view_modal_sms_btn');
+        if (d.phone && d.phone.trim() !== '') {
+            const cleanPhone = d.phone.replace(/[^0-9+]/g, '');
+            const smsText = encodeURIComponent(`Hello ${d.name}, peace be with you from God's Family UMC.`);
+            const smsUri = `sms:${cleanPhone}?&body=${smsText}`;
+            if (viewSmsBtn) {
+                viewSmsBtn.href = smsUri;
+                viewSmsBtn.style.display = 'inline-flex';
+            }
+            if (viewModalSmsBtn) {
+                viewModalSmsBtn.href = smsUri;
+                viewModalSmsBtn.style.display = 'inline-flex';
+            }
+        } else {
+            if (viewSmsBtn) viewSmsBtn.style.display = 'none';
+            if (viewModalSmsBtn) viewModalSmsBtn.style.display = 'none';
+        }
         
         // Photo Preview
         const photoPreview = document.getElementById('view_photo_preview');

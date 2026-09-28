@@ -289,7 +289,16 @@ include __DIR__ . '/layout/sidebar.php';
                                     <?php echo strtoupper(substr($b_item['full_name'], 0, 1)); ?>
                                 </div>
                                 <div>
-                                    <div class="font-weight-700 text-dark small mb-0.5"><?php echo htmlspecialchars($b_item['full_name']); ?></div>
+                                    <div class="font-weight-700 text-dark small mb-0.5 d-flex align-items-center gap-2">
+                                        <span><?php echo htmlspecialchars($b_item['full_name']); ?></span>
+                                        <?php if (!empty($b_item['phone'])): ?>
+                                            <a href="sms:<?php echo preg_replace('/[^0-9+]/', '', $b_item['phone']); ?>?&body=<?php echo rawurlencode("Happy Birthday " . $b_item['full_name'] . "! " . $wish . " - From God's Family UMC"); ?>" 
+                                               class="btn btn-sm btn-outline-primary py-0 px-2 d-inline-flex align-items-center gap-1 text-decoration-none" 
+                                               title="Send SMS Greeting" style="font-size:10px; border-radius:4px;">
+                                                <i class='bx bx-message-rounded-dots'></i> SMS
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                     <div class="text-muted extra-small" style="font-size: 11px;"><?php echo $b_date; ?></div>
                                 </div>
                             </div>
@@ -332,7 +341,16 @@ include __DIR__ . '/layout/sidebar.php';
                                     <i class='bx bxs-heart'></i>
                                 </div>
                                 <div>
-                                    <div class="font-weight-700 text-dark small mb-0.5"><?php echo htmlspecialchars($a_item['full_name']); ?></div>
+                                    <div class="font-weight-700 text-dark small mb-0.5 d-flex align-items-center gap-2">
+                                        <span><?php echo htmlspecialchars($a_item['full_name']); ?></span>
+                                        <?php if (!empty($a_item['phone'])): ?>
+                                            <a href="sms:<?php echo preg_replace('/[^0-9+]/', '', $a_item['phone']); ?>?&body=<?php echo rawurlencode("Happy Wedding Anniversary " . $a_item['full_name'] . "! " . $a_wish . " - From God's Family UMC"); ?>" 
+                                               class="btn btn-sm btn-outline-danger py-0 px-2 d-inline-flex align-items-center gap-1 text-decoration-none" 
+                                               title="Send SMS Greeting" style="font-size:10px; border-radius:4px;">
+                                                <i class='bx bx-message-rounded-dots'></i> SMS
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                     <div class="text-muted extra-small" style="font-size: 11px;"><?php echo $a_date; ?></div>
                                 </div>
                             </div>
