@@ -333,7 +333,7 @@ if ($format === 'pdf') {
     <body>
         <?php if (!isset($_GET['hidemenu']) || $_GET['hidemenu'] !== 'true'): ?>
         <div class="no-print">
-            <button onclick="window.print()" class="btn btn-primary">Download / Print PDF</button>
+            <button onclick="window.print()" class="btn btn-primary">Print</button>
             <button onclick="window.close();" class="btn">Close Window</button>
             <p style="font-size:0.8rem;margin-top:10px;color:#666;">Tip: Uncheck "Headers and footers" in your browser print settings to hide default page URLs.</p>
         </div>
