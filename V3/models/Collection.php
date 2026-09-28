@@ -33,6 +33,22 @@ class Collection {
     }
 
     /**
+     * Find a collection record by ID.
+     */
+    public function find(int $id): ?array {
+        $stmt = $this->pdo->prepare(
+            "SELECT c.*, m.full_name, u.name AS recorded_by_name
+             FROM collections c
+             LEFT JOIN members m ON c.member_id = m.member_id
+             JOIN users u ON c.recorded_by = u.user_id
+             WHERE c.collection_id = ?"
+        );
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    /**
      * Delete a collection record.
      */
     public function delete(int $id): bool {
