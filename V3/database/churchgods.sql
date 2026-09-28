@@ -290,7 +290,7 @@ INSERT IGNORE INTO `users` (`user_id`, `role_id`, `name`, `email`, `password`) V
 -- Seed Default System Settings
 -- --------------------------------------------------------
 INSERT IGNORE INTO `settings` (`setting_key`, `setting_value`) VALUES
-('church_address', '123 Church St, City, Country'),
+('church_address', '115 Rizal St, Pob 3, Peñaranda, Philippines, 3103'),
 ('church_contact', 'contact@godsfamchurch.com'),
 ('church_logo', 'assets/images/logo.png'),
 ('church_name', 'God\'s Family United Methodist Church'),

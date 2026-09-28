@@ -20,7 +20,7 @@ INSERT IGNORE INTO settings (setting_key, setting_value) VALUES
 ('church_logo', 'assets/images/logo.png'),
 ('church_tagline', 'Therefore go, grow in love, mission and service.'),
 ('church_contact', 'contact@godsfamchurch.com'),
-('church_address', '123 Church St, City, Country');
+('church_address', '115 Rizal St, Pob 3, Peñaranda, Philippines, 3103');
 
 -- Index for attendance status searches
 CREATE INDEX idx_attendance_status ON attendance(status);

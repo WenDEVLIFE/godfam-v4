@@ -79,6 +79,7 @@ include __DIR__ . '/layout/sidebar.php';
                 <div style="font-size: 8pt; color: #555; text-transform: uppercase;">South Nueva Ecija Philippine Annual Conference</div>
                 <div style="font-size: 8pt; color: #555; text-transform: uppercase;">Southeast Nueva Ecija District</div>
                 <div style="font-size: 12pt; font-weight: 800; color: #000; margin-top: 2px; text-transform: uppercase;">God's Family United Methodist Church</div>
+                <div style="font-size: 8pt; color: #555; margin-top: 3px;">115 Rizal St, Pob 3, Peñaranda, Philippines, 3103</div>
             </div>
         </div>
         <hr style="border: 0; border-top: 2px solid #000; margin: 5px 0;">

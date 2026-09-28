@@ -230,7 +230,9 @@ if ($format === 'pdf') {
                 ' . ($logoSrc ? '<img src="' . $logoSrc . '" class="logo"><br>' : '') . '
                 <div style="font-size:9px;color:#555;">The United Methodist Church</div>
                 <div style="font-size:8px;color:#555;">South Nueva Ecija Philippine Annual Conference</div>
+                <div style="font-size:8px;color:#555;">Southeast Nueva Ecija District</div>
                 <div style="font-size:12px;font-weight:bold;margin-top:2px;">God\'s Family United Methodist Church</div>
+                <div style="font-size:8px;color:#666;margin-top:2px;">115 Rizal St, Pob 3, Peñaranda, Philippines, 3103</div>
                 <hr style="border:0;border-top:1.5px solid #000;margin-top:8px;">
                 <div class="report-title">Attendance Report</div>
                 <div class="sub-title"><strong>Scope:</strong> ' . htmlspecialchars($eventLabel) . ' &nbsp;|&nbsp; <strong>Date:</strong> ' . htmlspecialchars($dateLabel) . '</div>
@@ -327,7 +329,9 @@ if ($format === 'pdf') {
                 <div class="church-info">
                     <div style="font-size:9pt;color:#555;">The United Methodist Church</div>
                     <div style="font-size:8pt;color:#555;">South Nueva Ecija Philippine Annual Conference</div>
+                    <div style="font-size:8pt;color:#555;">Southeast Nueva Ecija District</div>
                     <div style="font-size:12pt;font-weight:800;color:#000;margin-top:2px;">God's Family United Methodist Church</div>
+                    <div style="font-size:8.5pt;color:#666;margin-top:2px;">115 Rizal St, Pob 3, Peñaranda, Philippines, 3103</div>
                 </div>
             </div>
             <hr style="border:0;border-top:2px solid #000;">
