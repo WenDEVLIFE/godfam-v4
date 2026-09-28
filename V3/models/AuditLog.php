@@ -59,8 +59,17 @@ class AuditLog {
         }
 
         if (!empty($filters['user_id'])) {
-            $sql .= " AND a.user_id = ?";
-            $params[] = (int)$filters['user_id'];
+            if ($filters['user_id'] === 'system') {
+                $sql .= " AND a.user_id IS NULL";
+            } else {
+                $sql .= " AND a.user_id = ?";
+                $params[] = (int)$filters['user_id'];
+            }
+        }
+
+        if (!empty($filters['role'])) {
+            $sql .= " AND r.role_name = ?";
+            $params[] = $filters['role'];
         }
 
         if (!empty($filters['search'])) {
@@ -93,7 +102,7 @@ class AuditLog {
      * Count logs for pagination.
      */
     public function countLogs(array $filters = []): int {
-        $sql = "SELECT COUNT(*) FROM audit_logs a LEFT JOIN users u ON a.user_id = u.user_id WHERE 1=1";
+        $sql = "SELECT COUNT(*) FROM audit_logs a LEFT JOIN users u ON a.user_id = u.user_id LEFT JOIN roles r ON u.role_id = r.role_id WHERE 1=1";
         $params = [];
 
         if (!empty($filters['action'])) {
@@ -102,8 +111,17 @@ class AuditLog {
         }
 
         if (!empty($filters['user_id'])) {
-            $sql .= " AND a.user_id = ?";
-            $params[] = (int)$filters['user_id'];
+            if ($filters['user_id'] === 'system') {
+                $sql .= " AND a.user_id IS NULL";
+            } else {
+                $sql .= " AND a.user_id = ?";
+                $params[] = (int)$filters['user_id'];
+            }
+        }
+
+        if (!empty($filters['role'])) {
+            $sql .= " AND r.role_name = ?";
+            $params[] = $filters['role'];
         }
 
         if (!empty($filters['search'])) {
@@ -136,5 +154,18 @@ class AuditLog {
     public function getDistinctActions(): array {
         $stmt = $this->pdo->query("SELECT DISTINCT action FROM audit_logs WHERE action IS NOT NULL ORDER BY action ASC");
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Get distinct users who have activity in audit logs.
+     */
+    public function getDistinctUsers(): array {
+        $stmt = $this->pdo->query("
+            SELECT DISTINCT u.user_id, u.name, u.email
+            FROM audit_logs a
+            JOIN users u ON a.user_id = u.user_id
+            ORDER BY u.name ASC
+        ");
+        return $stmt->fetchAll();
     }
 }

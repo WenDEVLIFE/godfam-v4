@@ -20,6 +20,8 @@ $auditModel = new AuditLog($pdo);
 // Filters
 $filters = [
     'action'     => $_GET['action']     ?? null,
+    'user_id'    => $_GET['user_id']    ?? null,
+    'role'       => $_GET['role']       ?? null,
     'search'     => trim($_GET['search'] ?? ''),
     'start_date' => $_GET['start_date'] ?? null,
     'end_date'   => $_GET['end_date']   ?? null,
@@ -62,6 +64,8 @@ $logs            = $auditModel->getLogs($filters, $perPage, $offset);
 $totalLogs       = $auditModel->countLogs($filters);
 $totalPages      = max(1, ceil($totalLogs / $perPage));
 $distinctActions = $auditModel->getDistinctActions();
+$distinctUsers   = $auditModel->getDistinctUsers();
+$distinctRoles   = ['Administrator', 'Pastor', 'Secretary', 'Staff'];
 
 include __DIR__ . '/layout/header.php';
 include __DIR__ . '/layout/sidebar.php';
@@ -89,6 +93,29 @@ include __DIR__ . '/layout/sidebar.php';
                     <input type="text" name="search" class="form-control" placeholder="Search user, IP, or details..." value="<?php echo htmlspecialchars($filters['search']); ?>">
                 </div>
                 <div class="col-md-2 col-sm-6">
+                    <label class="form-label small font-weight-600 text-muted">User / Account</label>
+                    <select name="user_id" class="form-select">
+                        <option value="">All Users</option>
+                        <option value="system" <?php echo ($filters['user_id'] ?? '') === 'system' ? 'selected' : ''; ?>>System / Guest</option>
+                        <?php foreach ($distinctUsers as $u): ?>
+                            <option value="<?php echo $u['user_id']; ?>" <?php echo (string)($filters['user_id'] ?? '') === (string)$u['user_id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($u['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label small font-weight-600 text-muted">Role</label>
+                    <select name="role" class="form-select">
+                        <option value="">All Roles</option>
+                        <?php foreach ($distinctRoles as $r): ?>
+                            <option value="<?php echo $r; ?>" <?php echo ($filters['role'] ?? '') === $r ? 'selected' : ''; ?>>
+                                <?php echo $r; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-6">
                     <label class="form-label small font-weight-600 text-muted">Action Filter</label>
                     <select name="action" class="form-select">
                         <option value="">All Actions</option>
@@ -99,19 +126,21 @@ include __DIR__ . '/layout/sidebar.php';
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-3 col-sm-6">
-                    <label class="form-label small font-weight-600 text-muted">Start Date</label>
-                    <input type="date" name="start_date" class="form-control" value="<?php echo htmlspecialchars($filters['start_date'] ?? ''); ?>">
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <label class="form-label small font-weight-600 text-muted">End Date</label>
-                    <input type="date" name="end_date" class="form-control" value="<?php echo htmlspecialchars($filters['end_date'] ?? ''); ?>">
-                </div>
-                <div class="col-md-1 col-sm-12 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary w-100"><i class='bx bx-search'></i></button>
-                    <?php if (!empty($filters['search']) || !empty($filters['action']) || !empty($filters['start_date']) || !empty($filters['end_date'])): ?>
-                        <a href="audit_logs.php" class="btn btn-outline-secondary" title="Clear Filters"><i class='bx bx-x'></i></a>
-                    <?php endif; ?>
+                <div class="col-md-3 col-sm-12 d-flex gap-2">
+                    <div style="flex:1;">
+                        <label class="form-label small font-weight-600 text-muted">Start Date</label>
+                        <input type="date" name="start_date" class="form-control" value="<?php echo htmlspecialchars($filters['start_date'] ?? ''); ?>">
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label small font-weight-600 text-muted">End Date</label>
+                        <input type="date" name="end_date" class="form-control" value="<?php echo htmlspecialchars($filters['end_date'] ?? ''); ?>">
+                    </div>
+                    <div style="align-self: flex-end; display: flex; gap: 4px;">
+                        <button type="submit" class="btn btn-primary" title="Search"><i class='bx bx-search'></i></button>
+                        <?php if (!empty($filters['search']) || !empty($filters['action']) || !empty($filters['user_id']) || !empty($filters['role']) || !empty($filters['start_date']) || !empty($filters['end_date'])): ?>
+                            <a href="audit_logs.php" class="btn btn-outline-secondary" title="Clear Filters"><i class='bx bx-x'></i></a>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </form>
         </div>
