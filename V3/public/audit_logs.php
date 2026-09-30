@@ -88,11 +88,14 @@ include __DIR__ . '/layout/sidebar.php';
     <div class="card mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3 align-items-end">
+                <?php if (!empty($filters['action'])): ?>
+                    <input type="hidden" name="action" value="<?php echo htmlspecialchars($filters['action']); ?>">
+                <?php endif; ?>
                 <div class="col-md-3 col-sm-6">
                     <label class="form-label small font-weight-600 text-muted">Search Query</label>
                     <input type="text" name="search" class="form-control" placeholder="Search user, IP, or details..." value="<?php echo htmlspecialchars($filters['search']); ?>">
                 </div>
-                <div class="col-md-2 col-sm-6">
+                <div class="col-md-3 col-sm-6">
                     <label class="form-label small font-weight-600 text-muted">User / Account</label>
                     <select name="user_id" class="form-select">
                         <option value="">All Users</option>
@@ -115,18 +118,7 @@ include __DIR__ . '/layout/sidebar.php';
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-2 col-sm-6">
-                    <label class="form-label small font-weight-600 text-muted">Action Filter</label>
-                    <select name="action" class="form-select">
-                        <option value="">All Actions</option>
-                        <?php foreach ($distinctActions as $act): ?>
-                            <option value="<?php echo htmlspecialchars($act); ?>" <?php echo strtoupper($filters['action'] ?? '') === strtoupper($act) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($act); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-3 col-sm-12 d-flex gap-2">
+                <div class="col-md-4 col-sm-12 d-flex gap-2">
                     <div style="flex:1;">
                         <label class="form-label small font-weight-600 text-muted">Start Date</label>
                         <input type="date" name="start_date" class="form-control" value="<?php echo htmlspecialchars($filters['start_date'] ?? ''); ?>">
@@ -148,8 +140,39 @@ include __DIR__ . '/layout/sidebar.php';
 
     <!-- Audit Logs Table Card -->
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span><i class='bx bx-shield-quarter' style="margin-right:6px; color:var(--cms-blue);"></i> Recorded Audit Logs</span>
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 py-3 px-4">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <span class="font-weight-700" style="color:var(--dark-text); font-size: 1rem;">
+                    <i class='bx bx-shield-quarter' style="margin-right:6px; color:var(--cms-blue);"></i> Recorded Audit Logs
+                </span>
+                
+                <!-- Action Filter Dropdown (Placed next to Recorded Audit Logs) -->
+                <form method="GET" class="d-inline-flex align-items-center m-0">
+                    <?php if (!empty($filters['search'])): ?>
+                        <input type="hidden" name="search" value="<?php echo htmlspecialchars($filters['search']); ?>">
+                    <?php endif; ?>
+                    <?php if (!empty($filters['user_id'])): ?>
+                        <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($filters['user_id']); ?>">
+                    <?php endif; ?>
+                    <?php if (!empty($filters['role'])): ?>
+                        <input type="hidden" name="role" value="<?php echo htmlspecialchars($filters['role']); ?>">
+                    <?php endif; ?>
+                    <?php if (!empty($filters['start_date'])): ?>
+                        <input type="hidden" name="start_date" value="<?php echo htmlspecialchars($filters['start_date']); ?>">
+                    <?php endif; ?>
+                    <?php if (!empty($filters['end_date'])): ?>
+                        <input type="hidden" name="end_date" value="<?php echo htmlspecialchars($filters['end_date']); ?>">
+                    <?php endif; ?>
+                    <select name="action" class="form-select form-select-sm" style="height: 36px; padding: 4px 12px; font-size: 13px; font-weight: 500; min-width: 170px; border-radius: 6px;" onchange="this.form.submit()">
+                        <option value="">All Actions</option>
+                        <?php foreach ($distinctActions as $act): ?>
+                            <option value="<?php echo htmlspecialchars($act); ?>" <?php echo strtoupper($filters['action'] ?? '') === strtoupper($act) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($act); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
+            </div>
             <span class="badge badge-info"><?php echo number_format($totalLogs); ?> Total Entries</span>
         </div>
         <div class="card-body p-0">
