@@ -63,17 +63,41 @@ class AttendanceController {
     public function recordByQr($data, $pdo) {
         authorizeRoles(['Secretary', 'Committee Head', 'Administrator', 'Staff']);
         
-        if (empty($data['qr_token']) || empty($data['event_id']) || empty($data['date'])) {
-            return "Missing required fields.";
+        $tokenInput = trim($data['qr_token'] ?? '');
+        $memberIdInput = trim($data['member_id'] ?? '');
+
+        if (empty($tokenInput) && empty($memberIdInput)) {
+            return "Please scan a QR pass or select a member from the list.";
+        }
+        if (empty($data['event_id']) || empty($data['date'])) {
+            return "Missing required event information.";
         }
 
-        // We need Member model to find by token
+        // We need Member model to find by token or member_id
         require_once BASE_PATH . '/models/Member.php';
         $memberModel = new Member($pdo);
-        $member = $memberModel->findByQrToken($data['qr_token']);
+        $member = null;
+
+        // 1. Direct member_id passed from dropdown
+        if (!empty($memberIdInput)) {
+            $member = $memberModel->find($memberIdInput);
+        }
+
+        // 2. Lookup by QR token
+        if (!$member && !empty($tokenInput)) {
+            $member = $memberModel->findByQrToken($tokenInput);
+
+            // 3. Fallback: If typed code or numeric ID (e.g., ID #0001, 0001, 1)
+            if (!$member) {
+                $cleanedId = preg_replace('/[^0-9]/', '', $tokenInput);
+                if (!empty($cleanedId)) {
+                    $member = $memberModel->find((int)$cleanedId);
+                }
+            }
+        }
 
         if (!$member) {
-            return "Invalid QR Code.";
+            return "Member not found. Please verify the QR code or select from the dropdown.";
         }
 
         $mode = $data['mode'] ?? 'time_in';

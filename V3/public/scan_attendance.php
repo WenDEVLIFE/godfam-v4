@@ -72,6 +72,10 @@ $stmt = $pdo->prepare("
 $stmt->execute([$eventId]);
 $recentScans = $stmt->fetchAll();
 
+// Fetch All Members for Manual Dropdown Fallback
+$memberStmt = $pdo->query("SELECT member_id, full_name, email, phone, qr_token FROM members ORDER BY full_name ASC");
+$allMembersList = $memberStmt->fetchAll();
+
 // Include Layout Header
 include __DIR__ . '/layout/header.php';
 include __DIR__ . '/layout/sidebar.php';
@@ -144,7 +148,7 @@ include __DIR__ . '/layout/sidebar.php';
         <div>
             <h2 style="font-weight: 800; font-size: 1.85rem; color: var(--primary-color); margin-bottom: 6px;">Attendance Scanner</h2>
             <div class="d-flex align-items-center gap-2 flex-wrap">
-                <span class="badge badge-info" style="font-size: 0.85rem; padding: 6px 12px; font-weight: 700;">
+                <span class="badge badge-info" style="font-size: 0.85rem; padding: 6px 12px; font-weight: 700; white-space: normal; word-break: break-word; overflow-wrap: break-word; max-width: 100%; line-height: 1.4; display: inline-block;">
                     Event: <?php echo htmlspecialchars($event_data['title']); ?>
                 </span>
                 <span class="text-muted small" style="font-weight: 500;">
@@ -211,7 +215,7 @@ include __DIR__ . '/layout/sidebar.php';
                             <span class="input-group-text bg-white border-end-0" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-color: #cbd5e1; color: var(--muted-text); padding-left: 14px; padding-right: 10px;">
                                 <i class='bx bx-qr-scan' style="font-size: 1.25rem;"></i>
                             </span>
-                            <input type="text" id="qr_token" name="qr_token" class="form-control border-start-0" autofocus placeholder="Scan QR or type Member ID..." required style="height: 46px; font-size: 0.95rem; border-color: #cbd5e1; box-shadow: none;">
+                            <input type="text" id="qr_token" name="qr_token" class="form-control border-start-0" autofocus placeholder="Scan QR or type Member ID / Code..." required style="height: 46px; font-size: 0.95rem; border-color: #cbd5e1; box-shadow: none;">
                             <button class="btn btn-primary px-3" type="submit" id="submitBtn" style="height: 46px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
                                 <i class='bx bx-send' style="font-size: 1.1rem;"></i>
                             </button>
@@ -220,6 +224,32 @@ include __DIR__ . '/layout/sidebar.php';
                     <p class="text-muted small mt-2 mb-0" style="font-size: 0.8rem;">
                         <i class='bx bx-info-circle'></i> Physical scanners automatically submit when focused.
                     </p>
+
+                    <!-- Manual Member Code / Search Dropdown Fallback -->
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="member_fallback_select" class="form-label font-weight-700 small text-muted mb-0" style="font-size: 0.82rem;">
+                                <i class='bx bx-user-pin text-primary'></i> QR Scanner Failed? Search Member / Code:
+                            </label>
+                            <span class="badge bg-light text-secondary border" style="font-size: 9px; font-weight: 700;">MANUAL FALLBACK</span>
+                        </div>
+                        <div class="input-group">
+                            <select id="member_fallback_select" class="form-select form-control" style="height: 42px; font-size: 0.88rem; border-color: #cbd5e1;">
+                                <option value="">-- Choose Member or Member Code --</option>
+                                <?php foreach ($allMembersList as $m): ?>
+                                    <option value="<?php echo htmlspecialchars($m['qr_token'] ?: $m['member_id']); ?>" data-name="<?php echo htmlspecialchars($m['full_name']); ?>">
+                                        ID #<?php echo str_pad($m['member_id'], 4, '0', STR_PAD_LEFT); ?> &bull; <?php echo htmlspecialchars($m['full_name']); ?><?php echo !empty($m['phone']) ? ' (' . htmlspecialchars($m['phone']) . ')' : ''; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button class="btn btn-outline-primary px-3" type="button" onclick="submitManualAttendance()" style="height: 42px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                                <i class='bx bx-check'></i> Submit
+                            </button>
+                        </div>
+                        <p class="text-muted small mt-1 mb-0" style="font-size: 0.78rem;">
+                            <i class='bx bx-info-circle'></i> If QR pass cannot be scanned, select member above to record attendance.
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -352,10 +382,29 @@ include __DIR__ . '/layout/sidebar.php';
                 }
             }
         }
+    function submitManualAttendance() {
+        const sel = document.getElementById('member_fallback_select');
+        if (!sel || !sel.value) {
+            alert('Please select a member or member code from the dropdown list.');
+            return;
+        }
+        const qrInput = document.getElementById('qr_token');
+        if (qrInput) {
+            qrInput.value = sel.value;
+            document.getElementById('scan-form').submit();
+        }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
         const qrInput = document.getElementById('qr_token');
+        const sel = document.getElementById('member_fallback_select');
+        if (sel) {
+            sel.addEventListener('change', function() {
+                if (this.value && qrInput) {
+                    qrInput.value = this.value;
+                }
+            });
+        }
         if (qrInput) {
             qrInput.focus();
         }

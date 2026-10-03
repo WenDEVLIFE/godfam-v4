@@ -188,6 +188,42 @@ include __DIR__ . '/layout/sidebar.php';
     </div>
 </div>
 
+
+<style>
+/* Events Table Specific Styling */
+.events-table tbody tr:hover {
+    background-color: transparent !important;
+}
+.events-table tbody tr:nth-child(even):hover {
+    background-color: #FBFDFE !important;
+}
+.event-title-cell {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 320px;
+    min-width: 140px;
+    line-height: 1.35;
+}
+.event-title-link {
+    color: var(--dark-text, #1e293b);
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.15s ease-in-out;
+}
+.event-title-link:hover {
+    color: var(--primary-color, #1565C0);
+    text-decoration: underline;
+}
+.event-actions .btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.event-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+</style>
+
 <!-- Upcoming Events -->
 <div class="card mb-4">
     <div class="card-header bg-light">UPCOMING EVENTS</div>
@@ -196,7 +232,7 @@ include __DIR__ . '/layout/sidebar.php';
             <p class="p-4 text-center text-muted">No upcoming events scheduled.</p>
         <?php else: ?>
             <div class="table-responsive">
-                <table class="table mb-0">
+                <table class="table events-table mb-0">
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -211,7 +247,11 @@ include __DIR__ . '/layout/sidebar.php';
                         <?php foreach ($upcoming_events as $event): ?>
                         <tr>
                             <td class="small font-weight-700"><?php echo date('M d, Y', strtotime($event['date'])); ?></td>
-                            <td class="font-weight-600"><?php echo htmlspecialchars($event['title']); ?></td>
+                            <td class="event-title-cell">
+                                <a href="attendance.php?event_id=<?php echo (int)$event['event_id']; ?>" class="event-title-link" title="Open Event Attendance">
+                                    <?php echo htmlspecialchars($event['title']); ?>
+                                </a>
+                            </td>
                             <td class="small text-muted"><?php echo htmlspecialchars($event['location'] ?? 'Main Hall'); ?></td>
                             <td class="small"><?php echo $event['time'] ? date('h:i A', strtotime($event['time'])) : 'All Day'; ?></td>
                             <td>
@@ -224,11 +264,11 @@ include __DIR__ . '/layout/sidebar.php';
                             </td>
                             <td>
                                 <div class="event-actions">
-                                    <a href="attendance.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-outline-primary btn-sm">
-                                        <i class='bx bx-list-ul'></i> View Logs
+                                    <a href="attendance.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-outline-primary btn-sm" title="View & Manage Attendance">
+                                        <i class='bx bx-user-check'></i> Attendance
                                     </a>
                                     <?php if ($canScheduleEvents): ?>
-                                        <a href="scan_attendance.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-outline-success btn-sm">
+                                        <a href="scan_attendance.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-outline-success btn-sm" title="Open Live QR Scanner">
                                             <i class='bx bx-scan'></i> Scanner
                                         </a>
                                     <?php endif; ?>
@@ -267,7 +307,7 @@ include __DIR__ . '/layout/sidebar.php';
             <p class="p-4 text-center text-muted">No past events recorded.</p>
         <?php else: ?>
             <div class="table-responsive">
-                <table class="table mb-0">
+                <table class="table events-table mb-0">
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -281,7 +321,11 @@ include __DIR__ . '/layout/sidebar.php';
                         <?php foreach ($past_events as $event): ?>
                         <tr>
                             <td class="small font-weight-700"><?php echo date('M d, Y', strtotime($event['date'])); ?></td>
-                            <td class="font-weight-600"><?php echo htmlspecialchars($event['title']); ?></td>
+                            <td class="event-title-cell">
+                                <a href="attendance.php?event_id=<?php echo (int)$event['event_id']; ?>" class="event-title-link" title="Open Event Attendance">
+                                    <?php echo htmlspecialchars($event['title']); ?>
+                                </a>
+                            </td>
                             <td class="small text-muted"><?php echo htmlspecialchars($event['location'] ?? 'Main Hall'); ?></td>
                             <td>
                                 <?php 
@@ -293,8 +337,8 @@ include __DIR__ . '/layout/sidebar.php';
                             </td>
                             <td>
                                 <div class="event-actions">
-                                <a href="attendance.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-outline-primary btn-sm">
-                                    <i class='bx bx-list-ul'></i> View Logs
+                                <a href="attendance.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-outline-primary btn-sm" title="View & Manage Attendance">
+                                    <i class='bx bx-user-check'></i> Attendance
                                 </a>
                                 <?php if ($canEditDeleteEvents): ?>
                                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="openEditEventModal(<?php echo (int)$event['event_id']; ?>)">
@@ -531,7 +575,7 @@ function openDayModal(dateString) {
 
             html += `<div class="list-group-item px-0 py-3 border-bottom">
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="mb-0" style="font-weight: 600;">${eventTitle}</h5>
+                            <h5 class="mb-0" style="font-weight: 600; word-break: break-word;"><a href="attendance.php?event_id=${eventId}" class="event-title-link" title="Open Event Attendance">${eventTitle}</a></h5>
                             <span class="badge" style="background: var(--light-bg); color: var(--dark-text);">${escapeHtml(timeStr)}</span>
                         </div>
                         <p class="text-muted small mb-2"><i class='bx bx-map text-danger'></i> ${eventLocation}</p>
@@ -541,10 +585,10 @@ function openDayModal(dateString) {
             if (canUseEventTools) {
                 const smsEventMsg = encodeURIComponent(`Church Event: ${event.title} on ${event.date || dateString} at ${timeStr} (${eventLocation}). From God's Family UMC`);
                 html += `<div class="d-flex gap-2 flex-wrap" style="margin-top:10px;">
-                            <a href="attendance.php?event_id=${eventId}" class="btn btn-sm btn-outline-primary" style="margin-right: 5px;">
-                                <i class='bx bx-list-check'></i> Logs
+                            <a href="attendance.php?event_id=${eventId}" class="btn btn-sm btn-outline-primary" style="margin-right: 5px;" title="View & Manage Attendance">
+                                <i class='bx bx-user-check'></i> Attendance
                             </a>
-                            <a href="scan_attendance.php?event_id=${eventId}" class="btn btn-sm btn-outline-success" style="margin-right: 5px;">
+                            <a href="scan_attendance.php?event_id=${eventId}" class="btn btn-sm btn-outline-success" style="margin-right: 5px;" title="Open Live QR Scanner">
                                 <i class='bx bx-scan'></i> Scanner
                             </a>
                             <a href="sms:?&body=${smsEventMsg}" class="btn btn-sm btn-outline-info" style="margin-right: 5px;" title="Send SMS Notice">

@@ -56,6 +56,10 @@ $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
                 <i class='bx bxs-calendar-event'></i>
                 <span>Church Events</span>
             </a>
+            <a href="attendance.php" class="nav-link <?php echo in_array($current_page, ['attendance.php', 'scan_attendance.php']) ? 'active' : ''; ?>">
+                <i class='bx bxs-user-check'></i>
+                <span>Event Attendance</span>
+            </a>
         <?php endif; ?>
 
         <?php if ($is_member): ?>

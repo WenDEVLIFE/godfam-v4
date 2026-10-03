@@ -172,6 +172,140 @@
     color: #64748b;
 }
 
+/* Back Side of ID Card */
+.id-card-back {
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    font-family: 'Inter', sans-serif;
+    margin: 15px auto;
+    border: 1px solid #cbd5e1;
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.id-card-back-bg {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.95) 100%), url('../images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.96;
+    z-index: 1;
+}
+
+.id-card-back-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 480px;
+    padding: 20px 18px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.id-card-back-header {
+    margin-bottom: 12px;
+}
+
+.id-card-back-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #f59e0b;
+    object-fit: cover;
+    margin: 0 auto 6px auto;
+    background: #fff;
+    padding: 2px;
+    display: block;
+}
+
+.id-card-back-church {
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
+.id-card-back-sub {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: #cbd5e1;
+    margin-bottom: 2px;
+}
+
+.id-card-back-address {
+    font-size: 9px;
+    color: #94a3b8;
+    line-height: 1.3;
+}
+
+.id-card-back-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.id-card-back-notice {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 9.5px;
+    line-height: 1.45;
+    color: #e2e8f0;
+    text-align: left;
+}
+
+.id-card-back-verse {
+    font-style: italic;
+    font-size: 10px;
+    color: #f59e0b;
+    margin-bottom: 4px;
+}
+
+.id-card-back-signature {
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+}
+
+.id-card-back-sig-line {
+    text-align: center;
+    flex: 1;
+}
+
+.id-card-back-sig-line .sig-rule {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    height: 24px;
+    margin-bottom: 4px;
+}
+
+.id-card-back-sig-line div {
+    font-size: 8.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+}
+
 /* Modal Enhancements */
 .modal-lg {
     max-width: 800px;
@@ -269,22 +403,40 @@
     }
 
     #printable-id-card {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        display: block !important;
-        margin: 0 !important;
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        align-items: flex-start !important;
+        gap: 0.25in !important;
+        margin: 0 auto !important;
         padding: 0 !important;
-        width: auto !important;
-        height: auto !important;
-        background: #fff !important;
+        background: transparent !important;
     }
 
-    .id-card-modern {
+    .id-card-modern,
+    .id-card-back {
+        width: 2.125in !important;
+        height: 3.375in !important;
+        max-width: 2.125in !important;
+        max-height: 3.375in !important;
+        min-height: 3.375in !important;
         box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
         margin: 0 !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        box-sizing: border-box !important;
+    }
+
+    .id-card-back-bg {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 }
 

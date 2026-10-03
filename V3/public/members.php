@@ -298,7 +298,7 @@ include __DIR__ . '/layout/sidebar.php';
                         <div class="d-flex align-items-center gap-2">
                             <input type="checkbox" id="member_agree" required style="width: 16px; height: 16px;">
                             <label for="member_agree" class="small text-muted mb-0" style="cursor:pointer;">
-                                Member agrees to the <a href="javascript:void(0)" onclick="openPrivacyModal('member_agree')">Church Privacy Policy &amp; Data Protection Consent</a>.
+                                Member agrees to the <a href="javascript:void(0)" onclick="openPrivacyModal('member_agree')">Church Privacy Policy and Data Protection Consent</a>.
                             </label>
                         </div>
                     </div>
@@ -435,7 +435,7 @@ document.querySelectorAll('.view-member-btn').forEach(btn => {
         
         const badge = document.getElementById('view_status_badge');
         badge.textContent = d.status.toUpperCase();
-        document.getElementById('view_id_btn').href = 'profile.php?id=' + d.id;
+        document.getElementById('view_id_btn').href = 'generate_id_card.php?id=' + d.id;
         
         // SMS triggers in modal
         const viewSmsBtn = document.getElementById('view_sms_btn');

@@ -17,27 +17,35 @@ if (!isAdmin() && !isStaff()) {
     exit;
 }
 
-$eventId = $_GET['event_id'] ?? null;
-if (!$eventId) {
-    header("Location: events.php");
-    exit;
-}
-
 $controller = new AttendanceController($pdo);
 $memberController = new MemberController($pdo);
 $eventController = new EventController($pdo);
 
-$event = $eventController->index(); // This is a bit inefficient, find() would be better
-$event_data = null;
-foreach($event as $e) {
-    if($e['event_id'] == $eventId) {
-        $event_data = $e;
-        break;
+$allEvents = $eventController->index();
+$eventId = $_GET['event_id'] ?? null;
+
+// If no event_id, find the best matching active/upcoming or latest event
+if (!$eventId && !empty($allEvents)) {
+    $today = date('Y-m-d');
+    foreach ($allEvents as $e) {
+        if ($e['date'] >= $today) {
+            $eventId = $e['event_id'];
+            break;
+        }
+    }
+    if (!$eventId && !empty($allEvents[0])) {
+        $eventId = $allEvents[0]['event_id'];
     }
 }
 
-if (!$event_data) {
-    die("Event not found.");
+$event_data = null;
+if ($eventId) {
+    foreach($allEvents as $e) {
+        if($e['event_id'] == $eventId) {
+            $event_data = $e;
+            break;
+        }
+    }
 }
 
 $error = '';
@@ -61,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$attendeeList = $controller->viewAttendance($eventId);
+$attendeeList = $eventId ? $controller->viewAttendance($eventId) : [];
 $allMembers = $memberController->index();
 $csrf_token = generateCsrfToken();
 
@@ -71,6 +79,16 @@ include __DIR__ . '/layout/sidebar.php';
 ?>
 
 <div class="fade-in attendance-container">
+    <?php if (!$event_data): ?>
+        <div class="card p-5 text-center my-4 shadow-sm" style="border-radius: 12px;">
+            <div style="font-size: 3rem; color: var(--cms-blue); margin-bottom: 1rem;"><i class='bx bx-calendar-x'></i></div>
+            <h3>No Scheduled Events Found</h3>
+            <p class="text-muted">There are no church events created yet to record attendance for.</p>
+            <div class="mt-3">
+                <a href="events.php" class="btn btn-primary"><i class='bx bx-calendar-plus'></i> Schedule an Event</a>
+            </div>
+        </div>
+    <?php else: ?>
     <div class="print-header d-none-screen d-block-print mb-4" style="display: none; font-family: 'Arial', sans-serif;">
         <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 15px;">
             <img src="assets/images/logo.png" alt="Logo" style="height: 70px; width: 70px; border-radius: 50%; object-fit: cover; border: 1px solid #eee;">
@@ -89,10 +107,23 @@ include __DIR__ . '/layout/sidebar.php';
         </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print flex-wrap gap-3">
         <div>
-            <h2 class="mb-1"><?php echo htmlspecialchars($event_data['title']); ?></h2>
-            <p class="text-muted"><i class='bx bx-calendar'></i> <?php echo date('F d, Y', strtotime($event_data['date'])); ?> | Attendance Tracking</p>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <h2 class="mb-1" style="font-weight: 800;"><?php echo htmlspecialchars($event_data['title']); ?></h2>
+                <?php if (count($allEvents) > 1): ?>
+                    <div class="ms-2">
+                        <select class="form-select form-control form-control-sm" style="font-weight: 600; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;" onchange="window.location.href='attendance.php?event_id=' + this.value" title="Switch Event">
+                            <?php foreach ($allEvents as $ev): ?>
+                                <option value="<?php echo $ev['event_id']; ?>" <?php echo $ev['event_id'] == $eventId ? 'selected' : ''; ?>>
+                                    <?php echo date('M d, Y', strtotime($ev['date'])) . ' - ' . htmlspecialchars($ev['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <p class="text-muted mb-0"><i class='bx bx-calendar'></i> <?php echo date('F d, Y', strtotime($event_data['date'])); ?> | Attendance Tracking</p>
         </div>
         <div class="header-actions d-flex gap-2">
             <div class="dropdown" style="position:relative;">
@@ -351,6 +382,7 @@ include __DIR__ . '/layout/sidebar.php';
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
