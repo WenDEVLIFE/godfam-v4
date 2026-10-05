@@ -458,7 +458,7 @@ function switchGreetingsTab(tabName) {
     <div class="card-body">
         <div class="d-flex gap-2 flex-wrap">
             <a href="events.php" class="btn btn-outline-primary"><i class='bx bxs-calendar'></i> Manage Events</a>
-            <a href="scan_attendance.php" class="btn btn-primary"><i class='bx bx-qr-scan'></i> Scan QR Attendance</a>
+            <a href="scan_attendance.php<?php echo !empty($today_events[0]['event_id']) ? '?event_id=' . (int)$today_events[0]['event_id'] : ''; ?>" class="btn btn-primary"><i class='bx bx-qr-scan'></i> Scan QR Attendance</a>
             <a href="reports.php" class="btn btn-outline-primary"><i class='bx bxs-report'></i> Attendance Reports</a>
             <a href="financial_reports.php" class="btn btn-outline-primary"><i class='bx bx-spreadsheet'></i> Financial Reports</a>
             <a href="attendance_export.php?format=pdf&start_date=<?php echo date('Y-m-d'); ?>&end_date=<?php echo date('Y-m-d'); ?>" target="_blank" class="btn btn-outline-primary"><i class='bx bxs-file-pdf'></i> Export Today PDF</a>

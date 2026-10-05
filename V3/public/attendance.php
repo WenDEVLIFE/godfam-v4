@@ -339,27 +339,102 @@ include __DIR__ . '/layout/sidebar.php';
 }
 
 @media print {
-    .d-none-screen { display: block !important; }
-    .no-print { display: none !important; }
-    body { background: white !important; font-size: 11pt; color: black; }
-    .card { border: none !important; box-shadow: none !important; }
-    .card-header { display: none !important; }
-    .table-responsive { overflow: visible !important; }
-    table { width: 100% !important; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #000 !important; padding: 6px !important; color: black !important; }
-    th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
-    .badge { 
-        background: transparent !important; 
-        color: black !important; 
-        border: 1px solid #000 !important; 
+    body, body * {
+        visibility: visible !important;
+    }
+    .print-header {
+        display: block !important;
+        visibility: visible !important;
+        margin-bottom: 25px !important;
+    }
+    .print-header * {
+        visibility: visible !important;
+    }
+    .print-footer {
+        display: block !important;
+        visibility: visible !important;
+        margin-top: 40px !important;
+    }
+    .print-footer * {
+        visibility: visible !important;
+    }
+    .d-none-screen {
+        display: block !important;
+    }
+    .no-print,
+    .no-print *,
+    .sidebar,
+    .top-header,
+    .header,
+    .header-actions,
+    .col-lg-4,
+    .manual-entry-card,
+    .stats-grid,
+    .modal-overlay {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    body {
+        background: white !important;
+        font-size: 11pt !important;
+        color: black !important;
+        margin: 0 !important;
+        padding: 10mm 15mm !important;
+    }
+    .attendance-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+    .card-header {
+        display: none !important;
+    }
+    .table-responsive {
+        overflow: visible !important;
+        width: 100% !important;
+    }
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 15px !important;
+    }
+    th, td {
+        border: 1px solid #333 !important;
+        padding: 8px 10px !important;
+        color: black !important;
+        font-size: 10pt !important;
+    }
+    th {
+        background-color: #f2f2f2 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        font-weight: bold !important;
+    }
+    .badge {
+        background: transparent !important;
+        color: black !important;
+        border: 1px solid #000 !important;
         box-shadow: none !important;
         text-transform: uppercase;
         font-size: 8pt !important;
     }
-    .text-muted, .small { color: black !important; display: inline-block !important; visibility: visible !important; opacity: 1 !important; }
-    .col-lg-4, .manual-entry-card, .header-actions { display: none !important; }
-    .col-lg-8 { width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; }
-    .stats-grid { display: none !important; }
+    .text-muted, .small {
+        color: black !important;
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    .col-lg-8 {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
 }
 </style>
 

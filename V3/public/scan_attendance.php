@@ -16,27 +16,55 @@ if (!isAdmin() && !isStaff()) {
     exit;
 }
 
-$eventId = $_GET['event_id'] ?? null;
-if (!$eventId) {
+$eventController = new EventController($pdo);
+$attendanceController = new AttendanceController($pdo);
+
+// Find all events
+$event_list = $eventController->index();
+$eventId = !empty($_GET['event_id']) ? (int)$_GET['event_id'] : null;
+
+// Fallback: If no event_id provided, automatically resolve best matching event (today, upcoming, or latest)
+if (!$eventId && !empty($event_list)) {
+    $today = date('Y-m-d');
+    // 1. Event happening today
+    foreach ($event_list as $e) {
+        if ($e['date'] === $today) {
+            $eventId = (int)$e['event_id'];
+            break;
+        }
+    }
+    // 2. Next upcoming event
+    if (!$eventId) {
+        foreach ($event_list as $e) {
+            if ($e['date'] >= $today) {
+                $eventId = (int)$e['event_id'];
+                break;
+            }
+        }
+    }
+    // 3. Most recent event
+    if (!$eventId && !empty($event_list[0])) {
+        $eventId = (int)$event_list[0]['event_id'];
+    }
+}
+
+// Only redirect to events.php if there are literally zero events created in the system
+if (!$eventId || empty($event_list)) {
     header("Location: events.php");
     exit;
 }
 
-$eventController = new EventController($pdo);
-$attendanceController = new AttendanceController($pdo);
-
-// Find event data
-$event_list = $eventController->index();
 $event_data = null;
 foreach($event_list as $e) {
-    if($e['event_id'] == $eventId) {
+    if((int)$e['event_id'] === (int)$eventId) {
         $event_data = $e;
         break;
     }
 }
 
-if (!$event_data) {
-    die("Event not found.");
+if (!$event_data && !empty($event_list[0])) {
+    $event_data = $event_list[0];
+    $eventId = (int)$event_data['event_id'];
 }
 
 $error = '';
@@ -151,6 +179,15 @@ include __DIR__ . '/layout/sidebar.php';
                 <span class="badge badge-info" style="font-size: 0.85rem; padding: 6px 12px; font-weight: 700; white-space: normal; word-break: break-word; overflow-wrap: break-word; max-width: 100%; line-height: 1.4; display: inline-block;">
                     Event: <?php echo htmlspecialchars($event_data['title']); ?>
                 </span>
+                <?php if (count($event_list) > 1): ?>
+                    <select class="form-select form-select-sm d-inline-block" style="width: auto; height: 32px; font-size: 0.82rem; border-color: #cbd5e1; border-radius: 6px;" onchange="if(this.value) window.location.href='scan_attendance.php?event_id=' + this.value;" title="Switch to another event">
+                        <?php foreach ($event_list as $ev): ?>
+                            <option value="<?php echo (int)$ev['event_id']; ?>" <?php echo ((int)$ev['event_id'] === (int)$eventId) ? 'selected' : ''; ?>>
+                                Switch: <?php echo htmlspecialchars($ev['title']); ?> (<?php echo date('M d', strtotime($ev['date'])); ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                <?php endif; ?>
                 <span class="text-muted small" style="font-weight: 500;">
                     <i class='bx bx-calendar'></i> <?php echo date('M d, Y', strtotime($event_data['date'])); ?>
                 </span>
@@ -191,7 +228,26 @@ include __DIR__ . '/layout/sidebar.php';
                     </span>
                 </div>
                 <div class="card-body p-3">
-                    <div id="reader" style="width: 100%; min-height: 220px; background: #f8fafc;"></div>
+                    <!-- Camera Source Switcher -->
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-2 p-2" style="background: #f1f5f9; border-radius: 8px;">
+                        <label for="cameraSelect" class="small font-weight-700 text-muted mb-0 d-flex align-items-center gap-1" style="font-size: 0.78rem; white-space: nowrap;">
+                            <i class='bx bx-camera text-primary'></i> Camera:
+                        </label>
+                        <select id="cameraSelect" class="form-select form-select-sm" style="font-size: 0.82rem; height: 32px; border-radius: 6px; border-color: #cbd5e1; flex: 1;">
+                            <option value="">Detecting cameras...</option>
+                        </select>
+                        <button type="button" id="btnRestartCamera" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center" title="Refresh Cameras" onclick="initCamera()" style="height: 32px; padding: 0 8px; border-radius: 6px;">
+                            <i class='bx bx-refresh'></i>
+                        </button>
+                    </div>
+
+                    <!-- Scanner Box -->
+                    <div id="reader" style="width: 100%; min-height: 240px; background: #0f172a; border-radius: 8px; overflow: hidden; position: relative;">
+                        <div id="scannerOverlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 240px; color: #94a3b8; text-align: center; padding: 20px;">
+                            <i class='bx bx-loader-alt bx-spin' style="font-size: 2.2rem; color: #3b82f6; margin-bottom: 8px;"></i>
+                            <span id="scannerStatusText" style="font-size: 0.88rem; font-weight: 600;">Initializing camera...</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-footer bg-transparent p-4" style="border-top: 1px solid rgba(0,0,0,0.05);">
                     <form id="scan-form" method="POST">
@@ -343,8 +399,12 @@ include __DIR__ . '/layout/sidebar.php';
 </div>
 
 <!-- QR Scanner Script -->
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script src="assets/js/html5-qrcode.min.js" type="text/javascript"></script>
 <script>
+    let html5QrCode = null;
+    let currentCameraId = null;
+    let isScanning = false;
+
     function setScanMode(mode) {
         document.getElementById('scan_mode').value = mode;
         const btnCheckIn = document.getElementById('btnModeCheckIn');
@@ -382,6 +442,8 @@ include __DIR__ . '/layout/sidebar.php';
                 }
             }
         }
+    }
+
     function submitManualAttendance() {
         const sel = document.getElementById('member_fallback_select');
         if (!sel || !sel.value) {
@@ -392,6 +454,165 @@ include __DIR__ . '/layout/sidebar.php';
         if (qrInput) {
             qrInput.value = sel.value;
             document.getElementById('scan-form').submit();
+        }
+    }
+
+    async function initCamera() {
+        const overlay = document.getElementById('scannerOverlay');
+        const statusText = document.getElementById('scannerStatusText');
+        const cameraSelect = document.getElementById('cameraSelect');
+        const statusBadge = document.querySelector('.scanner-status-badge');
+
+        if (overlay) overlay.style.display = 'flex';
+        if (statusText) {
+            statusText.innerHTML = `
+                <i class='bx bx-loader-alt bx-spin' style="font-size: 2.2rem; color: #3b82f6; margin-bottom: 8px;"></i>
+                <div>Detecting cameras...</div>
+            `;
+        }
+
+        try {
+            if (typeof Html5Qrcode === 'undefined') {
+                throw new Error("Scanner library failed to load. Please check your internet or refresh.");
+            }
+
+            const devices = await Html5Qrcode.getCameras();
+            if (!devices || devices.length === 0) {
+                throw new Error("No camera devices detected. Make sure OBS Virtual Camera or your webcam is connected and enabled.");
+            }
+
+            if (cameraSelect) {
+                cameraSelect.innerHTML = '';
+                let obsCameraId = null;
+
+                devices.forEach((device, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = device.id;
+                    const label = device.label || `Camera ${index + 1}`;
+                    opt.textContent = label;
+
+                    // Automatically identify and prioritize OBS Virtual Camera
+                    if (label.toLowerCase().includes('obs') || label.toLowerCase().includes('virtual')) {
+                        obsCameraId = device.id;
+                        opt.textContent = '★ ' + label + ' (OBS Virtual Camera)';
+                    }
+                    cameraSelect.appendChild(opt);
+                });
+
+                // Prefer OBS Virtual Camera if present, otherwise first detected camera
+                currentCameraId = obsCameraId || devices[0].id;
+                cameraSelect.value = currentCameraId;
+
+                cameraSelect.onchange = function() {
+                    switchCamera(this.value);
+                };
+            } else {
+                currentCameraId = devices[0].id;
+            }
+
+            await startScanning(currentCameraId);
+
+        } catch (err) {
+            console.error("Camera Init Error:", err);
+            if (statusText) {
+                statusText.innerHTML = `
+                    <div style="color: #ef4444; margin-bottom: 8px;">
+                        <i class='bx bx-error-circle' style="font-size: 2.5rem;"></i>
+                    </div>
+                    <div style="font-weight: 700; color: #f87171; font-size: 0.95rem; margin-bottom: 4px;">Camera Unavailable</div>
+                    <div style="font-size: 0.8rem; line-height: 1.4; max-width: 290px; margin: 0 auto 12px; color: #cbd5e1;">
+                        ${err.message || 'Please grant camera permission in your browser.'}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="initCamera()" style="font-size: 0.8rem; padding: 4px 14px;">
+                        <i class='bx bx-refresh'></i> Grant Permission / Retry
+                    </button>
+                `;
+            }
+            if (statusBadge) {
+                statusBadge.style.background = 'rgba(239, 68, 68, 0.1)';
+                statusBadge.style.color = '#ef4444';
+                statusBadge.innerHTML = '<span style="width:8px;height:8px;background:#ef4444;border-radius:50%;display:inline-block;"></span> Offline';
+            }
+        }
+    }
+
+    async function startScanning(cameraId) {
+        const overlay = document.getElementById('scannerOverlay');
+        const qrInput = document.getElementById('qr_token');
+        const statusBadge = document.querySelector('.scanner-status-badge');
+
+        if (!html5QrCode) {
+            html5QrCode = new Html5Qrcode("reader");
+        }
+
+        if (isScanning) {
+            try {
+                await html5QrCode.stop();
+            } catch (e) {
+                console.warn("Stop scanner error:", e);
+            }
+            isScanning = false;
+        }
+
+        const config = {
+            fps: 15,
+            qrbox: function(viewfinderWidth, viewfinderHeight) {
+                const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+                const edge = Math.max(160, Math.floor(minEdge * 0.75));
+                return { width: edge, height: edge };
+            },
+            aspectRatio: 1.333333
+        };
+
+        const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+            if (qrInput) {
+                qrInput.value = decodedText;
+                if (statusBadge) {
+                    statusBadge.style.background = 'rgba(59, 130, 246, 0.2)';
+                    statusBadge.style.color = '#2563eb';
+                    statusBadge.innerHTML = '<i class="bx bx-check"></i> Scanned!';
+                }
+                document.getElementById('scan-form').submit();
+            }
+        };
+
+        await html5QrCode.start(
+            cameraId,
+            config,
+            qrCodeSuccessCallback,
+            (errorMessage) => {
+                // Ignore per-frame decode misses
+            }
+        );
+
+        isScanning = true;
+        if (overlay) overlay.style.display = 'none';
+
+        if (statusBadge) {
+            statusBadge.style.background = 'rgba(34, 197, 94, 0.1)';
+            statusBadge.style.color = '#16a34a';
+            statusBadge.innerHTML = '<span class="scanner-status-pulse"></span> Active';
+        }
+    }
+
+    async function switchCamera(newCameraId) {
+        currentCameraId = newCameraId;
+        const overlay = document.getElementById('scannerOverlay');
+        const statusText = document.getElementById('scannerStatusText');
+        if (overlay) {
+            overlay.style.display = 'flex';
+            if (statusText) {
+                statusText.innerHTML = `
+                    <i class='bx bx-loader-alt bx-spin' style="font-size: 2.2rem; color: #3b82f6; margin-bottom: 8px;"></i>
+                    <div>Switching to selected camera...</div>
+                `;
+            }
+        }
+        try {
+            await startScanning(newCameraId);
+        } catch (err) {
+            console.error("Camera Switch Error:", err);
+            alert("Failed to switch camera: " + (err.message || err));
         }
     }
 
@@ -425,25 +646,8 @@ include __DIR__ . '/layout/sidebar.php';
             });
         }
 
-        function onScanSuccess(decodedText, decodedResult) {
-            if (qrInput) {
-                qrInput.value = decodedText;
-                document.getElementById('scan-form').submit();
-            }
-        }
-
-        let html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader",
-            { 
-                fps: 10, 
-                qrbox: {width: 240, height: 240},
-                showTorchButtonIfSupported: true,
-                aspectRatio: 1.0
-            },
-            false
-        );
-        
-        html5QrcodeScanner.render(onScanSuccess);
+        // Initialize camera
+        initCamera();
     });
 </script>
 

@@ -370,12 +370,16 @@
         overflow: visible !important;
     }
 
-    body * {
+    /* Only hide surrounding elements when printing an ID card */
+    body:has(#printable-id-card) *,
+    body.id-card-print * {
         visibility: hidden !important;
     }
 
-    #printable-id-card,
-    #printable-id-card * {
+    body:has(#printable-id-card) #printable-id-card,
+    body:has(#printable-id-card) #printable-id-card *,
+    body.id-card-print #printable-id-card,
+    body.id-card-print #printable-id-card * {
         visibility: visible !important;
     }
 

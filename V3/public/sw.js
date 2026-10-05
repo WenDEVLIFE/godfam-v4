@@ -56,7 +56,7 @@ self.addEventListener('fetch', (event) => {
             if (networkResponse && networkResponse.status === 200) {
               caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
             }
-          }).catch(() => {/* ignore network errors offline */});
+          }).catch(() => {/* ignore network errors offline */ });
           return cachedResponse;
         }
         return fetch(event.request);
