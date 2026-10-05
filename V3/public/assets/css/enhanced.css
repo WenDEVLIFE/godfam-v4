@@ -193,7 +193,7 @@
 .id-card-back-bg {
     position: absolute;
     inset: 0;
-    background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.95) 100%), url('../images/background.jpg');
+    background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.95) 100%), url('../images/dashboard.jpg');
     background-size: cover;
     background-position: center;
     opacity: 0.96;
@@ -356,7 +356,7 @@
 /* Print Optimization */
 @media print {
     @page {
-        margin: 0;
+        margin: 0.4in;
         size: auto;
     }
 
@@ -367,7 +367,7 @@
         width: auto !important;
         height: auto !important;
         background: #fff !important;
-        overflow: hidden !important;
+        overflow: visible !important;
     }
 
     body * {
@@ -411,10 +411,17 @@
         flex-wrap: wrap !important;
         justify-content: center !important;
         align-items: flex-start !important;
-        gap: 0.25in !important;
+        gap: 0.3in !important;
         margin: 0 auto !important;
-        padding: 0 !important;
+        padding: 0.2in 0 !important;
         background: transparent !important;
+    }
+
+    .id-card-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 
     .id-card-modern,
@@ -426,17 +433,338 @@
         min-height: 3.375in !important;
         box-shadow: none !important;
         border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
         margin: 0 !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         box-sizing: border-box !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+
+    /* FRONT CARD PRINT OPTIMIZATION */
+    .id-card-modern {
+        background: #ffffff !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        padding: 0 !important;
+    }
+
+    .id-card-top-header {
+        height: auto !important;
+        min-height: auto !important;
+        padding: 6px 8px 3px !important;
+        gap: 6px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #ffffff !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+
+    .id-card-top-header img {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px !important;
+        max-height: 26px !important;
+        border-radius: 50% !important;
+        border: 1.5px solid var(--cms-gold, #f59e0b) !important;
+        object-fit: cover !important;
+        margin: 0 !important;
+    }
+
+    .id-church-titles {
+        text-align: center !important;
+    }
+
+    .id-church-name {
+        font-size: 9.5px !important;
+        font-weight: 900 !important;
+        letter-spacing: 0.5px !important;
+        line-height: 1.1 !important;
+        color: #000000 !important;
+    }
+
+    .id-church-sub {
+        font-size: 6.5px !important;
+        font-weight: 500 !important;
+        color: #475569 !important;
+        margin-top: 1px !important;
+        line-height: 1 !important;
+    }
+
+    .id-card-content {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: space-evenly !important;
+        padding: 2px 8px !important;
+        background: #ffffff !important;
+    }
+
+    .id-avatar-container {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        border-radius: 50% !important;
+        border: 2px solid #e2e8f0 !important;
+        margin: 2px auto !important;
+        box-shadow: none !important;
+        overflow: hidden !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .id-avatar-container img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+
+    .id-avatar-placeholder {
+        font-size: 20px !important;
+        font-weight: 800 !important;
+        color: #94a3b8 !important;
+        line-height: 1 !important;
+    }
+
+    .id-member-name {
+        font-size: 11px !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+        line-height: 1.15 !important;
+        margin: 1px 0 !important;
+        text-align: center !important;
+    }
+
+    .id-member-role {
+        font-size: 7px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px !important;
+        padding: 1px 6px !important;
+        border-radius: 4px !important;
+        margin: 1px 0 !important;
+        line-height: 1.2 !important;
+        color: #2563eb !important;
+        background: #eff6ff !important;
+    }
+
+    .id-card-content .small.text-muted,
+    .id-card-content .font-weight-700 {
+        font-size: 7px !important;
+        letter-spacing: 0.5px !important;
+        margin-bottom: 2px !important;
+        line-height: 1 !important;
+    }
+
+    .id-stats-grid {
+        margin-bottom: 2px !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    .id-stat-item {
+        padding: 0 !important;
+    }
+
+    .id-stat-label {
+        display: none !important;
+    }
+
+    .id-stat-value {
+        font-size: 6.5px !important;
+        line-height: 1 !important;
+        color: #475569 !important;
+    }
+
+    .id-qr-box {
+        margin: 1px auto 2px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .id-qr-box svg,
+    .id-qr-box img {
+        width: 66px !important;
+        height: 66px !important;
+        max-width: 66px !important;
+        max-height: 66px !important;
+        display: block !important;
+        margin: 0 auto !important;
+        object-fit: contain !important;
+    }
+
+    .id-card-footer-modern {
+        padding: 4px 6px !important;
+        margin-top: auto !important;
+        text-align: center !important;
+        border-top: 1px solid #f1f5f9 !important;
+        background: #f8fafc !important;
+    }
+
+    .id-card-footer-modern div {
+        font-size: 5.5px !important;
+        line-height: 1.1 !important;
+        margin-top: 1px !important;
+    }
+
+    .id-card-footer-modern div:first-child {
+        font-size: 6.5px !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+        margin-top: 0 !important;
+    }
+
+    /* BACK CARD PRINT OPTIMIZATION */
+    .id-card-back {
+        background: #0f172a !important;
+        color: #ffffff !important;
+        position: relative !important;
     }
 
     .id-card-back-bg {
+        position: absolute !important;
+        inset: 0 !important;
+        background: #0f172a !important;
+        background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.90) 0%, rgba(15, 23, 42, 0.96) 100%), url('../images/dashboard.jpg') !important;
+        background-size: cover !important;
+        background-position: center !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+        z-index: 1 !important;
+    }
+
+    .id-card-back-inner {
+        position: relative !important;
+        z-index: 2 !important;
+        height: 100% !important;
+        min-height: 100% !important;
+        padding: 6px 8px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        text-align: center !important;
+    }
+
+    .id-card-back-header {
+        margin-bottom: 2px !important;
+    }
+
+    .id-card-back-logo {
+        width: 24px !important;
+        height: 24px !important;
+        border-radius: 50% !important;
+        border: 1.5px solid #f59e0b !important;
+        margin: 0 auto 2px !important;
+        padding: 1px !important;
+        display: block !important;
+        background: #ffffff !important;
+        object-fit: cover !important;
+    }
+
+    .id-card-back-church {
+        font-size: 9px !important;
+        font-weight: 900 !important;
+        letter-spacing: 0.5px !important;
+        line-height: 1.1 !important;
+        margin-bottom: 1px !important;
+        color: #ffffff !important;
+    }
+
+    .id-card-back-sub {
+        font-size: 6.5px !important;
+        font-weight: 500 !important;
+        line-height: 1 !important;
+        margin-bottom: 1px !important;
+        color: #cbd5e1 !important;
+    }
+
+    .id-card-back-address {
+        font-size: 5.5px !important;
+        line-height: 1.15 !important;
+        color: #94a3b8 !important;
+    }
+
+    .id-card-back-body {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        gap: 2px !important;
+        margin: 2px 0 !important;
+    }
+
+    .id-card-back-verse {
+        font-size: 6px !important;
+        font-style: italic !important;
+        color: #f59e0b !important;
+        margin-bottom: 2px !important;
+        line-height: 1.15 !important;
+    }
+
+    .id-card-back-notice {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 5px !important;
+        padding: 4px 6px !important;
+        font-size: 5.8px !important;
+        line-height: 1.25 !important;
+        color: #e2e8f0 !important;
+        text-align: left !important;
+    }
+
+    .id-card-back-notice strong {
+        font-size: 6.5px !important;
+        color: #f59e0b !important;
+        display: block !important;
+        margin-bottom: 2px !important;
+        line-height: 1.1 !important;
+    }
+
+    .id-card-back-notice div {
+        margin-top: 2px !important;
+        font-size: 5.2px !important;
+        line-height: 1.15 !important;
+        color: #cbd5e1 !important;
+    }
+
+    .id-card-back-signature {
+        margin-top: auto !important;
+        padding-top: 3px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        align-items: flex-end !important;
+        gap: 6px !important;
+    }
+
+    .id-card-back-sig-line {
+        flex: 1 !important;
+        text-align: center !important;
+        margin: 0 !important;
+    }
+
+    .id-card-back-sig-line .sig-rule {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5) !important;
+        height: 12px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .id-card-back-sig-line div {
+        font-size: 5.2px !important;
+        letter-spacing: 0.2px !important;
+        line-height: 1 !important;
+        color: #cbd5e1 !important;
+        text-transform: uppercase !important;
     }
 }
 
@@ -723,7 +1051,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-image: url('../images/background.jpg') !important;
+    background-image: url('../images/dashboard.jpg') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
@@ -747,7 +1075,7 @@
    Global Church Background Image & Glassmorphism Styling
    ============================================================ */
 body {
-    background-image: linear-gradient(rgba(248, 250, 252, 0.88), rgba(248, 250, 252, 0.93)), url('../images/background.jpg') !important;
+    background-image: linear-gradient(rgba(248, 250, 252, 0.88), rgba(248, 250, 252, 0.93)), url('../images/dashboard.jpg') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
