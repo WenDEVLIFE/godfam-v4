@@ -167,6 +167,14 @@ include __DIR__ . '/layout/sidebar.php';
 }
 #reader video {
     border-radius: 8px;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: cover;
+}
+#reader #qr-shaded-region,
+#reader svg,
+#reader .qr-shaded-region {
+    display: none !important;
 }
 </style>
 
@@ -555,13 +563,10 @@ include __DIR__ . '/layout/sidebar.php';
         }
 
         const config = {
-            fps: 15,
-            qrbox: function(viewfinderWidth, viewfinderHeight) {
-                const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-                const edge = Math.max(160, Math.floor(minEdge * 0.75));
-                return { width: edge, height: edge };
-            },
-            aspectRatio: 1.333333
+            fps: 20,
+            experimentalFeatures: {
+                useBarCodeDetectorIfSupported: true
+            }
         };
 
         const qrCodeSuccessCallback = (decodedText, decodedResult) => {
