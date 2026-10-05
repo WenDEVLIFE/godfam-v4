@@ -1295,7 +1295,7 @@ textarea.form-control {
 /* ==========================================
    Responsive Overrides
    ========================================== */
-@media (max-width: 992px) {
+@media screen and (max-width: 992px) {
     .sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
@@ -1332,7 +1332,7 @@ textarea.form-control {
     }
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
     .calendar-day {
         min-height: 80px;
         padding: 6px 4px;

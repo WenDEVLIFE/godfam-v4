@@ -458,9 +458,10 @@
     }
 
     .id-card-top-header {
+        flex-shrink: 0 !important;
         height: auto !important;
         min-height: auto !important;
-        padding: 6px 8px 3px !important;
+        padding: 5px 8px 3px !important;
         gap: 6px !important;
         display: flex !important;
         align-items: center !important;
@@ -470,10 +471,10 @@
     }
 
     .id-card-top-header img {
-        width: 26px !important;
-        height: 26px !important;
-        min-width: 26px !important;
-        max-height: 26px !important;
+        width: 24px !important;
+        height: 24px !important;
+        min-width: 24px !important;
+        max-height: 24px !important;
         border-radius: 50% !important;
         border: 1.5px solid var(--cms-gold, #f59e0b) !important;
         object-fit: cover !important;
@@ -485,7 +486,7 @@
     }
 
     .id-church-name {
-        font-size: 9.5px !important;
+        font-size: 9px !important;
         font-weight: 900 !important;
         letter-spacing: 0.5px !important;
         line-height: 1.1 !important;
@@ -493,7 +494,7 @@
     }
 
     .id-church-sub {
-        font-size: 6.5px !important;
+        font-size: 6px !important;
         font-weight: 500 !important;
         color: #475569 !important;
         margin-top: 1px !important;
@@ -501,28 +502,31 @@
     }
 
     .id-card-content {
-        flex: 1 !important;
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: space-evenly !important;
-        padding: 2px 8px !important;
+        padding: 2px 6px !important;
         background: #ffffff !important;
+        overflow: hidden !important;
     }
 
     .id-avatar-container {
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
-        min-height: 44px !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
         border-radius: 50% !important;
         border: 2px solid #e2e8f0 !important;
-        margin: 2px auto !important;
+        margin: 1px auto 2px !important;
         box-shadow: none !important;
         overflow: hidden !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        flex-shrink: 0 !important;
     }
 
     .id-avatar-container img {
@@ -532,45 +536,49 @@
     }
 
     .id-avatar-placeholder {
-        font-size: 20px !important;
+        font-size: 18px !important;
         font-weight: 800 !important;
         color: #94a3b8 !important;
         line-height: 1 !important;
     }
 
     .id-member-name {
-        font-size: 11px !important;
+        font-size: 10px !important;
         font-weight: 800 !important;
         color: #0f172a !important;
         line-height: 1.15 !important;
         margin: 1px 0 !important;
         text-align: center !important;
+        flex-shrink: 0 !important;
     }
 
     .id-member-role {
-        font-size: 7px !important;
+        font-size: 6.5px !important;
         font-weight: 700 !important;
         letter-spacing: 0.5px !important;
-        padding: 1px 6px !important;
+        padding: 1px 5px !important;
         border-radius: 4px !important;
         margin: 1px 0 !important;
-        line-height: 1.2 !important;
+        line-height: 1.1 !important;
         color: #2563eb !important;
         background: #eff6ff !important;
+        flex-shrink: 0 !important;
     }
 
     .id-card-content .small.text-muted,
     .id-card-content .font-weight-700 {
-        font-size: 7px !important;
+        font-size: 6.5px !important;
         letter-spacing: 0.5px !important;
-        margin-bottom: 2px !important;
+        margin-bottom: 1px !important;
         line-height: 1 !important;
+        flex-shrink: 0 !important;
     }
 
     .id-stats-grid {
-        margin-bottom: 2px !important;
+        margin-bottom: 1px !important;
         padding: 0 !important;
         display: block !important;
+        flex-shrink: 0 !important;
     }
 
     .id-stat-item {
@@ -582,32 +590,38 @@
     }
 
     .id-stat-value {
-        font-size: 6.5px !important;
+        font-size: 6px !important;
         line-height: 1 !important;
         color: #475569 !important;
     }
 
     .id-qr-box {
-        margin: 1px auto 2px !important;
+        margin: 1px auto !important;
         padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        flex-shrink: 0 !important;
     }
 
     .id-qr-box svg,
     .id-qr-box img {
-        width: 66px !important;
-        height: 66px !important;
-        max-width: 66px !important;
-        max-height: 66px !important;
+        width: 62px !important;
+        height: 62px !important;
+        max-width: 62px !important;
+        max-height: 62px !important;
+        min-width: 62px !important;
+        min-height: 62px !important;
         display: block !important;
         margin: 0 auto !important;
         object-fit: contain !important;
     }
 
     .id-card-footer-modern {
-        padding: 4px 6px !important;
+        flex-shrink: 0 !important;
+        padding: 3px 6px !important;
         margin-top: auto !important;
         text-align: center !important;
         border-top: 1px solid #f1f5f9 !important;
@@ -615,13 +629,13 @@
     }
 
     .id-card-footer-modern div {
-        font-size: 5.5px !important;
+        font-size: 5px !important;
         line-height: 1.1 !important;
         margin-top: 1px !important;
     }
 
     .id-card-footer-modern div:first-child {
-        font-size: 6.5px !important;
+        font-size: 6px !important;
         font-weight: 700 !important;
         color: #1e293b !important;
         margin-top: 0 !important;
@@ -799,7 +813,7 @@
 /* ============================================================
    Mobile Adaptive Design & Responsive Utilities (PWA-Ready)
    ============================================================ */
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
 
     /* Touch-friendly interactive targets */
     .btn,
@@ -898,7 +912,8 @@
         width: 100% !important;
     }
 
-    .id-card-modern {
+    .id-card-modern,
+    .id-card-back {
         width: 100% !important;
         max-width: 320px !important;
         height: auto !important;
@@ -964,7 +979,7 @@
     }
 }
 
-@media (max-width: 480px) {
+@media screen and (max-width: 480px) {
 
     .page-title,
     h1,
@@ -1174,7 +1189,7 @@ body.dashboard-page {
     padding: 0 24px 24px 24px !important;
 }
 
-@media (max-width: 992px) {
+@media screen and (max-width: 992px) {
     .reminders-grid-container {
         grid-template-columns: 1fr !important;
     }

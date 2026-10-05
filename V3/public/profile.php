@@ -109,7 +109,8 @@ if (!empty($member['qr_token'])) {
             $qrCode->setMargin(8);
             $qrCode->setWriterByName('svg');
             $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::MEDIUM());
-            $qrSvgContent = $qrCode->writeString();
+            $rawSvg = $qrCode->writeString();
+            $qrSvgContent = preg_replace('/^<\?xml[^>]*\?>\s*/i', '', $rawSvg);
         } catch (\Throwable $e) {
             $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($member['qr_token']);
         }
