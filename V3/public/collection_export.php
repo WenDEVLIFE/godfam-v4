@@ -89,7 +89,60 @@ if ($format === 'excel') {
     }
 
     if (!class_exists(Spreadsheet::class)) {
-        die("Excel export library (PhpSpreadsheet) is not available on this server. Please run 'composer install' or use CSV export.");
+        header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '.xls"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: public');
+
+        echo '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+        echo '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
+        echo '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Financial Report</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->';
+        echo '<style>
+            table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; }
+            th, td { border: 1px solid #cbd5e0; padding: 6px 10px; font-size: 11pt; }
+            .header-main { font-size: 14pt; font-weight: bold; text-align: center; background: #ffffff; border: none; }
+            .header-sub { font-size: 10pt; font-style: italic; color: #4a5568; text-align: center; background: #ffffff; border: none; }
+            .col-header { background-color: #2d3748; color: #ffffff; font-weight: bold; text-align: center; }
+            .even { background-color: #f7fafc; }
+            .total-row { background-color: #ebf8ff; font-weight: bold; }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+            .num { mso-number-format:"\#\,\#\#0\.00"; text-align: right; }
+        </style></head><body>';
+        echo '<table>';
+        echo '<tr><td colspan="6" class="header-main">God\'s Family United Methodist Church – Financial Report</td></tr>';
+        echo '<tr><td colspan="6" class="header-sub">' . htmlspecialchars($reportTitle . " | Generated: " . date('F j, Y h:i A')) . '</td></tr>';
+        echo '<tr><td colspan="6" style="border:none; height:12px;"></td></tr>';
+        echo '<tr>';
+        echo '<th class="col-header">Date</th>';
+        echo '<th class="col-header">Member Name</th>';
+        echo '<th class="col-header">Type</th>';
+        echo '<th class="col-header">Amount (PHP)</th>';
+        echo '<th class="col-header">Notes</th>';
+        echo '<th class="col-header">Recorded By</th>';
+        echo '</tr>';
+
+        foreach ($logs as $idx => $log) {
+            $memberName = htmlspecialchars($log['full_name'] ? $log['full_name'] : 'Anonymous');
+            $cls = ($idx % 2 === 0) ? ' class="even"' : '';
+            echo '<tr' . $cls . '>';
+            echo '<td class="text-center">' . date('M d, Y', strtotime($log['collection_date'])) . '</td>';
+            echo '<td>' . $memberName . '</td>';
+            echo '<td>' . ucfirst(htmlspecialchars($log['type'])) . '</td>';
+            echo '<td class="num">' . number_format($log['amount'], 2) . '</td>';
+            echo '<td>' . htmlspecialchars($log['notes'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($log['recorded_by_name'] ?? '') . '</td>';
+            echo '</tr>';
+        }
+
+        echo '<tr class="total-row">';
+        echo '<td colspan="3" class="text-right"><strong>Total Collection</strong></td>';
+        echo '<td class="num"><strong>' . number_format($totalAmount, 2) . '</strong></td>';
+        echo '<td colspan="2"></td>';
+        echo '</tr>';
+
+        echo '</table></body></html>';
+        exit;
     }
 
     $spreadsheet = new Spreadsheet();
