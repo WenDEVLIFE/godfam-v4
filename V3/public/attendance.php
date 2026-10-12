@@ -22,7 +22,16 @@ $memberController = new MemberController($pdo);
 $eventController = new EventController($pdo);
 
 $allEvents = $eventController->index();
+$allMembers = $memberController->index();
 $eventId = $_GET['event_id'] ?? null;
+$attendeeList = $eventId ? $controller->viewAttendance($eventId) : [];
+$allMembers = $memberController->index();
+
+// Attendance statistics
+$totalMembers   = count($allMembers);
+$presentCount   = count($attendeeList);
+$absentCount    = max(0, $totalMembers - $presentCount);
+$attendanceRate = $totalMembers > 0 ? round(($presentCount / $totalMembers) * 100, 1) : 0;
 
 // If no event_id, find the best matching active/upcoming or latest event
 if (!$eventId && !empty($allEvents)) {
@@ -146,18 +155,6 @@ include __DIR__ . '/layout/sidebar.php';
             </a>
         </div>
     </div>
-
-    <!-- Attendance Summary -->
-    <div class="stats-grid mb-4">
-        <div class="stat-card">
-            <div class="stat-icon"><i class='bx bxs-user-check'></i></div>
-            <div>
-                <div class="stat-label">Present</div>
-                <div class="stat-number"><?php echo count($attendeeList); ?></div>
-            </div>
-        </div>
-    </div>
-
     <?php if ($error): ?>
         <div class="alert alert-danger"><i class='bx bx-error-circle'></i> <?php echo htmlspecialchars($error); ?></div>
     <?php endif; ?>
@@ -172,6 +169,47 @@ include __DIR__ . '/layout/sidebar.php';
                 <div class="card-header d-flex justify-content-between align-items-center no-print">
                     <span>Recorded Attendance</span>
                     <input type="text" id="logFilter" class="form-control form-control-sm" style="width:200px;" placeholder="Quick filter list...">
+                </div>
+                <!-- Attendance Summary -->
+                <div class="stats-grid mb-4">
+                      <!-- Attendance Summary -->
+                
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class='bx bxs-user-check'></i></div>
+                                <div>
+                                    <div class="stat-label">Total Attendes</div>
+                                    <div class="stat-number"><?php echo count($attendeeList); ?></div>
+                                </div>
+                            </div>
+               
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class='bx bxs-group'></i></div>
+                        <div>
+                            <div class="stat-label">Total Members</div>
+                            <div class="stat-number"><?php echo $totalMembers; ?></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class='bx bxs-user-check'></i></div>
+                        <div>
+                            <div class="stat-label">Present</div>
+                            <div class="stat-number"><?php echo $presentCount; ?></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class='bx bxs-user-x'></i></div>
+                        <div>
+                            <div class="stat-label">Absent</div>
+                            <div class="stat-number"><?php echo $absentCount; ?></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class='bx bxs-pie-chart-alt-2'></i></div>
+                        <div>
+                            <div class="stat-label">Attendance Rate</div>
+                            <div class="stat-number"><?php echo $attendanceRate; ?>%</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
