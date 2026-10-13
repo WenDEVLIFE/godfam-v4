@@ -171,6 +171,12 @@ include __DIR__ . '/layout/sidebar.php';
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
+                <tfoot>
+                    <tr style="font-weight: bold; background-color: #f8fafc;">
+                        <td colspan="5" style="text-align: right; font-weight: bold;">Total Attendees:</td>
+                        <td style="font-weight: bold;"><?php echo count($logs); ?></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
         <?php endif; ?>

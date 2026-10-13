@@ -30,6 +30,10 @@ $attendanceModel = new Attendance($pdo);
 $logs            = $attendanceModel->getLog($filters);
 $filename        = "attendance_report_" . date('Y-m-d_His');
 
+$totalMembersCount = (int)$pdo->query("SELECT COUNT(*) FROM members")->fetchColumn();
+$presentCount      = count($logs);
+$absentCount       = max(0, $totalMembersCount - $presentCount);
+
 // ============================================================
 // CSV Export
 // ============================================================
@@ -49,6 +53,11 @@ if ($format === 'csv') {
             !empty($log['time_out']) ? date('h:i A', strtotime($log['time_out'])) : '',
         ]);
     }
+    fputcsv($output, []);
+    fputcsv($output, ['TOTAL MEMBERS', $totalMembersCount]);
+    fputcsv($output, ['TOTAL ATTENDEES', count($logs)]);
+    fputcsv($output, ['TOTAL PRESENT', count($logs)]);
+    fputcsv($output, ['TOTAL ABSENT', $absentCount]);
     fclose($output);
     exit;
 }
@@ -121,8 +130,23 @@ if ($format === 'excel') {
         }
 
         echo '<tr class="total-row">';
-        echo '<td colspan="4" class="text-right"><strong>Total Present</strong></td>';
+        echo '<td colspan="4"><strong>TOTAL MEMBERS</strong></td>';
+        echo '<td class="text-center"><strong>' . $totalMembersCount . '</strong></td>';
+        echo '<td colspan="2"></td>';
+        echo '</tr>';
+        echo '<tr class="total-row">';
+        echo '<td colspan="4"><strong>TOTAL ATTENDEES</strong></td>';
         echo '<td class="text-center"><strong>' . count($logs) . '</strong></td>';
+        echo '<td colspan="2"></td>';
+        echo '</tr>';
+        echo '<tr class="total-row">';
+        echo '<td colspan="4"><strong>TOTAL PRESENT</strong></td>';
+        echo '<td class="text-center"><strong>' . count($logs) . '</strong></td>';
+        echo '<td colspan="2"></td>';
+        echo '</tr>';
+        echo '<tr class="total-row">';
+        echo '<td colspan="4"><strong>TOTAL ABSENT</strong></td>';
+        echo '<td class="text-center"><strong>' . $absentCount . '</strong></td>';
         echo '<td colspan="2"></td>';
         echo '</tr>';
 
@@ -196,14 +220,33 @@ if ($format === 'excel') {
         $row++;
     }
 
-    // ---- Total row ----
-    $sheet->setCellValue('A' . $row, 'Total Present');
-    $sheet->mergeCells("A{$row}:D{$row}");
-    $sheet->setCellValue('E' . $row, count($logs));
+    // ---- Total rows ----
     $totalStyle = [
         'font' => ['bold' => true],
         'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'EBF8FF']],
     ];
+
+    $sheet->setCellValue('A' . $row, 'TOTAL MEMBERS');
+    $sheet->mergeCells("A{$row}:D{$row}");
+    $sheet->setCellValue('E' . $row, $totalMembersCount);
+    $sheet->getStyle("A{$row}:G{$row}")->applyFromArray($totalStyle);
+    $row++;
+
+    $sheet->setCellValue('A' . $row, 'TOTAL ATTENDEES');
+    $sheet->mergeCells("A{$row}:D{$row}");
+    $sheet->setCellValue('E' . $row, count($logs));
+    $sheet->getStyle("A{$row}:G{$row}")->applyFromArray($totalStyle);
+    $row++;
+
+    $sheet->setCellValue('A' . $row, 'TOTAL PRESENT');
+    $sheet->mergeCells("A{$row}:D{$row}");
+    $sheet->setCellValue('E' . $row, count($logs));
+    $sheet->getStyle("A{$row}:G{$row}")->applyFromArray($totalStyle);
+    $row++;
+
+    $sheet->setCellValue('A' . $row, 'TOTAL ABSENT');
+    $sheet->mergeCells("A{$row}:D{$row}");
+    $sheet->setCellValue('E' . $row, $absentCount);
     $sheet->getStyle("A{$row}:G{$row}")->applyFromArray($totalStyle);
 
     // Auto-size columns
@@ -317,6 +360,32 @@ if ($format === 'pdf') {
                 <tbody>
                     ' . $tableRowsHtml . '
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="font-weight:bold;">TOTAL MEMBERS</td>
+                        <td style="text-align:center;font-weight:bold;">' . $totalMembersCount . '</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="font-weight:bold;">TOTAL ATTENDEES</td>
+                        <td style="text-align:center;font-weight:bold;">' . count($logs) . '</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="font-weight:bold;">TOTAL PRESENT</td>
+                        <td style="text-align:center;font-weight:bold;">' . count($logs) . '</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="font-weight:bold;">TOTAL ABSENT</td>
+                        <td style="text-align:center;font-weight:bold;">' . $absentCount . '</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tfoot>
             </table>
 
             <table class="sig-table">
@@ -433,6 +502,32 @@ if ($format === 'pdf') {
                     <tr><td colspan="6" style="text-align:center;">No attendance records found.</td></tr>
                 <?php endif; ?>
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="font-weight:bold;">TOTAL MEMBERS</td>
+                    <td style="text-align:center;font-weight:bold;"><?php echo $totalMembersCount; ?></td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="font-weight:bold;">TOTAL ATTENDEES</td>
+                    <td style="text-align:center;font-weight:bold;"><?php echo count($logs); ?></td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="font-weight:bold;">TOTAL PRESENT</td>
+                    <td style="text-align:center;font-weight:bold;"><?php echo count($logs); ?></td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="font-weight:bold;">TOTAL ABSENT</td>
+                    <td style="text-align:center;font-weight:bold;"><?php echo $absentCount; ?></td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+            </tfoot>
         </table>
 
         <div class="print-footer">

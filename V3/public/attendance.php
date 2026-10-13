@@ -177,7 +177,7 @@ include __DIR__ . '/layout/sidebar.php';
                             <div class="stat-card">
                                 <div class="stat-icon"><i class='bx bxs-user-check'></i></div>
                                 <div>
-                                    <div class="stat-label">Total Attendes</div>
+                                    <div class="stat-label">Total Attendees</div>
                                     <div class="stat-number"><?php echo count($attendeeList); ?></div>
                                 </div>
                             </div>
@@ -224,7 +224,7 @@ include __DIR__ . '/layout/sidebar.php';
                             </thead>
                             <tbody>
                                 <?php if (empty($attendeeList)): ?>
-                                    <tr><td colspan="3" class="text-center py-4 text-muted">No attendance recorded yet.</td></tr>
+                                    <tr><td colspan="4" class="text-center py-4 text-muted">No attendance recorded yet.</td></tr>
                                 <?php else: ?>
                                     <?php foreach ($attendeeList as $attendee): ?>
                                     <tr class="log-row">
@@ -236,9 +236,9 @@ include __DIR__ . '/layout/sidebar.php';
                                                 <strong><?php echo htmlspecialchars($attendee['full_name']); ?></strong>
                                                 <?php if (!empty($attendee['phone'])): ?>
                                                     <a href="sms:<?php echo preg_replace('/[^0-9+]/', '', $attendee['phone']); ?>?&body=<?php echo rawurlencode("Hello " . $attendee['full_name'] . ", thanks for attending " . $event_data['title'] . " at God's Family UMC!"); ?>" 
-                                                       class="btn btn-sm btn-outline-success py-0 px-2 ms-2 no-print" 
-                                                       title="Send SMS" 
-                                                       style="font-size: 10px; border-radius: 4px; display: inline-flex; align-items: center; gap: 2px;">
+                                                        class="btn btn-sm btn-outline-success py-0 px-2 ms-2 no-print" 
+                                                        title="Send SMS" 
+                                                        style="font-size: 10px; border-radius: 4px; display: inline-flex; align-items: center; gap: 2px;">
                                                         <i class='bx bx-message-rounded-dots'></i> SMS
                                                     </a>
                                                 <?php endif; ?>
@@ -267,6 +267,32 @@ include __DIR__ . '/layout/sidebar.php';
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td style="font-weight: bold; text-transform: uppercase;">TOTAL MEMBERS</td>
+                                    <td class="text-center" style="font-weight: bold; text-align: center;"><?php echo $totalMembers; ?></td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; text-transform: uppercase;">TOTAL ATTENDEES</td>
+                                    <td class="text-center" style="font-weight: bold; text-align: center;"><span id="tableTotalAttendees"><?php echo count($attendeeList); ?></span></td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; text-transform: uppercase;">TOTAL PRESENT</td>
+                                    <td class="text-center" style="font-weight: bold; text-align: center;"><?php echo $presentCount; ?></td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; text-transform: uppercase;">TOTAL ABSENT</td>
+                                    <td class="text-center" style="font-weight: bold; text-align: center;"><?php echo $absentCount; ?></td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -454,6 +480,11 @@ include __DIR__ . '/layout/sidebar.php';
         print-color-adjust: exact !important;
         font-weight: bold !important;
     }
+    tfoot td {
+        font-weight: bold !important;
+        border: 1px solid #333 !important;
+        font-size: 10pt !important;
+    }
     .badge {
         background: transparent !important;
         color: black !important;
@@ -504,10 +535,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterInput) {
         filterInput.addEventListener('input', function() {
             const query = this.value.toLowerCase();
+            let visibleCount = 0;
             document.querySelectorAll('.log-row').forEach(row => {
                 const name = row.querySelector('.member-name-cell').textContent.toLowerCase();
-                row.style.display = name.includes(query) ? '' : 'none';
+                const match = name.includes(query);
+                row.style.display = match ? '' : 'none';
+                if (match) visibleCount++;
             });
+            const totalEl = document.getElementById('tableTotalAttendees');
+            if (totalEl) totalEl.textContent = visibleCount;
         });
     }
 
