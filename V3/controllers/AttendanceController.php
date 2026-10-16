@@ -78,7 +78,7 @@ class AttendanceController {
         $memberModel = new Member($pdo);
         $member = null;
 
-        // 1. Direct member_id passed from dropdown
+        // 1. Direct member_id passed from auto-suggest search
         if (!empty($memberIdInput)) {
             $member = $memberModel->find($memberIdInput);
         }
@@ -94,10 +94,23 @@ class AttendanceController {
                     $member = $memberModel->find((int)$cleanedId);
                 }
             }
+
+            // 4. Fallback: Search by full name (exact or substring)
+            if (!$member) {
+                $stmtName = $pdo->prepare("SELECT * FROM members WHERE LOWER(full_name) = LOWER(?) LIMIT 1");
+                $stmtName->execute([$tokenInput]);
+                $member = $stmtName->fetch();
+
+                if (!$member) {
+                    $stmtLike = $pdo->prepare("SELECT * FROM members WHERE LOWER(full_name) LIKE LOWER(?) ORDER BY full_name ASC LIMIT 1");
+                    $stmtLike->execute(['%' . $tokenInput . '%']);
+                    $member = $stmtLike->fetch();
+                }
+            }
         }
 
         if (!$member) {
-            return "Member not found. Please verify the QR code or select from the dropdown.";
+            return "Member not found. Please verify the name or QR code.";
         }
 
         $mode = $data['mode'] ?? 'time_in';

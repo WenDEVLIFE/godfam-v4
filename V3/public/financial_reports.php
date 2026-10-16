@@ -95,27 +95,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $csrf_token = generateCsrfToken();
 
 // Filters
-$report_type  = in_array($_GET['type'] ?? 'daily', ['daily','monthly']) ? ($_GET['type'] ?? 'daily') : 'daily';
-$filter_date  = $_GET['date'] ?? date('Y-m-d');
-$filter_month = (int)($_GET['month'] ?? date('n'));
-$filter_year  = (int)($_GET['year']  ?? date('Y'));
+$valid_types = ['daily', 'weekly', 'monthly', 'yearly', 'custom'];
+$report_type = in_array($_GET['type'] ?? 'daily', $valid_types) ? ($_GET['type'] ?? 'daily') : 'daily';
+
+$filter_date       = $_GET['date'] ?? date('Y-m-d');
+$filter_week       = $_GET['week'] ?? date('Y-\WW');
+$filter_month      = (int)($_GET['month'] ?? date('n'));
+$filter_year       = (int)($_GET['year']  ?? date('Y'));
+$filter_start_date = $_GET['start_date'] ?? date('Y-m-01');
+$filter_end_date   = $_GET['end_date']   ?? date('Y-m-d');
 
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $filter_date)) $filter_date = date('Y-m-d');
+if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $filter_start_date)) $filter_start_date = date('Y-m-01');
+if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $filter_end_date)) $filter_end_date = date('Y-m-d');
 $filter_month = max(1, min(12, $filter_month));
 $filter_year  = max(2020, min((int)date('Y') + 1, $filter_year));
 
-$logs           = [];
-$type_breakdown = [];
+$month_names = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+
+$range_start  = '';
+$range_end    = '';
+$period_label = '';
 
 if ($report_type === 'daily') {
-    $logs = $collectionModel->getByDate($filter_date);
-    $type_breakdown = $collectionModel->getTypeBreakdown($filter_date, $filter_date);
-} else {
-    $m_start = sprintf('%04d-%02d-01', $filter_year, $filter_month);
-    $m_end   = date('Y-m-t', strtotime($m_start));
-    $logs    = $collectionModel->getByMonth($filter_year, $filter_month);
-    $type_breakdown = $collectionModel->getTypeBreakdown($m_start, $m_end);
+    $range_start  = $filter_date;
+    $range_end    = $filter_date;
+    $period_label = date('F j, Y', strtotime($filter_date));
+} elseif ($report_type === 'weekly') {
+    if (preg_match('/^(\d{4})-W(\d{2})$/', $filter_week, $matches)) {
+        $w_year = (int)$matches[1];
+        $w_week = (int)$matches[2];
+    } else {
+        $w_year = (int)date('o');
+        $w_week = (int)date('W');
+        $filter_week = sprintf('%04d-W%02d', $w_year, $w_week);
+    }
+    $dto = new DateTime();
+    $dto->setISODate($w_year, $w_week, 1); // Monday
+    $range_start = $dto->format('Y-m-d');
+    $dto->modify('+6 days'); // Sunday
+    $range_end = $dto->format('Y-m-d');
+    $period_label = "Week {$w_week}, {$w_year} (" . date('M d', strtotime($range_start)) . " – " . date('M d, Y', strtotime($range_end)) . ")";
+} elseif ($report_type === 'yearly') {
+    $range_start  = sprintf('%04d-01-01', $filter_year);
+    $range_end    = sprintf('%04d-12-31', $filter_year);
+    $period_label = "Year {$filter_year}";
+} elseif ($report_type === 'custom') {
+    if (strtotime($filter_start_date) > strtotime($filter_end_date)) {
+        $tmp = $filter_start_date;
+        $filter_start_date = $filter_end_date;
+        $filter_end_date = $tmp;
+    }
+    $range_start  = $filter_start_date;
+    $range_end    = $filter_end_date;
+    $period_label = date('M d, Y', strtotime($range_start)) . " – " . date('M d, Y', strtotime($range_end));
+} else { // monthly
+    $range_start  = sprintf('%04d-%02d-01', $filter_year, $filter_month);
+    $range_end    = date('Y-m-t', strtotime($range_start));
+    $period_label = $month_names[$filter_month-1] . " " . $filter_year;
 }
+
+$logs           = $collectionModel->getByDateRange($range_start, $range_end);
+$type_breakdown = $collectionModel->getTypeBreakdown($range_start, $range_end);
 
 $total = array_sum(array_column($logs, 'amount'));
 
@@ -125,13 +167,16 @@ foreach ($type_breakdown as $row) {
     $breakdown_map[$row['category']] = (float)$row['total'];
 }
 
-$month_names = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
-
 // Export links
-$export_base  = 'collection_export.php?type=' . $report_type;
+$export_base = 'collection_export.php?type=' . $report_type;
 if ($report_type === 'daily') {
     $export_base .= '&date=' . $filter_date;
+} elseif ($report_type === 'weekly') {
+    $export_base .= '&week=' . $filter_week;
+} elseif ($report_type === 'yearly') {
+    $export_base .= '&year=' . $filter_year;
+} elseif ($report_type === 'custom') {
+    $export_base .= '&start_date=' . $filter_start_date . '&end_date=' . $filter_end_date;
 } else {
     $export_base .= '&month=' . $filter_month . '&year=' . $filter_year;
 }
@@ -187,23 +232,33 @@ include __DIR__ . '/layout/sidebar.php';
     <form method="GET" class="report-filter-bar">
         <div class="filter-group">
             <label class="form-label">Report Type</label>
-            <select name="type" class="form-select" onchange="toggleFilters(this.value)" style="min-width: 140px;">
-                <option value="daily"   <?php echo $report_type === 'daily'   ? 'selected' : ''; ?>>Daily</option>
-                <option value="monthly" <?php echo $report_type === 'monthly' ? 'selected' : ''; ?>>Monthly</option>
+            <select name="type" class="form-select" onchange="toggleFilters(this.value)" style="min-width: 150px;">
+                <option value="daily"   <?php echo $report_type === 'daily'   ? 'selected' : ''; ?>>Daily View</option>
+                <option value="weekly"  <?php echo $report_type === 'weekly'  ? 'selected' : ''; ?>>Weekly View</option>
+                <option value="monthly" <?php echo $report_type === 'monthly' ? 'selected' : ''; ?>>Monthly View</option>
+                <option value="yearly"  <?php echo $report_type === 'yearly'  ? 'selected' : ''; ?>>Yearly View</option>
+                <option value="custom"  <?php echo $report_type === 'custom'  ? 'selected' : ''; ?>>Custom Date Range</option>
             </select>
         </div>
 
         <div id="daily-filter" style="<?php echo $report_type !== 'daily' ? 'display:none;' : ''; ?>">
             <div class="filter-group">
                 <label class="form-label">Date</label>
-                <input type="date" name="date" class="form-control" value="<?php echo htmlspecialchars($filter_date); ?>" style="min-width: 170px;">
+                <input type="date" name="date" class="form-control" value="<?php echo htmlspecialchars($filter_date); ?>" style="min-width: 160px;">
+            </div>
+        </div>
+
+        <div id="weekly-filter" style="<?php echo $report_type !== 'weekly' ? 'display:none;' : ''; ?>">
+            <div class="filter-group">
+                <label class="form-label">Select Week</label>
+                <input type="week" name="week" class="form-control" value="<?php echo htmlspecialchars($filter_week); ?>" style="min-width: 175px;">
             </div>
         </div>
 
         <div id="monthly-filter" style="<?php echo $report_type !== 'monthly' ? 'display:none;' : ''; ?>">
             <div class="filter-group">
                 <label class="form-label">Month</label>
-                <select name="month" class="form-select" style="min-width: 140px;">
+                <select name="month" class="form-select" style="min-width: 130px;">
                     <?php for ($m = 1; $m <= 12; $m++): ?>
                     <option value="<?php echo $m; ?>" <?php echo $m === $filter_month ? 'selected' : ''; ?>><?php echo $month_names[$m-1]; ?></option>
                     <?php endfor; ?>
@@ -211,11 +266,33 @@ include __DIR__ . '/layout/sidebar.php';
             </div>
             <div class="filter-group">
                 <label class="form-label">Year</label>
-                <select name="year" class="form-select" style="min-width: 100px;">
-                    <?php for ($y = date('Y'); $y >= 2020; $y--): ?>
+                <select name="year" class="form-select" style="min-width: 95px;">
+                    <?php for ($y = date('Y') + 1; $y >= 2020; $y--): ?>
                     <option value="<?php echo $y; ?>" <?php echo $y === $filter_year ? 'selected' : ''; ?>><?php echo $y; ?></option>
                     <?php endfor; ?>
                 </select>
+            </div>
+        </div>
+
+        <div id="yearly-filter" style="<?php echo $report_type !== 'yearly' ? 'display:none;' : ''; ?>">
+            <div class="filter-group">
+                <label class="form-label">Select Year</label>
+                <select name="year" class="form-select" style="min-width: 110px;">
+                    <?php for ($y = date('Y') + 1; $y >= 2020; $y--): ?>
+                    <option value="<?php echo $y; ?>" <?php echo $y === $filter_year ? 'selected' : ''; ?>><?php echo $y; ?></option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+        </div>
+
+        <div id="custom-filter" style="<?php echo $report_type !== 'custom' ? 'display:none;' : ''; ?>">
+            <div class="filter-group">
+                <label class="form-label">Start Date</label>
+                <input type="date" name="start_date" class="form-control" value="<?php echo htmlspecialchars($filter_start_date); ?>" style="min-width: 150px;">
+            </div>
+            <div class="filter-group">
+                <label class="form-label">End Date</label>
+                <input type="date" name="end_date" class="form-control" value="<?php echo htmlspecialchars($filter_end_date); ?>" style="min-width: 150px;">
             </div>
         </div>
 
@@ -246,8 +323,13 @@ include __DIR__ . '/layout/sidebar.php';
         </div>
     </div>
     <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
-        <div class="card-header bg-transparent py-3 px-4 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
-            <span style="font-weight: 700; color: var(--dark-text);">Collection Records</span>
+        <div class="card-header bg-transparent py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span style="font-weight: 700; color: var(--dark-text);">Collection Records</span>
+                <span class="badge bg-light text-secondary border" style="font-size: 11px; font-weight: 600;">
+                    <i class='bx bx-calendar'></i> <?php echo htmlspecialchars($period_label); ?>
+                </span>
+            </div>
             <span class="badge badge-info" style="font-size: 11px; padding: 6px 12px; border-radius: 20px;"><?php echo count($logs); ?> entries</span>
         </div>
         <div class="card-body p-0">
@@ -383,8 +465,17 @@ new Chart(ctx, {
 });
 
 function toggleFilters(type) {
-    document.getElementById('daily-filter').style.display   = type === 'daily'   ? 'flex' : 'none';
-    document.getElementById('monthly-filter').style.display = type === 'monthly' ? 'flex' : 'none';
+    const filterMap = {
+        daily:   'daily-filter',
+        weekly:  'weekly-filter',
+        monthly: 'monthly-filter',
+        yearly:  'yearly-filter',
+        custom:  'custom-filter'
+    };
+    Object.keys(filterMap).forEach(function (key) {
+        const el = document.getElementById(filterMap[key]);
+        if (el) el.style.display = (key === type) ? 'flex' : 'none';
+    });
 }
 
 function escapeHtml(str) {

@@ -89,6 +89,38 @@ class Collection {
     }
 
     /**
+     * Get all records for a specific year.
+     */
+    public function getByYear(int $year): array {
+        $stmt = $this->pdo->prepare(
+            "SELECT c.*, m.full_name, u.name AS recorded_by_name
+             FROM collections c
+             LEFT JOIN members m ON c.member_id = m.member_id
+             JOIN users u ON c.recorded_by = u.user_id
+             WHERE YEAR(c.collection_date) = ?
+             ORDER BY c.collection_date DESC, c.created_at DESC"
+        );
+        $stmt->execute([$year]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get all records within a custom date range (inclusive).
+     */
+    public function getByDateRange(string $startDate, string $endDate): array {
+        $stmt = $this->pdo->prepare(
+            "SELECT c.*, m.full_name, u.name AS recorded_by_name
+             FROM collections c
+             LEFT JOIN members m ON c.member_id = m.member_id
+             JOIN users u ON c.recorded_by = u.user_id
+             WHERE c.collection_date BETWEEN ? AND ?
+             ORDER BY c.collection_date DESC, c.created_at DESC"
+        );
+        $stmt->execute([$startDate, $endDate]);
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Get today's total collection.
      */
     public function getTodayTotal(): float {

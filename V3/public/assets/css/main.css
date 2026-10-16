@@ -779,7 +779,10 @@ textarea.form-control {
 }
 
 .report-filter-bar #daily-filter,
-.report-filter-bar #monthly-filter {
+.report-filter-bar #weekly-filter,
+.report-filter-bar #monthly-filter,
+.report-filter-bar #yearly-filter,
+.report-filter-bar #custom-filter {
     display: flex !important;
     flex-direction: row !important;
     align-items: flex-end !important;
@@ -791,7 +794,10 @@ textarea.form-control {
 }
 
 .report-filter-bar #daily-filter[style*="none"],
-.report-filter-bar #monthly-filter[style*="none"] {
+.report-filter-bar #weekly-filter[style*="none"],
+.report-filter-bar #monthly-filter[style*="none"],
+.report-filter-bar #yearly-filter[style*="none"],
+.report-filter-bar #custom-filter[style*="none"] {
     display: none !important;
 }
 

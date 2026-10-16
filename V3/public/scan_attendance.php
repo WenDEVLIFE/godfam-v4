@@ -176,6 +176,81 @@ include __DIR__ . '/layout/sidebar.php';
 #reader .qr-shaded-region {
     display: none !important;
 }
+
+/* Facebook-Style Auto-Suggest Search Bar */
+.fb-suggest-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 1060;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.fb-suggest-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s ease;
+}
+.fb-suggest-item:last-child {
+    border-bottom: none;
+}
+.fb-suggest-item:hover,
+.fb-suggest-item.active {
+    background: #f1f5f9;
+}
+.fb-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: #1e3a8a;
+    background: #dbeafe;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+.fb-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.fb-suggest-name {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.88rem;
+    line-height: 1.25;
+}
+.fb-suggest-sub {
+    font-size: 0.76rem;
+    color: #64748b;
+    line-height: 1.25;
+    margin-top: 2px;
+}
+.fb-suggest-empty {
+    padding: 16px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.84rem;
+}
+.fb-highlight {
+    background: #fef08a;
+    font-weight: 800;
+    padding: 0 2px;
+    border-radius: 2px;
+}
 </style>
 
 <div class="fade-in py-2">
@@ -264,6 +339,7 @@ include __DIR__ . '/layout/sidebar.php';
                         <input type="hidden" name="date" value="<?php echo htmlspecialchars($event_data['date']); ?>">
                         <input type="hidden" name="mode" id="scan_mode" value="time_in">
                         <input type="hidden" name="status" id="scan_status" value="Present">
+                        <input type="hidden" name="member_id" id="scan_member_id" value="">
 
                         <!-- Mode Segmented Toggle Buttons -->
                         <div class="mode-toggle-container">
@@ -279,39 +355,42 @@ include __DIR__ . '/layout/sidebar.php';
                             <span class="input-group-text bg-white border-end-0" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-color: #cbd5e1; color: var(--muted-text); padding-left: 14px; padding-right: 10px;">
                                 <i class='bx bx-qr-scan' style="font-size: 1.25rem;"></i>
                             </span>
-                            <input type="text" id="qr_token" name="qr_token" class="form-control border-start-0" autofocus placeholder="Scan QR or type Member ID / Code..." required style="height: 46px; font-size: 0.95rem; border-color: #cbd5e1; box-shadow: none;">
+                            <input type="text" id="qr_token" name="qr_token" class="form-control border-start-0" autofocus placeholder="Scan QR pass / Gun scanner..." style="height: 46px; font-size: 0.95rem; border-color: #cbd5e1; box-shadow: none;">
                             <button class="btn btn-primary px-3" type="submit" id="submitBtn" style="height: 46px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
                                 <i class='bx bx-send' style="font-size: 1.1rem;"></i>
                             </button>
                         </div>
                     </form>
                     <p class="text-muted small mt-2 mb-0" style="font-size: 0.8rem;">
-                        <i class='bx bx-info-circle'></i> Physical scanners automatically submit when focused.
+                        <i class='bx bx-info-circle'></i> Camera &amp; physical scanners automatically submit when scanned.
                     </p>
 
-                    <!-- Manual Member Code / Search Dropdown Fallback -->
-                    <div class="mt-3 pt-3 border-top">
+                    <!-- General Search Bar with Facebook-Style Auto-Suggest -->
+                    <div class="mt-3 pt-3 border-top position-relative" id="scannerSearchContainer">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label for="member_fallback_select" class="form-label font-weight-700 small text-muted mb-0" style="font-size: 0.82rem;">
-                                <i class='bx bx-user-pin text-primary'></i> QR Scanner Failed? Search Member / Code:
+                            <label for="fb_member_search" class="form-label font-weight-700 small text-muted mb-0" style="font-size: 0.82rem;">
+                                <i class='bx bx-search text-primary'></i> Search Member Name (Manual / No QR):
                             </label>
-                            <span class="badge bg-light text-secondary border" style="font-size: 9px; font-weight: 700;">MANUAL FALLBACK</span>
+                            <span class="badge bg-light text-primary border" style="font-size: 9px; font-weight: 700;">AUTO-SUGGEST</span>
                         </div>
-                        <div class="input-group">
-                            <select id="member_fallback_select" class="form-select form-control" style="height: 42px; font-size: 0.88rem; border-color: #cbd5e1;">
-                                <option value="">-- Choose Member or Member Code --</option>
-                                <?php foreach ($allMembersList as $m): ?>
-                                    <option value="<?php echo htmlspecialchars($m['qr_token'] ?: $m['member_id']); ?>" data-name="<?php echo htmlspecialchars($m['full_name']); ?>">
-                                        ID #<?php echo str_pad($m['member_id'], 4, '0', STR_PAD_LEFT); ?> &bull; <?php echo htmlspecialchars($m['full_name']); ?><?php echo !empty($m['phone']) ? ' (' . htmlspecialchars($m['phone']) . ')' : ''; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <button class="btn btn-outline-primary px-3" type="button" onclick="submitManualAttendance()" style="height: 42px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
-                                <i class='bx bx-check'></i> Submit
-                            </button>
+                        <div class="position-relative">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-color: #cbd5e1; color: var(--muted-text); padding-left: 12px; padding-right: 8px;">
+                                    <i class='bx bx-search' style="font-size: 1.15rem;"></i>
+                                </span>
+                                <input type="text" id="fb_member_search" class="form-control border-start-0" placeholder="Search by name (e.g. Juan Dela Cruz)..." autocomplete="off" style="height: 42px; font-size: 0.88rem; border-color: #cbd5e1; box-shadow: none;">
+                                <button class="btn btn-outline-secondary" type="button" id="btn_clear_search" style="display:none; height:42px; border-color: #cbd5e1;" onclick="clearMemberSearch()" title="Clear">
+                                    <i class='bx bx-x' style="font-size: 1.2rem;"></i>
+                                </button>
+                                <button class="btn btn-outline-primary px-3" type="button" onclick="submitManualSearch()" style="height: 42px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;">
+                                    <i class='bx bx-check'></i> Record
+                                </button>
+                            </div>
+                            <!-- Floating Facebook-style Auto-Suggest Dropdown Results -->
+                            <div id="fb_suggest_box" class="fb-suggest-dropdown shadow-lg" style="display: none;"></div>
                         </div>
                         <p class="text-muted small mt-1 mb-0" style="font-size: 0.78rem;">
-                            <i class='bx bx-info-circle'></i> If QR pass cannot be scanned, select member above to record attendance.
+                            <i class='bx bx-info-circle'></i> If QR code doesn't scan, type name above. Click any suggested match or press Enter to record attendance.
                         </p>
                     </div>
                 </div>
@@ -452,17 +531,167 @@ include __DIR__ . '/layout/sidebar.php';
         }
     }
 
-    function submitManualAttendance() {
-        const sel = document.getElementById('member_fallback_select');
-        if (!sel || !sel.value) {
-            alert('Please select a member or member code from the dropdown list.');
+    const allMembers = <?php echo json_encode($allMembersList, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+    let searchActiveIndex = -1;
+    let currentFilteredMembers = [];
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"']/g, function(char) {
+            return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[char];
+        });
+    }
+
+    function highlightMatch(text, query) {
+        if (!query) return escapeHtml(text);
+        const safeText = escapeHtml(text);
+        const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp('(' + safeQuery + ')', 'gi');
+        return safeText.replace(regex, '<span class="fb-highlight">$1</span>');
+    }
+
+    function renderSuggestions(members, query) {
+        const box = document.getElementById('fb_suggest_box');
+        if (!box) return;
+        currentFilteredMembers = members;
+        searchActiveIndex = -1;
+
+        if (members.length === 0) {
+            box.innerHTML = `
+                <div class="fb-suggest-empty">
+                    <i class='bx bx-user-x' style="font-size: 1.5rem; display: block; margin-bottom: 4px; opacity: 0.6;"></i>
+                    No members found matching "<strong>${escapeHtml(query)}</strong>"
+                </div>
+            `;
+            box.style.display = 'block';
             return;
         }
+
+        const isTimeOut = document.getElementById('scan_mode').value === 'time_out';
+        const actionBadge = isTimeOut 
+            ? `<span class="badge" style="background:#fef3c7; color:#92400e; font-size:10px;"><i class='bx bx-log-out-circle'></i> Time Out</span>`
+            : `<span class="badge" style="background:#dcfce7; color:#166534; font-size:10px;"><i class='bx bx-log-in-circle'></i> Check In</span>`;
+
+        let html = '';
+        members.forEach((m, idx) => {
+            const initial = (m.full_name || '?').trim().charAt(0).toUpperCase();
+            const avatarHtml = m.photo_path 
+                ? `<div class="fb-avatar"><img src="${escapeHtml(m.photo_path)}" alt="${escapeHtml(m.full_name)}"></div>`
+                : `<div class="fb-avatar">${initial}</div>`;
+            const memberIdFormatted = 'ID #' + String(m.member_id).padStart(4, '0');
+            const contactInfo = m.phone ? m.phone : (m.email ? m.email : '');
+
+            html += `
+                <div class="fb-suggest-item" data-index="${idx}" onclick="selectMemberFromSuggest(${m.member_id})">
+                    <div class="d-flex align-items-center gap-2" style="flex: 1; min-width: 0;">
+                        ${avatarHtml}
+                        <div style="min-width: 0; flex: 1;">
+                            <div class="fb-suggest-name text-truncate">
+                                ${highlightMatch(m.full_name, query)}
+                            </div>
+                            <div class="fb-suggest-sub text-truncate">
+                                <span class="badge bg-light text-secondary border" style="font-size: 9px; padding: 1px 4px;">${memberIdFormatted}</span>
+                                ${contactInfo ? `&bull; ${escapeHtml(contactInfo)}` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        ${actionBadge}
+                    </div>
+                </div>
+            `;
+        });
+
+        box.innerHTML = html;
+        box.style.display = 'block';
+    }
+
+    function selectMemberFromSuggest(memberId) {
+        const member = allMembers.find(m => Number(m.member_id) === Number(memberId));
+        if (!member) return;
+
+        const scanMemberId = document.getElementById('scan_member_id');
+        const qrInput = document.getElementById('qr_token');
+        const searchInput = document.getElementById('fb_member_search');
+
+        if (scanMemberId) scanMemberId.value = member.member_id;
+        if (qrInput) qrInput.value = member.qr_token || member.member_id;
+        if (searchInput) searchInput.value = member.full_name;
+
+        hideSuggestions();
+
+        // Submit attendance form immediately
+        document.getElementById('scan-form').submit();
+    }
+
+    function submitManualSearch() {
+        const searchInput = document.getElementById('fb_member_search');
+        if (!searchInput) return;
+        const query = searchInput.value.trim();
+        if (!query) {
+            searchInput.focus();
+            return;
+        }
+
+        // If an item is active with keyboard navigation
+        if (searchActiveIndex >= 0 && currentFilteredMembers[searchActiveIndex]) {
+            selectMemberFromSuggest(currentFilteredMembers[searchActiveIndex].member_id);
+            return;
+        }
+
+        // If suggestions are currently shown, pick the top match
+        if (currentFilteredMembers.length > 0) {
+            selectMemberFromSuggest(currentFilteredMembers[0].member_id);
+            return;
+        }
+
+        // Try direct find in allMembers
+        const found = allMembers.find(m => 
+            (m.full_name || '').toLowerCase() === query.toLowerCase() ||
+            String(m.member_id) === query.replace(/[^0-9]/g, '')
+        );
+        if (found) {
+            selectMemberFromSuggest(found.member_id);
+            return;
+        }
+
+        // Fallback: send query to backend to resolve via controller
         const qrInput = document.getElementById('qr_token');
         if (qrInput) {
-            qrInput.value = sel.value;
+            qrInput.value = query;
             document.getElementById('scan-form').submit();
         }
+    }
+
+    function clearMemberSearch() {
+        const searchInput = document.getElementById('fb_member_search');
+        const clearBtn = document.getElementById('btn_clear_search');
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
+        if (clearBtn) clearBtn.style.display = 'none';
+        hideSuggestions();
+    }
+
+    function hideSuggestions() {
+        const box = document.getElementById('fb_suggest_box');
+        if (box) box.style.display = 'none';
+        searchActiveIndex = -1;
+    }
+
+    function updateActiveSuggestItem() {
+        const box = document.getElementById('fb_suggest_box');
+        if (!box) return;
+        const items = box.querySelectorAll('.fb-suggest-item');
+        items.forEach((item, idx) => {
+            if (idx === searchActiveIndex) {
+                item.classList.add('active');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('active');
+            }
+        });
     }
 
     async function initCamera() {
@@ -623,25 +852,86 @@ include __DIR__ . '/layout/sidebar.php';
 
     document.addEventListener("DOMContentLoaded", function() {
         const qrInput = document.getElementById('qr_token');
-        const sel = document.getElementById('member_fallback_select');
-        if (sel) {
-            sel.addEventListener('change', function() {
-                if (this.value && qrInput) {
-                    qrInput.value = this.value;
+        const searchInput = document.getElementById('fb_member_search');
+        const clearBtn = document.getElementById('btn_clear_search');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                if (clearBtn) clearBtn.style.display = query ? 'inline-flex' : 'none';
+
+                if (query.length === 0) {
+                    hideSuggestions();
+                    return;
+                }
+
+                const qLower = query.toLowerCase();
+                const matched = allMembers.filter(m => {
+                    const name = (m.full_name || '').toLowerCase();
+                    const email = (m.email || '').toLowerCase();
+                    const phone = (m.phone || '').toLowerCase();
+                    const idStr = String(m.member_id || '');
+                    return name.includes(qLower) || email.includes(qLower) || phone.includes(qLower) || idStr.includes(qLower);
+                }).slice(0, 10);
+
+                renderSuggestions(matched, query);
+            });
+
+            searchInput.addEventListener('keydown', function(e) {
+                const box = document.getElementById('fb_suggest_box');
+                const isOpen = box && box.style.display !== 'none';
+
+                if (e.key === 'ArrowDown') {
+                    if (isOpen && currentFilteredMembers.length > 0) {
+                        e.preventDefault();
+                        searchActiveIndex = (searchActiveIndex + 1) % currentFilteredMembers.length;
+                        updateActiveSuggestItem();
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    if (isOpen && currentFilteredMembers.length > 0) {
+                        e.preventDefault();
+                        searchActiveIndex = (searchActiveIndex - 1 + currentFilteredMembers.length) % currentFilteredMembers.length;
+                        updateActiveSuggestItem();
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submitManualSearch();
+                } else if (e.key === 'Escape') {
+                    hideSuggestions();
+                }
+            });
+
+            // Focus on search input when clicking the search box container
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim().length > 0) {
+                    this.dispatchEvent(new Event('input'));
                 }
             });
         }
+
+        // Close auto-suggest box when clicking outside
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('scannerSearchContainer');
+            if (container && !container.contains(e.target)) {
+                hideSuggestions();
+            }
+        });
+
         if (qrInput) {
             qrInput.focus();
         }
 
         document.body.addEventListener('click', (e) => {
+            const container = document.getElementById('scannerSearchContainer');
+            if (container && container.contains(e.target)) {
+                return; // Don't redirect focus if user is searching manually
+            }
             if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT' && document.activeElement.tagName !== 'BUTTON') {
                 if (qrInput) qrInput.focus();
             }
         });
 
-        // Submit on enter
+        // Submit on enter for physical scanner input
         if (qrInput) {
             qrInput.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
