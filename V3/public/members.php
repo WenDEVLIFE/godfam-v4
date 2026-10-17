@@ -16,6 +16,7 @@ if (!isAdmin() && !isStaff()) {
 }
 
 $controller = new MemberController($pdo);
+$member_types = ['Member', 'Youth Member', 'Child', 'Senior'];
 $error = '';
 $success = '';
 
@@ -79,6 +80,7 @@ include __DIR__ . '/layout/sidebar.php';
                     <tr>
                         <th>ID</th>
                         <th>Full Name</th>
+                        <th>Category</th>
                         <th>Email / Phone</th>
                         <th>Additional Info</th>
                         <th>Status</th>
@@ -87,12 +89,17 @@ include __DIR__ . '/layout/sidebar.php';
                 </thead>
                 <tbody>
                     <?php if (empty($members)): ?>
-                        <tr><td colspan="5" class="text-center py-4 text-muted">No members found.</td></tr>
+                        <tr><td colspan="7" class="text-center py-4 text-muted">No members found.</td></tr>
                     <?php else: ?>
                         <?php foreach ($members as $member): ?>
                         <tr>
                             <td class="small font-weight-700">#<?php echo str_pad($member['member_id'], 4, '0', STR_PAD_LEFT); ?></td>
                             <td class="font-weight-600"><?php echo htmlspecialchars($member['full_name']); ?></td>
+                            <td>
+                                <span class="badge bg-light text-dark border" style="font-size: 11px; font-weight: 700;">
+                                    <?php echo htmlspecialchars($member['member_type'] ?? 'Member'); ?>
+                                </span>
+                            </td>
                             <td class="small">
                                 <div><?php echo htmlspecialchars($member['email'] ?? ''); ?></div>
                                 <div class="text-muted d-flex align-items-center gap-1">
@@ -134,6 +141,7 @@ include __DIR__ . '/layout/sidebar.php';
                                             data-photo="<?php echo htmlspecialchars($member['photo_path'] ?? ''); ?>"
                                             data-birthday="<?php echo htmlspecialchars($member['birthday'] ?? ''); ?>"
                                             data-wedding-anniversary="<?php echo htmlspecialchars($member['wedding_anniversary'] ?? ''); ?>"
+                                            data-member-type="<?php echo htmlspecialchars($member['member_type'] ?? 'Member'); ?>"
                                             data-role="<?php echo htmlspecialchars($member['role_name'] ?? 'Member'); ?>">
                                         View
                                     </button>
@@ -148,6 +156,7 @@ include __DIR__ . '/layout/sidebar.php';
                                             data-photo="<?php echo htmlspecialchars($member['photo_path'] ?? ''); ?>"
                                             data-birthday="<?php echo htmlspecialchars($member['birthday'] ?? ''); ?>"
                                             data-wedding-anniversary="<?php echo htmlspecialchars($member['wedding_anniversary'] ?? ''); ?>"
+                                            data-member-type="<?php echo htmlspecialchars($member['member_type'] ?? 'Member'); ?>"
                                             data-status="<?php echo htmlspecialchars($member['status']); ?>">
                                         Edit
                                     </button>
@@ -181,6 +190,10 @@ include __DIR__ . '/layout/sidebar.php';
             <div class="row mb-3">
                 <div class="col-4 text-muted small uppercase font-weight-bold">Full Name</div>
                 <div class="col-8" id="view_full_name"></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4 text-muted small uppercase font-weight-bold">Member Category</div>
+                <div class="col-8" id="view_member_type"></div>
             </div>
             <div class="row mb-3">
                 <div class="col-4 text-muted small uppercase font-weight-bold">Email</div>
@@ -272,6 +285,15 @@ include __DIR__ . '/layout/sidebar.php';
                     <div class="form-group">
                         <label class="form-label">Wedding Anniversary</label>
                         <input type="date" name="wedding_anniversary" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Member Category</label>
+                        <select name="member_type" class="form-control">
+                            <?php foreach ($member_types as $mt): ?>
+                                <option value="<?php echo htmlspecialchars($mt); ?>"><?php echo htmlspecialchars($mt); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -372,6 +394,15 @@ include __DIR__ . '/layout/sidebar.php';
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">Member Category</label>
+                        <select name="member_type" id="edit_member_type" class="form-control">
+                            <?php foreach ($member_types as $mt): ?>
+                                <option value="<?php echo htmlspecialchars($mt); ?>"><?php echo htmlspecialchars($mt); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">Status</label>
                         <select name="status" id="edit_status" class="form-control">
                             <option value="active">Active</option>
@@ -426,6 +457,7 @@ document.querySelectorAll('.view-member-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         const d = this.dataset;
         document.getElementById('view_full_name').textContent = d.name;
+        document.getElementById('view_member_type').textContent = d.memberType || 'Member';
         document.getElementById('view_email').textContent = d.email;
         document.getElementById('view_phone').textContent = d.phone || '---';
         document.getElementById('view_address').textContent = d.address || '---';
@@ -481,6 +513,7 @@ document.querySelectorAll('.edit-member-btn').forEach(btn => {
         document.getElementById('edit_phone').value = d.phone;
         document.getElementById('edit_address').value = d.address;
         document.getElementById('edit_status').value = d.status;
+        document.getElementById('edit_member_type').value = d.memberType || 'Member';
         
         if (d.birthday) {
             document.getElementById('edit_birthday').value = d.birthday;

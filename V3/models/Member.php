@@ -45,9 +45,10 @@ class Member {
 
     public function create($data) {
         $qrToken = bin2hex(random_bytes(16));
-        $stmt = $this->pdo->prepare("INSERT INTO members (full_name, photo_path, email, phone, contact_info, address, birthday, wedding_anniversary, status, qr_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $this->pdo->prepare("INSERT INTO members (full_name, member_type, photo_path, email, phone, contact_info, address, birthday, wedding_anniversary, status, qr_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if ($stmt->execute([
             $data['full_name'],
+            !empty($data['member_type']) ? $data['member_type'] : 'Member',
             $data['photo_path'] ?? null,
             $data['email'] ?? null,
             $data['phone'] ?? null,
@@ -64,9 +65,10 @@ class Member {
     }
 
     public function update($id, $data) {
-        $stmt = $this->pdo->prepare("UPDATE members SET full_name = ?, photo_path = ?, email = ?, phone = ?, contact_info = ?, address = ?, birthday = ?, wedding_anniversary = ?, status = ? WHERE member_id = ?");
+        $stmt = $this->pdo->prepare("UPDATE members SET full_name = ?, member_type = ?, photo_path = ?, email = ?, phone = ?, contact_info = ?, address = ?, birthday = ?, wedding_anniversary = ?, status = ? WHERE member_id = ?");
         return $stmt->execute([
             $data['full_name'],
+            !empty($data['member_type']) ? $data['member_type'] : 'Member',
             $data['photo_path'] ?? null,
             $data['email'] ?? null,
             $data['phone'] ?? null,

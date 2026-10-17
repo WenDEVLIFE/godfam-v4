@@ -101,7 +101,7 @@ $stmt->execute([$eventId]);
 $recentScans = $stmt->fetchAll();
 
 // Fetch All Members for Manual Dropdown Fallback
-$memberStmt = $pdo->query("SELECT member_id, full_name, email, phone, qr_token FROM members ORDER BY full_name ASC");
+$memberStmt = $pdo->query("SELECT member_id, full_name, member_type, email, phone, qr_token FROM members ORDER BY full_name ASC");
 $allMembersList = $memberStmt->fetchAll();
 
 // Include Layout Header
@@ -206,7 +206,7 @@ include __DIR__ . '/layout/sidebar.php';
 }
 .fb-suggest-item:hover,
 .fb-suggest-item.active {
-    background: #f1f5f9;
+    background: #e7f0fd;
 }
 .fb-avatar {
     width: 36px;
@@ -250,6 +250,89 @@ include __DIR__ . '/layout/sidebar.php';
     font-weight: 800;
     padding: 0 2px;
     border-radius: 2px;
+}
+.fb-member-type-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #334155;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+/* Manual Entry search block */
+.fb-manual-heading {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+.fb-search-wrap {
+    position: relative;
+}
+.fb-search-input {
+    width: 100%;
+    height: 46px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    padding-left: 42px;
+    padding-right: 78px;
+    font-size: 0.9rem;
+    box-shadow: none;
+}
+.fb-search-input:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+.fb-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: #94a3b8;
+    pointer-events: none;
+}
+.fb-search-caret {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: #94a3b8;
+    pointer-events: none;
+}
+.fb-search-clear-btn {
+    position: absolute;
+    right: 38px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 1.15rem;
+    line-height: 1;
+    padding: 2px 4px;
+    cursor: pointer;
+}
+.fb-search-clear-btn:hover {
+    color: #475569;
+}
+.fb-record-btn {
+    width: 100%;
+    height: 46px;
+    border-radius: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 </style>
 
@@ -367,29 +450,22 @@ include __DIR__ . '/layout/sidebar.php';
 
                     <!-- General Search Bar with Facebook-Style Auto-Suggest -->
                     <div class="mt-3 pt-3 border-top position-relative" id="scannerSearchContainer">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label for="fb_member_search" class="form-label font-weight-700 small text-muted mb-0" style="font-size: 0.82rem;">
-                                <i class='bx bx-search text-primary'></i> Search Member Name (Manual / No QR):
-                            </label>
-                            <span class="badge bg-light text-primary border" style="font-size: 9px; font-weight: 700;">AUTO-SUGGEST</span>
-                        </div>
-                        <div class="position-relative">
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-color: #cbd5e1; color: var(--muted-text); padding-left: 12px; padding-right: 8px;">
-                                    <i class='bx bx-search' style="font-size: 1.15rem;"></i>
-                                </span>
-                                <input type="text" id="fb_member_search" class="form-control border-start-0" placeholder="Search by name (e.g. Juan Dela Cruz)..." autocomplete="off" style="height: 42px; font-size: 0.88rem; border-color: #cbd5e1; box-shadow: none;">
-                                <button class="btn btn-outline-secondary" type="button" id="btn_clear_search" style="display:none; height:42px; border-color: #cbd5e1;" onclick="clearMemberSearch()" title="Clear">
-                                    <i class='bx bx-x' style="font-size: 1.2rem;"></i>
-                                </button>
-                                <button class="btn btn-outline-primary px-3" type="button" onclick="submitManualSearch()" style="height: 42px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;">
-                                    <i class='bx bx-check'></i> Record
-                                </button>
-                            </div>
+                        <div class="fb-manual-heading">Manual Entry</div>
+                        <label for="fb_member_search" class="form-label font-weight-700 small text-muted mb-1" style="font-size: 0.82rem;">Search Member</label>
+                        <div class="fb-search-wrap">
+                            <i class='bx bx-search fb-search-icon'></i>
+                            <input type="text" id="fb_member_search" class="fb-search-input" placeholder="Type member name..." autocomplete="off">
+                            <button type="button" id="btn_clear_search" class="fb-search-clear-btn" style="display: none;" onclick="clearMemberSearch()" title="Clear">
+                                <i class='bx bx-x'></i>
+                            </button>
+                            <i class='bx bx-chevron-down fb-search-caret'></i>
                             <!-- Floating Facebook-style Auto-Suggest Dropdown Results -->
                             <div id="fb_suggest_box" class="fb-suggest-dropdown shadow-lg" style="display: none;"></div>
                         </div>
-                        <p class="text-muted small mt-1 mb-0" style="font-size: 0.78rem;">
+                        <button type="button" class="btn btn-primary fb-record-btn mt-2" onclick="submitManualSearch()">
+                            <i class='bx bx-check'></i> Record Attendance
+                        </button>
+                        <p class="text-muted small mt-2 mb-0" style="font-size: 0.78rem;">
                             <i class='bx bx-info-circle'></i> If QR code doesn't scan, type name above. Click any suggested match or press Enter to record attendance.
                         </p>
                     </div>
@@ -567,11 +643,6 @@ include __DIR__ . '/layout/sidebar.php';
             return;
         }
 
-        const isTimeOut = document.getElementById('scan_mode').value === 'time_out';
-        const actionBadge = isTimeOut 
-            ? `<span class="badge" style="background:#fef3c7; color:#92400e; font-size:10px;"><i class='bx bx-log-out-circle'></i> Time Out</span>`
-            : `<span class="badge" style="background:#dcfce7; color:#166534; font-size:10px;"><i class='bx bx-log-in-circle'></i> Check In</span>`;
-
         let html = '';
         members.forEach((m, idx) => {
             const initial = (m.full_name || '?').trim().charAt(0).toUpperCase();
@@ -580,6 +651,7 @@ include __DIR__ . '/layout/sidebar.php';
                 : `<div class="fb-avatar">${initial}</div>`;
             const memberIdFormatted = 'ID #' + String(m.member_id).padStart(4, '0');
             const contactInfo = m.phone ? m.phone : (m.email ? m.email : '');
+            const memberType = m.member_type || 'Member';
 
             html += `
                 <div class="fb-suggest-item" data-index="${idx}" onclick="selectMemberFromSuggest(${m.member_id})">
@@ -596,7 +668,7 @@ include __DIR__ . '/layout/sidebar.php';
                         </div>
                     </div>
                     <div class="text-right flex-shrink-0">
-                        ${actionBadge}
+                        <span class="fb-member-type-pill">${escapeHtml(memberType)}</span>
                     </div>
                 </div>
             `;

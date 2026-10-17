@@ -13,8 +13,19 @@ require_once BASE_PATH . '/utils/FileUpload.php';
 class MemberController {
     private $memberModel;
 
+    /** Single source of truth for member categories. */
+    private $memberTypes = ['Member', 'Youth Member', 'Child', 'Senior'];
+
     public function __construct($pdo) {
         $this->memberModel = new Member($pdo);
+    }
+
+    /**
+     * Validate a member_type against the allowed list, falling back to 'Member'.
+     */
+    private function sanitizeMemberType($value) {
+        $value = trim((string)$value);
+        return in_array($value, $this->memberTypes, true) ? $value : 'Member';
     }
 
     /**
@@ -47,6 +58,7 @@ class MemberController {
         // Data Sanitization
         $sanitizedData = [
             'full_name'           => htmlspecialchars(trim($data['full_name'])),
+            'member_type'         => $this->sanitizeMemberType($data['member_type'] ?? ''),
             'email'               => trim($data['email']),
             'phone'               => $this->formatPhone($data['phone'] ?? ''),
             'address'             => htmlspecialchars(trim($data['address'] ?? '')),
@@ -103,6 +115,7 @@ class MemberController {
 
         $sanitizedData = [
             'full_name'           => htmlspecialchars(trim($data['full_name'])),
+            'member_type'         => $this->sanitizeMemberType($data['member_type'] ?? ''),
             'email'               => trim($data['email'] ?? ''),
             'phone'               => $this->formatPhone($data['phone'] ?? ''),
             'address'             => htmlspecialchars(trim($data['address'] ?? '')),

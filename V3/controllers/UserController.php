@@ -56,6 +56,7 @@ class UserController {
             $memberId = $existingMember['member_id'];
             $updateData = [
                 'full_name'           => $data['name'],
+                'member_type'         => $existingMember['member_type'] ?? 'Member',
                 'photo_path'          => $existingMember['photo_path'],
                 'email'               => $data['email'],
                 'phone'               => $existingMember['phone'],
@@ -69,6 +70,7 @@ class UserController {
         } else {
             $newMemberData = [
                 'full_name'           => htmlspecialchars(trim($data['name'])),
+                'member_type'         => 'Member',
                 'email'               => trim($data['email']),
                 'phone'               => null,
                 'address'             => null,
@@ -112,6 +114,7 @@ class UserController {
                     $weddingAnniversary = !empty($data['wedding_anniversary']) ? trim($data['wedding_anniversary']) : $existingMember['wedding_anniversary'];
                     $updateData = [
                         'full_name'           => $data['name'],
+                        'member_type'         => $existingMember['member_type'] ?? 'Member',
                         'photo_path'          => $existingMember['photo_path'],
                         'email'               => $data['email'],
                         'phone'               => $existingMember['phone'],
