@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../utils/daily_reminders.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (!isAdmin() && !isStaff()) {
+if (!isStaff()) {
     http_response_code(403);
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;

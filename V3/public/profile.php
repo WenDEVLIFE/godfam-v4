@@ -18,7 +18,7 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 // Ensure user is logged in
 requireLogin();
 
-$member_id = ((isAdmin() || isStaff()) && !empty($_GET['id'])) ? (int)$_GET['id'] : ($_SESSION['member_id'] ?? null);
+$member_id = (isStaff() && !empty($_GET['id'])) ? (int)$_GET['id'] : ($_SESSION['member_id'] ?? null);
 $memberModel = new Member($pdo);
 
 // Fallback: some existing user accounts may not have member_id in session.
@@ -58,7 +58,6 @@ if (!$member_id && !empty($_SESSION['user_id'])) {
         // create a minimal member record and link it to the current user.
         if (
             !$member_id &&
-            !isAdmin() &&
             !isStaff() &&
             (!empty($sessionName) || !empty($sessionEmail))
         ) {
@@ -78,7 +77,7 @@ if (!$member_id && !empty($_SESSION['user_id'])) {
 }
 
 if (!$member_id) {
-    if (isAdmin() || isStaff()) {
+    if (isStaff()) {
         // If Admin/Staff, they might be viewing a specific member
         $member_id = $_GET['id'] ?? null;
     }
@@ -123,7 +122,7 @@ if (!empty($member['qr_token'])) {
 }
 
 // Check permissions
-if (!isAdmin() && !isStaff() && (int)($_SESSION['member_id'] ?? 0) !== (int)$member_id) {
+if (!isStaff() && (int)($_SESSION['member_id'] ?? 0) !== (int)$member_id) {
     die("Unauthorized Access: You can only view your own ID card.");
 }
 

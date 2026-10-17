@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../../models/Attendance.php';
 require_once __DIR__ . '/../../models/Member.php';
 
-if (!isAdmin() && !isStaff()) {
+if (!isStaff()) {
     http_response_code(403);
     echo json_encode(['error' => 'Unauthorized']);
     exit;

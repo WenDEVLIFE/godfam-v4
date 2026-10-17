@@ -16,11 +16,8 @@ try {
     // 1. Roles (Ensure system roles exist)
     $roles = [
         [1, 'Administrator', 'administrator', 'System Administrator with full access', 1],
-        [2, 'Pastor', 'pastor', 'Pastoral leadership', 1],
-        [3, 'Staff', 'staff', 'Operational church staff', 1],
         [4, 'Member', 'member', 'Standard church member', 1],
         [5, 'Secretary', 'secretary', 'Administrative secretary', 1],
-        [6, 'Committee Head', 'committee_head', 'Committee department leader', 1],
         [9, 'Treasurer', 'treasurer', 'Finance and collections controller', 1],
     ];
 
@@ -33,9 +30,9 @@ try {
     // 2. Members
     $dummyMembers = [
         ['full_name' => 'Camille Jane Madrid',  'email' => 'camillejanemadrid629@gmail.com', 'phone' => '+639171234567', 'birthday' => '1995-06-29', 'gender' => 'Female', 'address' => '123 Main St, Cabanatuan City', 'status' => 'active', 'role_id' => 1],
-        ['full_name' => 'Rev. Benjamin Santos', 'email' => 'pastor.benjamin@church.org',     'phone' => '+639182345678', 'birthday' => '1978-04-12', 'gender' => 'Male',   'address' => '45 Church Compound, Gapan City', 'status' => 'active', 'role_id' => 2],
+        ['full_name' => 'Rev. Benjamin Santos', 'email' => 'pastor.benjamin@church.org',     'phone' => '+639182345678', 'birthday' => '1978-04-12', 'gender' => 'Male',   'address' => '45 Church Compound, Gapan City', 'status' => 'active', 'role_id' => 1],
         ['full_name' => 'Maria Clara Dela Cruz','email' => 'maria.delacruz@gmail.com',       'phone' => '+639193456789', 'birthday' => '1992-09-16', 'gender' => 'Female', 'address' => '78 Rizal St, San Jose City',     'status' => 'active', 'role_id' => 5],
-        ['full_name' => 'Juan Dela Cruz',       'email' => 'juan.delacruz@yahoo.com',        'phone' => '+639204567890', 'birthday' => '1988-11-20', 'gender' => 'Male',   'address' => '12 Mabini Ave, Talavera',       'status' => 'active', 'role_id' => 3],
+        ['full_name' => 'Juan Dela Cruz',       'email' => 'juan.delacruz@yahoo.com',        'phone' => '+639204567890', 'birthday' => '1988-11-20', 'gender' => 'Male',   'address' => '12 Mabini Ave, Talavera',       'status' => 'active', 'role_id' => 4],
         ['full_name' => 'Grace Gonzales',       'email' => 'grace.gonzales@gmail.com',       'phone' => '+639215678901', 'birthday' => '2001-03-15', 'gender' => 'Female', 'address' => '56 Luna St, Santa Rosa',         'status' => 'active', 'role_id' => 4],
         ['full_name' => 'Joshua Ramos',         'email' => 'joshua.ramos@outlook.com',       'phone' => '+639226789012', 'birthday' => '1999-08-04', 'gender' => 'Male',   'address' => '89 Bonifacio St, Cabanatuan City','status' => 'active', 'role_id' => 4],
         ['full_name' => 'Angelica Reyes',       'email' => 'angelica.reyes@gmail.com',       'phone' => '+639237890123', 'birthday' => '1996-12-10', 'gender' => 'Female', 'address' => '34 Quezon Blvd, Gapan City',    'status' => 'active', 'role_id' => 4],
@@ -84,9 +81,9 @@ try {
     $passwordHash = password_hash('Admin123!', PASSWORD_DEFAULT);
     $dummyUsers = [
         ['role_id' => 1, 'email' => 'camillejanemadrid629@gmail.com', 'name' => 'Camille Jane Madrid'],
-        ['role_id' => 2, 'email' => 'pastor.benjamin@church.org',     'name' => 'Rev. Benjamin Santos'],
+        ['role_id' => 1, 'email' => 'pastor.benjamin@church.org',     'name' => 'Rev. Benjamin Santos'],
         ['role_id' => 5, 'email' => 'maria.delacruz@gmail.com',       'name' => 'Maria Clara Dela Cruz'],
-        ['role_id' => 3, 'email' => 'juan.delacruz@yahoo.com',        'name' => 'Juan Dela Cruz'],
+        ['role_id' => 4, 'email' => 'juan.delacruz@yahoo.com',        'name' => 'Juan Dela Cruz'],
         ['role_id' => 4, 'email' => 'grace.gonzales@gmail.com',       'name' => 'Grace Gonzales'],
     ];
 

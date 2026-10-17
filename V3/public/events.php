@@ -17,7 +17,7 @@ $controller = new EventController($pdo);
 $error = $_SESSION['event_error'] ?? '';
 $success = $_SESSION['event_success'] ?? '';
 unset($_SESSION['event_error'], $_SESSION['event_success']);
-$canScheduleEvents = isAdmin() || isStaff();
+$canScheduleEvents = canManage();
 $canEditDeleteEvents = hasRole(['Administrator', 'Secretary']);
 
 function redirectToEventsPage() {

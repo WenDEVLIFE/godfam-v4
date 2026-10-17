@@ -9,11 +9,8 @@ class Role {
     // Core system roles that can NEVER be modified, renamed, or deleted
     private static $protectedRoles = [
         'administrator',
-        'pastor',
-        'secretary',
-        'staff',
         'member',
-        'committee_head',
+        'secretary',
         'treasurer'
     ];
 
@@ -101,7 +98,7 @@ class Role {
         }
 
         if ($this->isSystemRole($role)) {
-            return "Protected system roles (Administrator, Pastor, Secretary, Staff, etc.) cannot be edited or modified.";
+            return "Protected system roles (Administrator, Member, Secretary, Treasurer) cannot be edited or modified.";
         }
 
         $roleName = trim($data['role_name'] ?? '');
@@ -138,7 +135,7 @@ class Role {
         }
 
         if ($this->isSystemRole($role)) {
-            return "Protected system roles (Administrator, Pastor, Secretary, Staff, etc.) cannot be deleted.";
+            return "Protected system roles (Administrator, Member, Secretary, Treasurer) cannot be deleted.";
         }
 
         // Check if any users or members are assigned

@@ -10,7 +10,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../models/AuditLog.php';
 
-if (!isAdmin() && !isStaff()) {
+if (!canManage()) {
     header("Location: dashboard.php");
     exit;
 }
@@ -65,7 +65,7 @@ $totalLogs       = $auditModel->countLogs($filters);
 $totalPages      = max(1, ceil($totalLogs / $perPage));
 $distinctActions = $auditModel->getDistinctActions();
 $distinctUsers   = $auditModel->getDistinctUsers();
-$distinctRoles   = ['Administrator', 'Pastor', 'Secretary', 'Staff'];
+$distinctRoles   = ['Administrator', 'Secretary', 'Treasurer'];
 
 include __DIR__ . '/layout/header.php';
 include __DIR__ . '/layout/sidebar.php';

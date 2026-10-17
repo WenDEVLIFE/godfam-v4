@@ -10,7 +10,7 @@ require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../models/Attendance.php';
 require_once __DIR__ . '/../models/Event.php';
 
-if (!isAdmin() && !isStaff()) {
+if (!canManage()) {
     header("Location: dashboard.php");
     exit;
 }

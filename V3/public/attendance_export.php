@@ -13,7 +13,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../models/Attendance.php';
 
-if (!isAdmin() && !isStaff()) {
+if (!canManage()) {
     die("Unauthorized access.");
 }
 

@@ -153,7 +153,7 @@ class UserController {
             return "User account not found.";
         }
 
-        if (in_array($targetUser['role_name'], ['Administrator', 'Secretary'], true)) {
+        if (in_array($targetUser['role_name'], ['Administrator', 'Secretary', 'Treasurer'], true)) {
             error_log(sprintf(
                 '[SECURITY] Protected user deletion blocked at %s. Acting user: %s. Target user: %s (%s, role: %s). Result: blocked.',
                 date('c'),
@@ -163,7 +163,7 @@ class UserController {
                 $targetUser['role_name']
             ));
 
-            return "Administrator and Secretary accounts cannot be deleted.";
+            return "Administrator, Secretary, and Treasurer accounts cannot be deleted.";
         }
 
         if ($this->userModel->delete($id)) {

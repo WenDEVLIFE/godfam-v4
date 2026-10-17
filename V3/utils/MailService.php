@@ -186,6 +186,7 @@ class MailService {
 
             // Content
             $mail->isHTML(true);
+            $mail->CharSet = 'UTF-8';
             $mail->Subject = $subject;
             $mail->Body    = $body;
 

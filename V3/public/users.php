@@ -127,7 +127,7 @@ include __DIR__ . '/layout/sidebar.php';
                             </tr>
                         <?php else: ?>
                             <?php foreach ($users as $u): ?>
-                            <?php $isProtectedAccount = in_array($u['role_name'], ['Administrator', 'Secretary'], true); ?>
+                            <?php $isProtectedAccount = in_array($u['role_name'], ['Administrator', 'Secretary', 'Treasurer'], true); ?>
                             <?php $avatar = userAvatarPath($u['member_photo'] ?? ''); ?>
                             <tr style="border-bottom: 1px solid rgba(0,0,0,0.03);">
                                 <td style="padding-left: 24px;">

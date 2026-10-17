@@ -30,19 +30,19 @@ class MemberController {
 
     /**
      * Display a list of members.
-     * Roles: Secretary, Committee Head, Staff
+     * Roles: Administrator, Secretary
      */
     public function index() {
-        authorizeRoles(['Secretary', 'Committee Head', 'Staff', 'Administrator']);
+        authorizeRoles(['Administrator', 'Secretary']);
         return $this->memberModel->all();
     }
 
     /**
      * Add a new member.
-     * Roles: Secretary, Committee Head, Administrator
+     * Roles: Administrator, Secretary
      */
     public function add($data, $files = null) {
-        authorizeRoles(['Secretary', 'Committee Head', 'Administrator']);
+        authorizeRoles(['Administrator', 'Secretary']);
         
         // Validation
         if (empty($data['full_name'])) return "Name is required.";
@@ -85,10 +85,10 @@ class MemberController {
 
     /**
      * Edit an existing member.
-     * Roles: Secretary, Committee Head, Administrator
+     * Roles: Administrator, Secretary
      */
     public function edit($id, $data, $files = null) {
-        authorizeRoles(['Secretary', 'Committee Head', 'Administrator']);
+        authorizeRoles(['Administrator', 'Secretary']);
         
         if (empty($data['full_name'])) return "Name is required.";
         if (empty($id)) return "Member ID is required.";
@@ -170,7 +170,7 @@ class MemberController {
      * Roles: Secretary only.
      */
     public function delete($id) {
-        authorizeRoles(['Secretary', 'Administrator']);
+        authorizeRoles(['Administrator', 'Secretary']);
         
         $member = $this->memberModel->find($id);
         if ($member && $member['photo_path'] && file_exists(BASE_PATH . '/public/' . $member['photo_path'])) {

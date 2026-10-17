@@ -11,7 +11,7 @@ require_once __DIR__ . '/../controllers/AttendanceController.php';
 require_once __DIR__ . '/../controllers/EventController.php';
 
 // Ensure user is authorized
-if (!isAdmin() && !isStaff()) {
+if (!canManage()) {
     header("Location: dashboard.php");
     exit;
 }

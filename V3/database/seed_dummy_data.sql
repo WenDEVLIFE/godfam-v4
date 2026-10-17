@@ -11,11 +11,8 @@ USE `churchgods`;
 -- --------------------------------------------------------
 INSERT IGNORE INTO `roles` (`role_id`, `role_name`, `role_slug`, `description`, `is_system`) VALUES
 (1, 'Administrator', 'administrator', 'System Administrator with full access', 1),
-(2, 'Pastor', 'pastor', 'Pastoral leadership', 1),
-(3, 'Staff', 'staff', 'Operational church staff', 1),
 (4, 'Member', 'member', 'Standard church member', 1),
 (5, 'Secretary', 'secretary', 'Administrative secretary', 1),
-(6, 'Committee Head', 'committee_head', 'Committee department leader', 1),
 (9, 'Treasurer', 'treasurer', 'Finance and collections controller', 1);
 
 -- --------------------------------------------------------
@@ -23,9 +20,9 @@ INSERT IGNORE INTO `roles` (`role_id`, `role_name`, `role_slug`, `description`, 
 -- --------------------------------------------------------
 INSERT IGNORE INTO `members` (`member_id`, `full_name`, `email`, `phone`, `contact_info`, `birthday`, `birthdate`, `gender`, `address`, `status`, `role_id`, `qr_token`) VALUES
 (1, 'Camille Jane Madrid', 'camillejanemadrid629@gmail.com', '+639171234567', '+639171234567', '1995-06-29', '1995-06-29', 'Female', '123 Main St, Cabanatuan City', 'active', 1, '4a8f9c1e2b3d4f5a6b7c8d9e0f1a2b3c'),
-(2, 'Rev. Benjamin Santos', 'pastor.benjamin@church.org', '+639182345678', '+639182345678', '1978-04-12', '1978-04-12', 'Male', '45 Church Compound, Gapan City', 'active', 2, 'b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8'),
+(2, 'Rev. Benjamin Santos', 'pastor.benjamin@church.org', '+639182345678', '+639182345678', '1978-04-12', '1978-04-12', 'Male', '45 Church Compound, Gapan City', 'active', 1, 'b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8'),
 (3, 'Maria Clara Dela Cruz', 'maria.delacruz@gmail.com', '+639193456789', '+639193456789', '1992-09-16', '1992-09-16', 'Female', '78 Rizal St, San Jose City', 'active', 5, 'c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9'),
-(4, 'Juan Dela Cruz', 'juan.delacruz@yahoo.com', '+639204567890', '+639204567890', '1988-11-20', '1988-11-20', 'Male', '12 Mabini Ave, Talavera', 'active', 3, 'd5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0'),
+(4, 'Juan Dela Cruz', 'juan.delacruz@yahoo.com', '+639204567890', '+639204567890', '1988-11-20', '1988-11-20', 'Male', '12 Mabini Ave, Talavera', 'active', 4, 'd5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0'),
 (5, 'Grace Gonzales', 'grace.gonzales@gmail.com', '+639215678901', '+639215678901', '2001-03-15', '2001-03-15', 'Female', '56 Luna St, Santa Rosa', 'active', 4, 'e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1'),
 (6, 'Joshua Ramos', 'joshua.ramos@outlook.com', '+639226789012', '+639226789012', '1999-08-04', '1999-08-04', 'Male', '89 Bonifacio St, Cabanatuan City', 'active', 4, 'f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2'),
 (7, 'Angelica Reyes', 'angelica.reyes@gmail.com', '+639237890123', '+639237890123', '1996-12-10', '1996-12-10', 'Female', '34 Quezon Blvd, Gapan City', 'active', 4, 'a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3'),
@@ -39,9 +36,9 @@ INSERT IGNORE INTO `members` (`member_id`, `full_name`, `email`, `phone`, `conta
 -- --------------------------------------------------------
 INSERT IGNORE INTO `users` (`user_id`, `role_id`, `member_id`, `name`, `email`, `password`, `status`) VALUES
 (1, 1, 1, 'Camille Jane Madrid', 'camillejanemadrid629@gmail.com', '$2y$10$ht3egELlhO4SI9M1o4jrIewEtNQDhR5O3RHg98gWJ4l/CCllg4XM6', 'active'),
-(2, 2, 2, 'Rev. Benjamin Santos', 'pastor.benjamin@church.org', '$2y$10$ht3egELlhO4SI9M1o4jrIewEtNQDhR5O3RHg98gWJ4l/CCllg4XM6', 'active'),
+(2, 1, 2, 'Rev. Benjamin Santos', 'pastor.benjamin@church.org', '$2y$10$ht3egELlhO4SI9M1o4jrIewEtNQDhR5O3RHg98gWJ4l/CCllg4XM6', 'active'),
 (3, 5, 3, 'Maria Clara Dela Cruz', 'maria.delacruz@gmail.com', '$2y$10$ht3egELlhO4SI9M1o4jrIewEtNQDhR5O3RHg98gWJ4l/CCllg4XM6', 'active'),
-(4, 3, 4, 'Juan Dela Cruz', 'juan.delacruz@yahoo.com', '$2y$10$ht3egELlhO4SI9M1o4jrIewEtNQDhR5O3RHg98gWJ4l/CCllg4XM6', 'active'),
+(4, 4, 4, 'Juan Dela Cruz', 'juan.delacruz@yahoo.com', '$2y$10$ht3egELlhO4SI9M1o4jrIewEtNQDhR5O3RHg98gWJ4l/CCllg4XM6', 'active'),
 (5, 4, 5, 'Grace Gonzales', 'grace.gonzales@gmail.com', '$2y$10$ht3egELlhO4SI9M1o4jrIewEtNQDhR5O3RHg98gWJ4l/CCllg4XM6', 'active');
 
 -- --------------------------------------------------------

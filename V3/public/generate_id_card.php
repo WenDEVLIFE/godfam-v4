@@ -30,7 +30,7 @@ $error       = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'regenerate_token') {
     if (!validateCsrfToken($_POST['csrf_token'] ?? '')) {
         $error = "CSRF Token Validation Failed.";
-    } else if (!isAdmin() && !isStaff()) {
+    } else if (!isStaff()) {
         $error = "Unauthorized to regenerate QR tokens.";
     } else {
         $newToken = $memberModel->regenerateToken($member_id);
@@ -60,7 +60,7 @@ if (!$member) {
 }
 
 // Authorization check: Admin/Staff can view any; Members can only view their own
-if (!isAdmin() && !isStaff() && (int)($_SESSION['member_id'] ?? 0) !== (int)$member_id) {
+if (!isStaff() && (int)($_SESSION['member_id'] ?? 0) !== (int)$member_id) {
     die("Unauthorized Access: You can only view your own Digital ID Card.");
 }
 
@@ -106,7 +106,7 @@ include __DIR__ . '/layout/sidebar.php';
             <button onclick="window.print()" class="btn btn-primary font-weight-600 no-print">
                 <i class='bx bx-printer'></i> Print ID Card
             </button>
-            <?php if (isAdmin() || isStaff()): ?>
+            <?php if (isStaff()): ?>
                 <form method="POST" style="margin:0;" onsubmit="return confirm('Are you sure you want to regenerate this QR token? The old QR code will become invalid.');">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                     <input type="hidden" name="action" value="regenerate_token">
@@ -115,7 +115,7 @@ include __DIR__ . '/layout/sidebar.php';
                     </button>
                 </form>
             <?php endif; ?>
-            <a href="<?php echo (isAdmin() || isStaff()) ? 'members.php' : 'dashboard.php'; ?>" class="btn btn-outline-primary font-weight-600 no-print">
+            <a href="<?php echo isStaff() ? 'members.php' : 'dashboard.php'; ?>" class="btn btn-outline-primary font-weight-600 no-print">
                 <i class='bx bx-left-arrow-alt'></i> Back
             </a>
         </div>

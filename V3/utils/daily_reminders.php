@@ -40,7 +40,7 @@ function processDailyReminders(PDO $pdo): array {
     $staffStmt = $pdo->query(
         "SELECT u.email, u.name FROM users u
          JOIN roles r ON u.role_id = r.role_id
-         WHERE r.role_name IN ('Administrator','Pastor','Staff','Secretary','Committee Head')
+         WHERE r.role_name IN ('Administrator','Secretary','Treasurer')
            AND u.email IS NOT NULL AND u.email != ''"
     );
     $staffList = $staffStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -70,13 +70,18 @@ function processDailyReminders(PDO $pdo): array {
             if (!empty($c['email'])) {
                 try {
                     $subject = "🎉 Happy Birthday from God's Family UMC, " . $c['full_name'] . "!";
-                    $htmlBody = generateCelebrantEmailHtml(
-                        "🎂 Happy Birthday!",
-                        "Dear " . htmlspecialchars($c['full_name']) . ",",
-                        "On behalf of God's Family United Methodist Church, we wish you a blessed and wonderful birthday! May God grant you abundant peace, happiness, and prosperity in the year ahead.",
-                        "\"The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you.\" &mdash; Numbers 6:24-25"
-                    );
-                    $res = $mailer->sendAnnouncement($subject, strip_tags($htmlBody), $c['email'], date('M d, Y'), "God's Family UMC");
+                    $message =
+                        "Dear " . htmlspecialchars($c['full_name']) . ",\n\n"
+                        . "Happy Birthday! 🎂🎉\n\n"
+                        . "God's Family United Methodist Church wishes you a wonderful and blessed birthday! May God continue to guide you, strengthen your faith, and fill your life with love, happiness, peace, and good health.\n\n"
+                        . "May this new year of your life bring you more blessings, meaningful opportunities, and beautiful moments with your family and loved ones.\n\n"
+                        . "Always remember that you are a valued member of our church family. May God's grace and love be with you today and always.\n\n"
+                        . "Once again, Happy Birthday! May the Lord bless you abundantly.\n\n"
+                        . "With prayers and blessings,\n"
+                        . "God's Family United Methodist Church\n"
+                        . "Peñaranda, Nueva Ecija\n"
+                        . "Camille Jane";
+                    $res = $mailer->sendAnnouncement($subject, $message, $c['email'], date('M d, Y'), "God's Family United Methodist Church");
                     if (!empty($res['success'])) {
                         $stats['emails_sent']++;
                     } else {
@@ -106,13 +111,14 @@ function processDailyReminders(PDO $pdo): array {
             if (!empty($c['email'])) {
                 try {
                     $subject = "💖 Happy Wedding Anniversary from God's Family UMC!";
-                    $htmlBody = generateCelebrantEmailHtml(
-                        "💍 Happy Wedding Anniversary!",
-                        "Dear " . htmlspecialchars($c['full_name']) . ",",
-                        "Congratulations on celebrating your wedding anniversary today! We thank God for your love and commitment to each other, and we pray for continuous blessings, joy, and grace upon your union.",
-                        "\"And over all these virtues put on love, which binds them all together in perfect unity.\" &mdash; Colossians 3:14"
-                    );
-                    $res = $mailer->sendAnnouncement($subject, strip_tags($htmlBody), $c['email'], date('M d, Y'), "God's Family UMC");
+                    $message =
+                        "Happy Wedding Anniversary, " . htmlspecialchars($c['full_name']) . "! ❤️\n\n"
+                        . "May God continue to bless your marriage with lasting love, joy, understanding, and faithfulness. May He strengthen your bond and guide you both as you continue your journey together.\n\n"
+                        . "May your love grow deeper and your home remain filled with peace and God's blessings.\n\n"
+                        . "Happy Anniversary, and God bless your marriage always!\n\n"
+                        . "With prayers and love,\n"
+                        . "God's Family United Methodist Church (GFUMC)";
+                    $res = $mailer->sendAnnouncement($subject, $message, $c['email'], date('M d, Y'), "God's Family United Methodist Church (GFUMC)");
                     if (!empty($res['success'])) {
                         $stats['emails_sent']++;
                     } else {
@@ -162,40 +168,6 @@ function processDailyReminders(PDO $pdo): array {
     }
 
     return $stats;
-}
-
-// Helper: Celebrant Direct Email HTML Template
-function generateCelebrantEmailHtml(string $headerTitle, string $greetingName, string $bodyText, string $verse): string {
-    $todayYear = date('Y');
-    return "<!DOCTYPE html>
-<html>
-<head><style>
-body { font-family: 'Segoe UI', Arial, sans-serif; color: #2d3748; background:#f7fafc; margin:0; padding:0; }
-.container { max-width:580px; margin:24px auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.06); border:1px solid #e2e8f0; }
-.header { background:linear-gradient(135deg, #2b6cb0 0%, #1a365d 100%); color:#ffffff; padding:36px 24px; text-align:center; }
-.header h1 { margin:0; font-size:24px; font-weight:700; letter-spacing:0.5px; }
-.content { padding:32px 28px; line-height:1.6; }
-.verse { background:#ebf8ff; border-left:4px solid #3182ce; padding:16px 20px; margin:24px 0; border-radius:0 8px 8px 0; font-style:italic; color:#2c5282; font-size:15px; }
-.footer { background:#f7fafc; color:#a0aec0; padding:20px; text-align:center; font-size:13px; border-top:1px solid #edf2f7; }
-</style></head>
-<body>
-<div class='container'>
-    <div class='header'>
-        <h1>{$headerTitle}</h1>
-        <p style='margin:8px 0 0; opacity:.9; font-size:14px;'>God's Family United Methodist Church</p>
-    </div>
-    <div class='content'>
-        <p style='font-size:16px; font-weight:600;'>{$greetingName}</p>
-        <p>{$bodyText}</p>
-        <div class='verse'>{$verse}</div>
-        <p>Warmest regards,<br><strong>God's Family UMC Pastoral Team & Board</strong></p>
-    </div>
-    <div class='footer'>
-        &copy; {$todayYear} God's Family United Methodist Church &bull; Automated Greetings
-    </div>
-</div>
-</body>
-</html>";
 }
 
 // Helper: Staff Digest HTML Template
@@ -248,7 +220,7 @@ ul { padding-left:20px; margin:10px 0; }
         <div class='section-title'>📅 Today's Church Events</div>
         <ul>{$eventItems}</ul>
 
-        <p style='margin-top:24px; font-size:13px; color:#718096;'>This notification is automatically generated for Church Pastors, Staff, and Leadership.</p>
+        <p style='margin-top:24px; font-size:13px; color:#718096;'>This notification is automatically generated for Church Leadership.</p>
     </div>
 </div>
 </body>

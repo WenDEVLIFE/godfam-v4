@@ -13,7 +13,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../models/Collection.php';
 
-if (!isAdmin() && !isStaff()) {
+if (!canManageFinance()) {
     die("Unauthorized access.");
 }
 
@@ -328,7 +328,7 @@ if ($format === 'pdf') {
                         Prepared by:
                         <div class="sig-line"></div>
                         <strong>' . $preparedByName . '</strong><br>
-                        <span style="font-size:9px;color:#666;">System Admin / Staff</span>
+                        <span style="font-size:9px;color:#666;">System Administrator</span>
                     </td>
                     <td>
                         Noted by:
@@ -447,7 +447,7 @@ if ($format === 'pdf') {
                     <p>Prepared by:</p>
                     <div class="sig-line"></div>
                     <p class="sig-name"><?php echo htmlspecialchars($_SESSION['name'] ?? 'System Admin'); ?></p>
-                    <p class="sig-title">System Admin / Staff</p>
+                    <p class="sig-title">System Administrator</p>
                 </div>
                 <div class="signature-box">
                     <p>Noted by:</p>

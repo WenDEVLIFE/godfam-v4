@@ -17,19 +17,19 @@ class AttendanceController {
 
     /**
      * View attendance for an event.
-     * Roles: Secretary, Committee Head, Staff
+     * Roles: Administrator, Secretary
      */
     public function viewAttendance($eventId) {
-        authorizeRoles(['Secretary', 'Committee Head', 'Staff', 'Administrator']);
+        authorizeRoles(['Administrator', 'Secretary']);
         return $this->attendanceModel->getByEvent($eventId);
     }
 
     /**
      * Record attendance.
-     * Roles: Secretary, Committee Head
+     * Roles: Administrator, Secretary
      */
     public function record($data) {
-        authorizeRoles(['Secretary', 'Committee Head', 'Administrator', 'Staff']);
+        authorizeRoles(['Administrator', 'Secretary']);
         
         if (empty($data['member_id']) || empty($data['event_id']) || empty($data['date'])) {
             return "Missing required fields.";
@@ -49,7 +49,7 @@ class AttendanceController {
      * Record time out for attendance manually.
      */
     public function recordTimeOutManual($attendanceId) {
-        authorizeRoles(['Secretary', 'Committee Head', 'Administrator', 'Staff']);
+        authorizeRoles(['Administrator', 'Secretary']);
         if ($this->attendanceModel->recordTimeOut($attendanceId)) {
             return true;
         }
@@ -58,10 +58,10 @@ class AttendanceController {
 
     /**
      * Record attendance via QR Token.
-     * Roles: Secretary, Committee Head
+     * Roles: Administrator, Secretary
      */
     public function recordByQr($data, $pdo) {
-        authorizeRoles(['Secretary', 'Committee Head', 'Administrator', 'Staff']);
+        authorizeRoles(['Administrator', 'Secretary']);
         
         $tokenInput = trim($data['qr_token'] ?? '');
         $memberIdInput = trim($data['member_id'] ?? '');

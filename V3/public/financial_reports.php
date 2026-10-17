@@ -12,7 +12,7 @@ require_once __DIR__ . '/../models/Collection.php';
 require_once __DIR__ . '/../models/Member.php';
 require_once __DIR__ . '/../models/AuditLog.php';
 
-if (!isAdmin() && !isStaff()) {
+if (!canManageFinance()) {
     header("Location: dashboard.php");
     exit;
 }

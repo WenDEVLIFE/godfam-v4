@@ -13,8 +13,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
 $csrf_token = generateCsrfToken();
 
 $is_admin = hasRole('Administrator');
-$is_staff = hasRole(['Staff', 'Pastor', 'Secretary', 'Committee Head']);
+$is_staff = hasRole(['Administrator', 'Secretary', 'Treasurer']);
 $is_member = hasRole('Member');
+$can_manage = canManage();
+$can_finance = canManageFinance();
 
 // Initial for user avatar
 $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
@@ -50,7 +52,7 @@ $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
             </a>
         <?php endif; ?>
 
-        <?php if ($is_admin || $is_staff): ?>
+        <?php if ($can_manage): ?>
             <div class="nav-section-title">Management</div>
             <a href="events.php" class="nav-link <?php echo $current_page === 'events.php' ? 'active' : ''; ?>">
                 <i class='bx bxs-calendar-event'></i>
@@ -76,20 +78,26 @@ $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
             <span>Announcements</span>
         </a>
 
-        <?php if ($is_admin || $is_staff): ?>
+        <?php if ($can_manage || $can_finance): ?>
             <div class="nav-section-title">Analytics & Reports</div>
+            <?php if ($can_manage): ?>
             <a href="reports.php" class="nav-link <?php echo $current_page === 'reports.php' ? 'active' : ''; ?>">
                 <i class='bx bxs-bar-chart-alt-2'></i>
                 <span>Attendance Reports</span>
             </a>
+            <?php endif; ?>
+            <?php if ($can_finance): ?>
             <a href="financial_reports.php" class="nav-link <?php echo $current_page === 'financial_reports.php' ? 'active' : ''; ?>">
                 <i class='bx bxs-bank'></i>
                 <span>Financial Reports</span>
             </a>
+            <?php endif; ?>
+            <?php if ($can_manage): ?>
             <a href="audit_logs.php" class="nav-link <?php echo $current_page === 'audit_logs.php' ? 'active' : ''; ?>">
                 <i class='bx bxs-shield'></i>
                 <span>Audit &amp; Login Logs</span>
             </a>
+            <?php endif; ?>
         <?php endif; ?>
 
         <a href="#" class="nav-link" id="logoutTrigger" onclick="openLogoutModal(event)" style="margin-top: auto;">

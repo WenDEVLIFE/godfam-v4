@@ -17,10 +17,10 @@ class EventController {
 
     /**
      * List all events.
-     * Roles: Secretary, Committee Head, Staff
+     * Roles: Administrator, Secretary, Treasurer, Member
      */
     public function index() {
-        authorizeRoles(['Secretary', 'Committee Head', 'Staff', 'Administrator', 'Member']);
+        authorizeRoles(['Administrator', 'Secretary', 'Treasurer', 'Member']);
         return $this->eventModel->all();
     }
 
@@ -28,7 +28,7 @@ class EventController {
      * Get past events for history view.
      */
     public function history($limit = 10) {
-        authorizeRoles(['Secretary', 'Committee Head', 'Staff', 'Administrator', 'Member']);
+        authorizeRoles(['Administrator', 'Secretary', 'Treasurer', 'Member']);
         return $this->eventModel->getPast($limit);
     }
 
@@ -36,16 +36,16 @@ class EventController {
      * Get upcoming events for dashboard/list widgets.
      */
     public function upcoming($limit = null) {
-        authorizeRoles(['Secretary', 'Committee Head', 'Staff', 'Administrator', 'Member']);
+        authorizeRoles(['Administrator', 'Secretary', 'Treasurer', 'Member']);
         return $this->eventModel->getUpcoming($limit);
     }
 
     /**
      * Create an event.
-     * Roles: Secretary, Committee Head, Administrator
+     * Roles: Administrator, Secretary
      */
     public function create($data) {
-        authorizeRoles(['Secretary', 'Committee Head', 'Administrator']);
+        authorizeRoles(['Administrator', 'Secretary']);
         
         $eventData = $this->normalizeEventData($data);
         if (is_string($eventData)) {

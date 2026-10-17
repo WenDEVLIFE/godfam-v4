@@ -70,17 +70,24 @@ function authorizeRoles($roles) {
 }
 
 /**
- * Helper for Admin role.
+ * Helper for Administrator role. Full system access.
  */
 function isAdmin() {
     return hasRole('Administrator');
 }
 
 /**
- * Helper for Staff roles (inclusive of Admin/Pastor/Secretary/Committee Head).
+ * Helper for Secretary role.
  */
-function isStaff() {
-    return hasRole(['Administrator', 'Staff', 'Pastor', 'Secretary', 'Committee Head']);
+function isSecretary() {
+    return hasRole('Secretary');
+}
+
+/**
+ * Helper for Treasurer role.
+ */
+function isTreasurer() {
+    return hasRole('Treasurer');
 }
 
 /**
@@ -88,4 +95,28 @@ function isStaff() {
  */
 function isMember() {
     return hasRole('Member');
+}
+
+/**
+ * Helper for staff-level roles (any privileged, non-member role).
+ * Administrator, Secretary, Treasurer.
+ */
+function isStaff() {
+    return hasRole(['Administrator', 'Secretary', 'Treasurer']);
+}
+
+/**
+ * Helper for management capabilities.
+ * Administrator, Secretary.
+ */
+function canManage() {
+    return hasRole(['Administrator', 'Secretary']);
+}
+
+/**
+ * Helper for finance capabilities.
+ * Administrator, Treasurer.
+ */
+function canManageFinance() {
+    return hasRole(['Administrator', 'Treasurer']);
 }

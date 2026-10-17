@@ -12,7 +12,7 @@ require_once __DIR__ . '/../controllers/MemberController.php';
 require_once __DIR__ . '/../controllers/EventController.php';
 
 // Ensure user is authorized
-if (!isAdmin() && !isStaff()) {
+if (!canManage()) {
     header("Location: dashboard.php");
     exit;
 }

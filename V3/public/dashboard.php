@@ -37,7 +37,7 @@ $upcoming_anniversaries = [];
 $today_collection       = 0;
 $month_collection       = 0;
 
-if (isAdmin() || isStaff()) {
+if (isStaff()) {
     $stmt = $pdo->query("SELECT COUNT(*) FROM members");
     $total_members = $stmt->fetchColumn();
 
@@ -154,7 +154,7 @@ include __DIR__ . '/layout/sidebar.php';
     </div>
 </div>
 
-<?php if (isAdmin() || isStaff()): ?>
+<?php if (isStaff()): ?>
 
 <!-- ===== REMINDERS & GREETINGS CENTER WIDGET ===== -->
 <div class="reminders-widget-card mb-4">
@@ -593,7 +593,7 @@ function switchGreetingsTab(tabName) {
     </div>
 </div>
 
-<?php if (isAdmin() || isStaff()): ?>
+<?php if (isStaff()): ?>
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>

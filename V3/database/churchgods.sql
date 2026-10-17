@@ -273,11 +273,8 @@ from ((`roles` `r` join `role_permissions` `rp` on(`rp`.`role_id` = `r`.`role_id
 -- --------------------------------------------------------
 INSERT IGNORE INTO `roles` (`role_id`, `role_name`, `role_slug`, `description`, `is_system`) VALUES
 (1, 'Administrator', 'administrator', 'System Administrator with full access', 1),
-(2, 'Pastor', 'pastor', 'Pastoral leadership', 1),
-(3, 'Staff', 'staff', 'Operational church staff', 1),
 (4, 'Member', 'member', 'Standard church member', 1),
 (5, 'Secretary', 'secretary', 'Administrative secretary', 1),
-(6, 'Committee Head', 'committee_head', 'Committee department leader', 1),
 (9, 'Treasurer', 'treasurer', 'Finance and collections controller', 1);
 
 -- --------------------------------------------------------
