@@ -434,18 +434,11 @@ include __DIR__ . '/layout/sidebar.php';
                             </button>
                         </div>
 
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-color: #cbd5e1; color: var(--muted-text); padding-left: 14px; padding-right: 10px;">
-                                <i class='bx bx-qr-scan' style="font-size: 1.25rem;"></i>
-                            </span>
-                            <input type="text" id="qr_token" name="qr_token" class="form-control border-start-0" autofocus placeholder="Scan QR pass / Gun scanner..." style="height: 46px; font-size: 0.95rem; border-color: #cbd5e1; box-shadow: none;">
-                            <button class="btn btn-primary px-3" type="submit" id="submitBtn" style="height: 46px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
-                                <i class='bx bx-send' style="font-size: 1.1rem;"></i>
-                            </button>
-                        </div>
+                        <!-- QR token is filled by the camera scanner (or manual search) and submitted automatically -->
+                        <input type="hidden" name="qr_token" id="qr_token" value="">
                     </form>
                     <p class="text-muted small mt-2 mb-0" style="font-size: 0.8rem;">
-                        <i class='bx bx-info-circle'></i> Camera &amp; physical scanners automatically submit when scanned.
+                        <i class='bx bx-info-circle'></i> The camera submits automatically when a QR code is scanned.
                     </p>
 
                     <!-- General Search Bar with Facebook-Style Auto-Suggest -->
@@ -486,7 +479,7 @@ include __DIR__ . '/layout/sidebar.php';
                             <i class='bx bx-mobile-alt text-info' style="font-size: 1.1rem;"></i> Maximize screen brightness on mobile QR passes.
                         </li>
                         <li class="d-flex align-items-center gap-2">
-                            <i class='bx bx-target-lock text-primary' style="font-size: 1.1rem;"></i> Keep the text box focused when using USB barcode guns.
+                            <i class='bx bx-edit text-primary' style="font-size: 1.1rem;"></i> If a QR won't scan, use the manual name search below.
                         </li>
                     </ul>
                 </div>
