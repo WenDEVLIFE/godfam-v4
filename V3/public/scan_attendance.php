@@ -177,6 +177,24 @@ include __DIR__ . '/layout/sidebar.php';
     display: none !important;
 }
 
+/* Scanner 2-Column Responsive Layout */
+.scanner-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: start;
+}
+@media (min-width: 992px) {
+    .scanner-grid {
+        grid-template-columns: 380px 1fr;
+    }
+}
+@media (min-width: 1280px) {
+    .scanner-grid {
+        grid-template-columns: 410px 1fr;
+    }
+}
+
 /* Facebook-Style Auto-Suggest Search Bar */
 .fb-suggest-dropdown {
     position: absolute;
@@ -184,19 +202,19 @@ include __DIR__ . '/layout/sidebar.php';
     left: 0;
     right: 0;
     background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    max-height: 280px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    max-height: 250px;
     overflow-y: auto;
     z-index: 1060;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
 }
 .fb-suggest-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 9px 14px;
+    gap: 10px;
+    padding: 8px 12px;
     cursor: pointer;
     border-bottom: 1px solid #f1f5f9;
     transition: background 0.15s ease;
@@ -209,14 +227,14 @@ include __DIR__ . '/layout/sidebar.php';
     background: #e7f0fd;
 }
 .fb-avatar {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #1e3a8a;
     background: #dbeafe;
     flex-shrink: 0;
@@ -230,20 +248,20 @@ include __DIR__ . '/layout/sidebar.php';
 .fb-suggest-name {
     font-weight: 700;
     color: #1e293b;
-    font-size: 0.88rem;
+    font-size: 0.84rem;
     line-height: 1.25;
 }
 .fb-suggest-sub {
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     color: #64748b;
     line-height: 1.25;
-    margin-top: 2px;
+    margin-top: 1px;
 }
 .fb-suggest-empty {
-    padding: 16px;
+    padding: 14px;
     text-align: center;
     color: #94a3b8;
-    font-size: 0.84rem;
+    font-size: 0.82rem;
 }
 .fb-highlight {
     background: #fef08a;
@@ -253,8 +271,8 @@ include __DIR__ . '/layout/sidebar.php';
 }
 .fb-member-type-pill {
     display: inline-block;
-    padding: 3px 10px;
-    font-size: 0.7rem;
+    padding: 2px 8px;
+    font-size: 0.68rem;
     font-weight: 700;
     line-height: 1.2;
     color: #334155;
@@ -278,12 +296,12 @@ include __DIR__ . '/layout/sidebar.php';
 }
 .fb-search-input {
     width: 100%;
-    height: 46px;
-    border-radius: 10px;
+    height: 42px;
+    border-radius: 8px;
     border: 1px solid #cbd5e1;
-    padding-left: 42px;
-    padding-right: 78px;
-    font-size: 0.9rem;
+    padding-left: 38px;
+    padding-right: 70px;
+    font-size: 0.88rem;
     box-shadow: none;
 }
 .fb-search-input:focus {
@@ -292,31 +310,31 @@ include __DIR__ . '/layout/sidebar.php';
 }
 .fb-search-icon {
     position: absolute;
-    left: 14px;
+    left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #94a3b8;
     pointer-events: none;
 }
 .fb-search-caret {
     position: absolute;
-    right: 14px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #94a3b8;
     pointer-events: none;
 }
 .fb-search-clear-btn {
     position: absolute;
-    right: 38px;
+    right: 32px;
     top: 50%;
     transform: translateY(-50%);
     border: none;
     background: transparent;
     color: #94a3b8;
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     line-height: 1;
     padding: 2px 4px;
     cursor: pointer;
@@ -326,8 +344,9 @@ include __DIR__ . '/layout/sidebar.php';
 }
 .fb-record-btn {
     width: 100%;
-    height: 46px;
-    border-radius: 10px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 0.88rem;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
@@ -383,9 +402,9 @@ include __DIR__ . '/layout/sidebar.php';
     <?php endif; ?>
 
     <!-- Main Scanner Layout Grid -->
-    <div class="row g-4">
+    <div class="scanner-grid mb-4">
         <!-- Left Column: Scanner Window & Controls -->
-        <div class="col-lg-5 col-xl-4">
+        <div class="scanner-left-pane">
             <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
                 <div class="card-header bg-transparent py-3 px-4 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
                     <h5 style="margin: 0; font-weight: 800; color: var(--dark-text); font-size: 1.05rem;">LIVE SCANNER</h5>
@@ -487,7 +506,7 @@ include __DIR__ . '/layout/sidebar.php';
         </div>
 
         <!-- Right Column: Live Recent Scans Feed -->
-        <div class="col-lg-7 col-xl-8">
+        <div class="scanner-right-pane">
             <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden; min-height: 520px;">
                 <div class="card-header bg-transparent py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
                     <h5 style="margin: 0; font-weight: 800; color: var(--dark-text); font-size: 1.05rem;">LIVE RECENT SCANS</h5>
