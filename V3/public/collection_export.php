@@ -66,9 +66,9 @@ if ($format === 'csv') {
         fputcsv($output, [
             $log['collection_date'],
             $memberName,
-            ucfirst($log['type']),
+            ucfirst($log['category'] ?? ''),
             $log['amount'],
-            $log['notes'],
+            $log['remarks'] ?? '',
             $log['recorded_by_name']
         ]);
     }
@@ -88,7 +88,11 @@ if ($format === 'excel') {
         require_once __DIR__ . '/../vendor/autoload.php';
     }
 
-    if (!class_exists(Spreadsheet::class)) {
+    // NOTE: PhpSpreadsheet's ZIP dependency (maennchen/zipstream-php v3.x)
+    // requires PHP 8.1+ (readonly properties / enums). On older runtimes this
+    // triggers a fatal parse error while writing the .xlsx, so fall back to the
+    // lightweight HTML/.xls export instead.
+    if (!class_exists(Spreadsheet::class) || PHP_VERSION_ID < 80100) {
         header('Content-Type: application/vnd.ms-excel; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '.xls"');
         header('Cache-Control: max-age=0');
@@ -128,9 +132,9 @@ if ($format === 'excel') {
             echo '<tr' . $cls . '>';
             echo '<td class="text-center">' . date('M d, Y', strtotime($log['collection_date'])) . '</td>';
             echo '<td>' . $memberName . '</td>';
-            echo '<td>' . ucfirst(htmlspecialchars($log['type'])) . '</td>';
+            echo '<td>' . ucfirst(htmlspecialchars($log['category'] ?? '')) . '</td>';
             echo '<td class="num">' . number_format($log['amount'], 2) . '</td>';
-            echo '<td>' . htmlspecialchars($log['notes'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($log['remarks'] ?? '') . '</td>';
             echo '<td>' . htmlspecialchars($log['recorded_by_name'] ?? '') . '</td>';
             echo '</tr>';
         }
@@ -185,9 +189,9 @@ if ($format === 'excel') {
         
         $sheet->setCellValue('A' . $row, date('M d, Y', strtotime($log['collection_date'])));
         $sheet->setCellValue('B' . $row, $memberName);
-        $sheet->setCellValue('C' . $row, ucfirst($log['type']));
+        $sheet->setCellValue('C' . $row, ucfirst($log['category'] ?? ''));
         $sheet->setCellValue('D' . $row, $log['amount']);
-        $sheet->setCellValue('E' . $row, $log['notes']);
+        $sheet->setCellValue('E' . $row, $log['remarks'] ?? '');
         $sheet->setCellValue('F' . $row, $log['recorded_by_name']);
         
         // Format amount column
