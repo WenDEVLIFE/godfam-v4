@@ -6,6 +6,7 @@
 require_once BASE_PATH . '/config/database.php';
 require_once BASE_PATH . '/models/Announcement.php';
 require_once BASE_PATH . '/models/User.php';
+require_once BASE_PATH . '/models/Member.php';
 require_once BASE_PATH . '/middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/middleware/CSRF.php';
 require_once BASE_PATH . '/utils/MailService.php';
@@ -13,6 +14,7 @@ require_once BASE_PATH . '/utils/MailService.php';
 class AnnouncementController {
     private $announcementModel;
     private $userModel;
+    private $memberModel;
     private $mailService;
     private $pdo;
 
@@ -20,6 +22,7 @@ class AnnouncementController {
         $this->pdo = $pdo;
         $this->announcementModel = new Announcement($pdo);
         $this->userModel = new User($pdo);
+        $this->memberModel = new Member($pdo);
         $this->mailService = new MailService();
     }
 
@@ -191,9 +194,11 @@ class AnnouncementController {
 
     private function collectRecipientEmails() {
         $userEmails = $this->userModel->getEmails();
+        $memberEmails = $this->memberModel->getEmails();
+        $allEmails = array_merge($userEmails, $memberEmails);
 
         $normalized = [];
-        foreach ($userEmails as $email) {
+        foreach ($allEmails as $email) {
             $clean = strtolower(trim((string)$email));
             if ($clean === '') {
                 continue;
