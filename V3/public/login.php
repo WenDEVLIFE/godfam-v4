@@ -124,7 +124,7 @@ $captcha_phrase = CaptchaService::generateLocalCaptcha();
 
                 <div class="form-group" style="margin-top: 15px;">
                     <div class="d-flex align-items-start gap-2">
-                        <input type="checkbox" id="agree_terms" name="agree_terms" required style="margin-top: 4px;">
+                        <input type="checkbox" id="agree_terms" name="agree_terms" style="margin-top: 4px;">
                         <label for="agree_terms" class="small text-muted" style="cursor: pointer;">
                             I understand and agree to the <a href="javascript:void(0)" onclick="openPrivacyModal('agree_terms')">Church Privacy Policy &amp; Data Protection Consent</a>.
                         </label>
