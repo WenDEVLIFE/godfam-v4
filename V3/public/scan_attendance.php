@@ -204,7 +204,7 @@ include __DIR__ . '/layout/sidebar.php';
     background: #ffffff;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
-    max-height: 250px;
+    max-height: 340px;
     overflow-y: auto;
     z-index: 1060;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
@@ -405,7 +405,7 @@ include __DIR__ . '/layout/sidebar.php';
     <div class="scanner-grid mb-4">
         <!-- Left Column: Scanner Window & Controls -->
         <div class="scanner-left-pane">
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; overflow: visible; position: relative; z-index: 10;">
                 <div class="card-header bg-transparent py-3 px-4 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
                     <h5 style="margin: 0; font-weight: 800; color: var(--dark-text); font-size: 1.05rem;">LIVE SCANNER</h5>
                     <span class="scanner-status-badge">
