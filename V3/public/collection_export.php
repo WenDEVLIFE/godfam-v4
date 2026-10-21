@@ -88,11 +88,13 @@ if ($format === 'excel') {
         require_once __DIR__ . '/../vendor/autoload.php';
     }
 
-    // NOTE: PhpSpreadsheet's ZIP dependency (maennchen/zipstream-php v3.x)
-    // requires PHP 8.1+ (readonly properties / enums). On older runtimes this
-    // triggers a fatal parse error while writing the .xlsx, so fall back to the
-    // lightweight HTML/.xls export instead.
-    if (!class_exists(Spreadsheet::class) || PHP_VERSION_ID < 80100) {
+    // NOTE: zipstream-php v3.x requires PHP 8.1+ (readonly properties / enums)
+    // and crashes with a parse error on older runtimes. The vendor pins
+    // zipstream-php 2.x (PHP 8.0 compatible, marked by ZipStream\Option\Archive),
+    // so the native .xlsx writer works on PHP 8.0 too; keep the lightweight
+    // HTML/.xls fallback whenever that is not the case.
+    $zipStreamOk = PHP_VERSION_ID >= 80100 || class_exists(\ZipStream\Option\Archive::class);
+    if (!class_exists(Spreadsheet::class) || !$zipStreamOk) {
         header('Content-Type: application/vnd.ms-excel; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '.xls"');
         header('Cache-Control: max-age=0');

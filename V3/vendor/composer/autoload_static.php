@@ -123,6 +123,7 @@ class ComposerStaticInit5726834464b54df5c26cde494ec31af2
         ),
         'P' =>
         array (
+            'Psr\\Http\\Message\\' => 18,
             'Psr\\SimpleCache\\' => 16,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
         ),
@@ -212,6 +213,10 @@ class ComposerStaticInit5726834464b54df5c26cde494ec31af2
         'Sabberworm\\CSS\\' =>
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
+        ),
+        'Psr\\Http\\Message\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\SimpleCache\\' =>
         array (
