@@ -72,7 +72,13 @@ include __DIR__ . '/layout/sidebar.php';
 
 
 <div class="card">
-    <div class="card-header">ACTIVE MEMBERS</div>
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span>ACTIVE MEMBERS</span>
+        <div class="position-relative" style="min-width: 260px;">
+            <input type="text" id="memberSearchInput" class="form-control form-control-sm" placeholder="Search name, ID, email, category..." autocomplete="off" style="padding-left: 32px; border-radius: 6px;">
+            <i class='bx bx-search' style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 15px; color: #94a3b8;"></i>
+        </div>
+    </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table mb-0">
@@ -547,6 +553,23 @@ document.querySelectorAll('.delete-member-btn').forEach(btn => {
         document.getElementById('deleteMemberModal').classList.add('active');
     });
 });
+
+// Instant member search filter (client-side, no reload)
+(function() {
+    const input = document.getElementById('memberSearchInput');
+    if (!input) return;
+    input.addEventListener('input', function() {
+        const term = this.value.trim().toLowerCase();
+        const rows = document.querySelectorAll('.card tbody tr');
+        rows.forEach(row => {
+            if (row.querySelector('td[colspan]')) return; // skip "No members found" row
+            const id = row.querySelector('td:nth-child(1)');
+            if (!id) return;
+            const text = row.textContent.toLowerCase();
+            row.style.display = (!term || text.includes(term)) ? '' : 'none';
+        });
+    });
+})();
 
 </script>
 
