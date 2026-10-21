@@ -81,7 +81,7 @@ function processDailyReminders(PDO $pdo): array {
                         . "God's Family United Methodist Church\n"
                         . "Peñaranda, Nueva Ecija\n"
                         . "Camille Jane";
-                    $res = $mailer->sendAnnouncement($subject, $message, $c['email'], date('M d, Y'), "God's Family United Methodist Church");
+                    $res = $mailer->sendGreeting($subject, $message, $c['email'], "God's Family United Methodist Church");
                     if (!empty($res['success'])) {
                         $stats['emails_sent']++;
                     } else {
@@ -118,7 +118,7 @@ function processDailyReminders(PDO $pdo): array {
                         . "Happy Anniversary, and God bless your marriage always!\n\n"
                         . "With prayers and love,\n"
                         . "God's Family United Methodist Church (GFUMC)";
-                    $res = $mailer->sendAnnouncement($subject, $message, $c['email'], date('M d, Y'), "God's Family United Methodist Church (GFUMC)");
+                    $res = $mailer->sendGreeting($subject, $message, $c['email'], "God's Family United Methodist Church (GFUMC)");
                     if (!empty($res['success'])) {
                         $stats['emails_sent']++;
                     } else {
@@ -154,7 +154,7 @@ function processDailyReminders(PDO $pdo): array {
 
         foreach ($staffList as $staff) {
             try {
-                $res = $mailer->sendAnnouncement($digestSubject, strip_tags($digestHtml), $staff['email'], date('M d, Y'), "Church Reminder System");
+                $res = $mailer->sendGreeting($digestSubject, strip_tags($digestHtml), $staff['email'], "Church Reminder System");
                 if (!empty($res['success'])) {
                     $stats['emails_sent']++;
                 } else {
@@ -168,6 +168,32 @@ function processDailyReminders(PDO $pdo): array {
     }
 
     return $stats;
+}
+
+// Helper: run reminders at most once per calendar day.
+// Used by the dashboard so greetings go out automatically on first staff
+// dashboard visit of the day, without needing a cron job.
+function runDailyRemindersOncePerDay(PDO $pdo, bool $force = false): ?array {
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS reminder_runs (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            run_date DATE NOT NULL UNIQUE,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        $stmt = $pdo->prepare("INSERT IGNORE INTO reminder_runs (run_date) VALUES (?)");
+        $stmt->execute([date('Y-m-d')]);
+        $alreadyRan = ($stmt->rowCount() === 0);
+
+        if ($alreadyRan && !$force) {
+            return null;
+        }
+
+        return processDailyReminders($pdo);
+    } catch (\Throwable $e) {
+        error_log('Daily reminders auto-run failed: ' . $e->getMessage());
+        return null;
+    }
 }
 
 // Helper: Staff Digest HTML Template

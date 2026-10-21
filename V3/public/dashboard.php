@@ -18,6 +18,15 @@ require_once __DIR__ . '/../models/Collection.php';
 // Ensure user is logged in
 requireLogin();
 
+// Automatic daily greetings (birthday, wedding anniversary, staff digest).
+// Runs at most once per calendar day; the manual "Trigger Reminders" button
+// still works and always forces a run.
+if (isStaff()) {
+    define('ALLOW_WEB_TRIGGER', true);
+    require_once __DIR__ . '/../utils/daily_reminders.php';
+    runDailyRemindersOncePerDay($pdo);
+}
+
 $csrf_token = generateCsrfToken();
 
 $memberModel     = new Member($pdo);

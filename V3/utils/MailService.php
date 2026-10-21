@@ -96,6 +96,52 @@ class MailService {
     }
 
     /**
+     * Send a personal greeting (birthday, anniversary, digest).
+     * Unlike sendAnnouncement(), the subject is used as-is (no
+     * "Church Announcement:" prefix) and the body is a warm message.
+     */
+    public function sendGreeting($subject, $message, $recipient, $senderLabel = null) {
+        if (!filter_var((string)$recipient, FILTER_VALIDATE_EMAIL)) {
+            return [
+                'success' => false,
+                'error' => 'Invalid recipient email address.'
+            ];
+        }
+
+        $safeSenderLabel = $senderLabel ?: ($this->config['from_name'] ?? "God's Family United Methodist Church");
+        $body = "
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; color: #333; margin: 0; padding: 0; background-color: #f4f7f6; }
+                .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+                .header { background-color: #1a202c; color: #ffffff; padding: 40px 20px; text-align: center; }
+                .header h1 { margin: 0; font-size: 22px; font-weight: 400; letter-spacing: 1px; }
+                .content { padding: 36px 30px; font-size: 16px; color: #4a5568; }
+                .footer { background-color: #f8f9fa; color: #7f8c8d; padding: 20px; text-align: center; font-size: 12px; border-top: 1px solid #eee; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>" . htmlspecialchars($subject) . "</h1>
+                </div>
+                <div class='content'>
+                    " . nl2br(htmlspecialchars($message)) . "
+                    <p style='margin-top:24px; font-size:13px; color:#718096;'>" . htmlspecialchars($safeSenderLabel) . "</p>
+                </div>
+                <div class='footer'>
+                    &copy; " . date('Y') . " God's Family United Methodist Church. All rights reserved.
+                </div>
+            </div>
+        </body>
+        </html>";
+
+        return $this->sendEmail($recipient, $subject, $body);
+    }
+
+    /**
      * Send OTP Verification Email
      */
     public function sendOTPMail($email, $otp) {
