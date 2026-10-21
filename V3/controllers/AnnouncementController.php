@@ -253,19 +253,14 @@ class AnnouncementController {
             ];
         }
 
-        if ($successCount > 0 && $failedCount > 0) {
-            return [
-                'announcement_saved' => true,
-                'notification_status' => 'partial_failed',
-                'message' => "Announcement published. Email sent to {$successCount} recipient(s), {$failedCount} failed."
-            ];
-        }
-
+        // Email delivery issues are logged internally (notification_attempts +
+        // error_log) but never surfaced to the user: the announcement itself
+        // was published successfully.
         if ($failedCount > 0) {
             return [
                 'announcement_saved' => true,
-                'notification_status' => 'failed',
-                'message' => "Announcement published successfully, but email notifications could not be delivered."
+                'notification_status' => ($successCount > 0 ? 'partial_failed' : 'failed'),
+                'message' => "Announcement published successfully."
             ];
         }
 
