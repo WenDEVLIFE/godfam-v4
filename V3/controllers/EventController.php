@@ -80,9 +80,22 @@ class EventController {
         }
 
         if ($this->eventModel->update($id, $eventData)) {
+            // Automatic attendance finalization: when an event is marked
+            // 'complete', auto-mark absences and recalculate member
+            // active/inactive statuses (3 consecutive absences rule).
+            $message = 'Event updated successfully.';
+            if (($eventData['status'] ?? '') === 'complete') {
+                require_once BASE_PATH . '/models/Attendance.php';
+                $attendanceModel = new Attendance($this->eventModel->getPDO());
+                $absencesMarked = $attendanceModel->markAbsencesForEvent($id);
+                if ($absencesMarked > 0) {
+                    $message .= ' ' . $absencesMarked . ' member(s) automatically marked absent and member statuses were recalculated.';
+                }
+            }
+
             return [
                 'event_saved' => true,
-                'message' => 'Event updated successfully.',
+                'message' => $message,
             ];
         }
 

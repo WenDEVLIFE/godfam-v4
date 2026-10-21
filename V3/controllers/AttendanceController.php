@@ -46,6 +46,16 @@ class AttendanceController {
     }
 
     /**
+     * Auto-mark absences for an event and recalculate member statuses.
+     * Used by the manual "Sync Absences" button on the attendance page.
+     * Roles: Administrator, Secretary
+     */
+    public function markAbsences($eventId) {
+        authorizeRoles(['Administrator', 'Secretary']);
+        return $this->attendanceModel->markAbsencesForEvent($eventId);
+    }
+
+    /**
      * Record time out for attendance manually.
      */
     public function recordTimeOutManual($attendanceId) {

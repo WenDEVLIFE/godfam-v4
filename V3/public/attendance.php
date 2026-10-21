@@ -75,6 +75,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $controller->recordTimeOutManual($_POST['attendance_id']);
         if ($result === true) $success = "Time Out recorded successfully.";
         else $error = $result;
+    } elseif ($action === 'mark_absences') {
+        $marked = $controller->markAbsences($eventId);
+        if ($marked !== false && $marked !== null) {
+            $success = "Sync complete: " . (int)$marked . " member(s) marked absent. Member statuses (active/inactive) recalculated automatically.";
+        } else {
+            $error = "Failed to sync absences for this event.";
+        }
     }
 }
 
@@ -135,6 +142,13 @@ include __DIR__ . '/layout/sidebar.php';
             <p class="text-muted mb-0"><i class='bx bx-calendar'></i> <?php echo date('F d, Y', strtotime($event_data['date'])); ?> | Attendance Tracking</p>
         </div>
         <div class="header-actions d-flex gap-2">
+            <form method="POST" action="" onsubmit="return confirm('Auto-mark absences? Everyone without a Present record for this event will be marked Absent, and member active/inactive statuses will be recalculated.');" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                <input type="hidden" name="action" value="mark_absences">
+                <button type="submit" class="btn btn-outline-warning" title="Auto-mark absent for members with no record, then recalculate statuses">
+                    <i class='bx bx-user-x'></i> Sync Absences
+                </button>
+            </form>
             <div class="dropdown" style="position:relative;">
                 <button type="button" class="btn btn-outline-secondary" onclick="toggleExportMenu()">
                     <i class='bx bx-export'></i> Export Log

@@ -52,6 +52,47 @@ class Attendance {
     }
 
     /**
+     * Auto-mark 'Absent' for every member (except visiting) who has no
+     * attendance record for this event, then recalculate each member's
+     * active/inactive status. Idempotent: members already recorded
+     * (Present) are skipped.
+     */
+    public function markAbsencesForEvent($eventId) {
+        $eventId = (int)$eventId;
+        if ($eventId <= 0) return 0;
+
+        $stmt = $this->pdo->prepare("SELECT date FROM events WHERE event_id = ?");
+        $stmt->execute([$eventId]);
+        $eventDate = $stmt->fetchColumn();
+        if (!$eventDate) return 0;
+
+        $insert = $this->pdo->prepare("
+            INSERT INTO attendance (member_id, event_id, date, status)
+            SELECT m.member_id, ?, ?, 'Absent'
+            FROM members m
+            WHERE m.status != 'visiting'
+              AND NOT EXISTS (
+                  SELECT 1 FROM attendance a
+                  WHERE a.member_id = m.member_id
+                    AND a.event_id = ?
+                    AND a.date = ?
+              )
+        ");
+        $insert->execute([$eventId, $eventDate, $eventId, $eventDate]);
+        $marked = $insert->rowCount();
+
+        // Recalculate status for everyone involved in this event
+        $stmt = $this->pdo->prepare("SELECT DISTINCT member_id FROM attendance WHERE event_id = ?");
+        $stmt->execute([$eventId]);
+        $memberIds = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        foreach ($memberIds as $memberId) {
+            $this->autoRecalculateMemberStatus((int)$memberId);
+        }
+
+        return (int)$marked;
+    }
+
+    /**
      * Auto-trigger member status recalculation after attendance recording.
      */
     public function autoRecalculateMemberStatus($memberId) {

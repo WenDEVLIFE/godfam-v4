@@ -83,8 +83,8 @@ class Member {
 
     /**
      * Automatically update member status based on attendance record.
-     * Rule: If 3 or more consecutive 'Absent' entries exist (or 3+ total recorded absences), mark as inactive.
-     * If member attends service ('Present'), restore to 'active'.
+     * Rule: If 3 or more consecutive 'Absent' entries exist, mark as inactive.
+     * If member attends an event ('Present'), restore to 'active'.
      * Only auto-updates if not currently 'visiting'.
      */
     public function recalculateStatus($id) {
@@ -110,12 +110,8 @@ class Member {
             }
         }
 
-        // Total distinct absent count
-        $stmtCount = $this->pdo->prepare("SELECT COUNT(DISTINCT event_id) FROM attendance WHERE member_id = ? AND status = 'Absent'");
-        $stmtCount->execute([$id]);
-        $totalAbsences = (int)$stmtCount->fetchColumn();
-
-        $newStatus = ($consecutiveAbsences >= 3 || $totalAbsences >= 3) ? 'inactive' : 'active';
+        // Strictly consecutive: 3 absences in a row -> inactive
+        $newStatus = $consecutiveAbsences >= 3 ? 'inactive' : 'active';
         
         if ($member['status'] !== $newStatus) {
             $stmtUpdate = $this->pdo->prepare("UPDATE members SET status = ? WHERE member_id = ?");
