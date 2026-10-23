@@ -19,6 +19,7 @@ require_once BASE_PATH . '/models/Member.php';
 require_once BASE_PATH . '/models/Event.php';
 require_once BASE_PATH . '/models/Notification.php';
 require_once BASE_PATH . '/utils/MailService.php';
+require_once BASE_PATH . '/utils/Greetings.php';
 
 function processDailyReminders(PDO $pdo): array {
     $memberModel = new Member($pdo);
@@ -69,19 +70,8 @@ function processDailyReminders(PDO $pdo): array {
         foreach ($bdayToday as $c) {
             if (!empty($c['email'])) {
                 try {
-                    $subject = "🎉 Happy Birthday from God's Family UMC, " . $c['full_name'] . "!";
-                    $message =
-                        "Dear " . htmlspecialchars($c['full_name']) . ",\n\n"
-                        . "Happy Birthday! 🎂🎉\n\n"
-                        . "God's Family United Methodist Church wishes you a wonderful and blessed birthday! May God continue to guide you, strengthen your faith, and fill your life with love, happiness, peace, and good health.\n\n"
-                        . "May this new year of your life bring you more blessings, meaningful opportunities, and beautiful moments with your family and loved ones.\n\n"
-                        . "Always remember that you are a valued member of our church family. May God's grace and love be with you today and always.\n\n"
-                        . "Once again, Happy Birthday! May the Lord bless you abundantly.\n\n"
-                        . "With prayers and blessings,\n"
-                        . "God's Family United Methodist Church\n"
-                        . "Peñaranda, Nueva Ecija\n"
-                        . "Camille Jane";
-                    $res = $mailer->sendGreeting($subject, $message, $c['email'], "God's Family United Methodist Church");
+                    $greeting = buildBirthdayGreeting($c);
+                    $res = $mailer->sendGreeting($greeting['subject'], $greeting['message'], $c['email'], "God's Family United Methodist Church");
                     if (!empty($res['success'])) {
                         $stats['emails_sent']++;
                     } else {
@@ -110,15 +100,8 @@ function processDailyReminders(PDO $pdo): array {
         foreach ($annivToday as $c) {
             if (!empty($c['email'])) {
                 try {
-                    $subject = "💖 Happy Wedding Anniversary from God's Family UMC!";
-                    $message =
-                        "Happy Wedding Anniversary, " . htmlspecialchars($c['full_name']) . "! ❤️\n\n"
-                        . "May God continue to bless your marriage with lasting love, joy, understanding, and faithfulness. May He strengthen your bond and guide you both as you continue your journey together.\n\n"
-                        . "May your love grow deeper and your home remain filled with peace and God's blessings.\n\n"
-                        . "Happy Anniversary, and God bless your marriage always!\n\n"
-                        . "With prayers and love,\n"
-                        . "God's Family United Methodist Church (GFUMC)";
-                    $res = $mailer->sendGreeting($subject, $message, $c['email'], "God's Family United Methodist Church (GFUMC)");
+                    $greeting = buildAnniversaryGreeting($c);
+                    $res = $mailer->sendGreeting($greeting['subject'], $greeting['message'], $c['email'], "God's Family United Methodist Church (GFUMC)");
                     if (!empty($res['success'])) {
                         $stats['emails_sent']++;
                     } else {

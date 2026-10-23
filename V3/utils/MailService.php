@@ -45,8 +45,11 @@ class MailService {
 
     /**
      * Send a formal announcement email.
+     *
+     * When an image is supplied it is embedded inline (cid:announcementImage)
+     * and attached as a downloadable file.
      */
-    public function sendAnnouncement($title, $content, $recipient, $publishedAt = null, $senderLabel = null) {
+    public function sendAnnouncement($title, $content, $recipient, $publishedAt = null, $senderLabel = null, $imagePath = null) {
         if (!filter_var((string)$recipient, FILTER_VALIDATE_EMAIL)) {
             return [
                 'success' => false,
@@ -57,6 +60,28 @@ class MailService {
         $subject = 'Church Announcement: ' . $title;
         $safePublishedAt = $publishedAt ?: date('M d, Y h:i A');
         $safeSenderLabel = $senderLabel ?: ($this->config['from_name'] ?? "God's Family United Methodist Church");
+
+        $resolvedImage = $this->resolveImagePath($imagePath);
+        $imageBlock = '';
+        $options = [];
+        if ($resolvedImage !== null) {
+            $imageBlock = "
+                    <div style='text-align:center; margin:24px 0;'>
+                        <img src=\"cid:announcementImage\" alt=\"Announcement photo\" style=\"max-width:100%; height:auto; border-radius:6px;\">
+                    </div>";
+            $extension = strtolower((string)pathinfo($resolvedImage, PATHINFO_EXTENSION));
+            $slug = strtolower(trim((string)preg_replace('/[^A-Za-z0-9]+/', '-', (string)$title), '-'));
+            if (strlen($slug) > 40) {
+                $slug = trim(substr($slug, 0, 40), '-');
+            }
+            if ($slug === '') {
+                $slug = 'photo';
+            }
+            $attachmentName = 'announcement-' . $slug . ($extension !== '' ? '.' . $extension : '');
+            $options['embedded'] = ['announcementImage' => $resolvedImage];
+            $options['attachments'] = [['path' => $resolvedImage, 'name' => $attachmentName]];
+        }
+
         $body = "
         <!DOCTYPE html>
         <html>
@@ -78,7 +103,7 @@ class MailService {
                     <h1>God's Family United Methodist Church</h1>
                 </div>
                 <div class='content'>
-                    <h2>" . htmlspecialchars($title) . "</h2>
+                    <h2>" . htmlspecialchars($title) . "</h2>" . $imageBlock . "
                     <div class='announcement-text'>" . nl2br(htmlspecialchars($content)) . "</div>
                     <p style='margin-top:20px; color:#718096; font-size:13px;'>
                         Published: " . htmlspecialchars($safePublishedAt) . "<br>
@@ -92,7 +117,33 @@ class MailService {
         </body>
         </html>";
 
-        return $this->sendEmail($recipient, $subject, $body);
+        return $this->sendEmail($recipient, $subject, $body, $options);
+    }
+
+    /**
+     * Resolve an announcement image path. Relative paths are resolved
+     * against the public directory. Returns null when the file is unusable.
+     */
+    private function resolveImagePath($imagePath) {
+        if ($imagePath === null) {
+            return null;
+        }
+
+        $path = trim((string)$imagePath);
+        if ($path === '') {
+            return null;
+        }
+
+        $isAbsolute = (bool)preg_match('#^([A-Za-z]:)?[\\\\/]#', $path);
+        if (!$isAbsolute) {
+            $path = BASE_PATH . '/public/' . ltrim($path, '/');
+        }
+
+        if (!is_file($path) || !is_readable($path)) {
+            return null;
+        }
+
+        return $path;
     }
 
     /**
@@ -193,7 +244,7 @@ class MailService {
     /**
      * Core Email Sending Logic (SMTP)
      */
-    private function sendEmail($to, $subject, $body) {
+    private function sendEmail($to, $subject, $body, array $options = []) {
         if (!$this->isAvailable()) {
             $err = 'PHPMailer library is not available. Please run `composer install` to install dependencies.';
             error_log("MailService Error: {$err}");
@@ -235,6 +286,28 @@ class MailService {
             $mail->CharSet = 'UTF-8';
             $mail->Subject = $subject;
             $mail->Body    = $body;
+
+            if (!empty($options['embedded']) && is_array($options['embedded'])) {
+                foreach ($options['embedded'] as $cid => $path) {
+                    if (is_file($path) && is_readable($path)) {
+                        $mail->addEmbeddedImage($path, (string)$cid, basename($path));
+                    }
+                }
+            }
+
+            if (!empty($options['attachments']) && is_array($options['attachments'])) {
+                foreach ($options['attachments'] as $attachment) {
+                    if (!is_array($attachment) || empty($attachment['path'])) {
+                        continue;
+                    }
+                    $path = $attachment['path'];
+                    if (!is_file($path) || !is_readable($path)) {
+                        continue;
+                    }
+                    $name = !empty($attachment['name']) ? (string)$attachment['name'] : basename($path);
+                    $mail->addAttachment($path, $name);
+                }
+            }
 
             $mail->send();
             return [

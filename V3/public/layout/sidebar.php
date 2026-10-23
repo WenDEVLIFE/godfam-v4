@@ -50,6 +50,10 @@ $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
                 <i class='bx bxs-shield-quarter'></i>
                 <span>System Roles</span>
             </a>
+            <a href="test_notifications.php" class="nav-link <?php echo $current_page === 'test_notifications.php' ? 'active' : ''; ?>">
+                <i class='bx bx-paper-plane'></i>
+                <span>Test Notifications</span>
+            </a>
         <?php endif; ?>
 
         <?php if ($can_manage): ?>

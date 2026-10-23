@@ -86,6 +86,7 @@ class AnnouncementController {
             }
         }
         $data['image_path'] = $image_path;
+        $imageAbsolutePath = $image_path ? BASE_PATH . '/public/' . $image_path : null;
 
         $announcementId = $this->announcementModel->create($data);
         if ($announcementId !== false) {
@@ -105,7 +106,7 @@ class AnnouncementController {
                     'message' => 'Announcement published successfully. No valid recipient emails were found.'
                 ];
             } else {
-                return $this->sendAnnouncementNotifications($announcementId, $data, $recipients);
+                return $this->sendAnnouncementNotifications($announcementId, $data, $recipients, $imageAbsolutePath);
             }
         }
         return "Failed to create announcement.";
@@ -212,7 +213,7 @@ class AnnouncementController {
         return array_keys($normalized);
     }
 
-    private function sendAnnouncementNotifications($announcementId, $data, $recipients) {
+    private function sendAnnouncementNotifications($announcementId, $data, $recipients, $imageAbsolutePath = null) {
         $successCount = 0;
         $failedCount = 0;
         $skippedCount = 0;
@@ -231,7 +232,8 @@ class AnnouncementController {
                 $data['content'],
                 $recipientEmail,
                 $publishedAt,
-                $publisherRole
+                $publisherRole,
+                $imageAbsolutePath
             );
 
             if (!empty($result['success'])) {

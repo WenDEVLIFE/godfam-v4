@@ -435,7 +435,7 @@ include __DIR__ . '/layout/sidebar.php';
                 <div class="form-group">
                     <label class="form-label">Attach Picture (Optional)</label>
                     <input type="file" name="announcement_image" class="form-control" accept="image/*">
-                    <small class="text-muted mt-1">Max size: 2MB. Format: JPG, PNG, GIF</small>
+                    <small class="text-muted mt-1">Max size: 5MB. Format: JPG, PNG, WEBP.</small>
                 </div>
 
                 <div class="form-group mb-0">
