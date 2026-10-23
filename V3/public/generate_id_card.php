@@ -73,18 +73,21 @@ if (!empty($member['qr_token'])) {
     if (class_exists('Endroid\QrCode\QrCode')) {
         try {
             $qrCode = new QrCode($member['qr_token']);
-            $qrCode->setSize(200);
-            $qrCode->setMargin(8);
+            // Endroid 3.x margin unit is PIXELS: ~100px on an 800px canvas gives
+            // a ~3.6-module quiet zone, which scanners need. CSS then prints the
+            // QR at ~1.1in with ~0.77mm modules (camera friendly).
+            $qrCode->setSize(800);
+            $qrCode->setMargin(100);
             $qrCode->setWriterByName('svg');
             $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::MEDIUM());
             $rawSvg = $qrCode->writeString();
             $qrSvgContent = preg_replace('/^<\?xml[^>]*\?>\s*/i', '', $rawSvg);
         } catch (\Throwable $e) {
-            $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($member['qr_token']);
+            $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=' . urlencode($member['qr_token']);
         }
     } else {
         // Fallback for environments where vendor/ directory was omitted
-        $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($member['qr_token']);
+        $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=' . urlencode($member['qr_token']);
     }
 } else {
     $qrError = 'No QR token assigned. Please regenerate token.';
@@ -132,6 +135,9 @@ include __DIR__ . '/layout/sidebar.php';
         <span class="badge bg-light text-dark border px-3 py-2" style="font-size: 0.85rem; font-weight: 600;">
             <i class='bx bx-credit-card-front'></i> Standard CR80 ID Card &bull; 3.375" &times; 2.125" &bull; Double-Sided (Back to Back)
         </span>
+        <div class="text-muted small mt-2" style="font-size: 0.78rem;">
+            <i class='bx bx-info-circle'></i> For a scannable printed QR, set the printer scale to <strong>100% / Actual Size</strong> (do not use "Fit to Page").
+        </div>
     </div>
 
     <!-- ID Card Container -->
@@ -176,7 +182,7 @@ include __DIR__ . '/layout/sidebar.php';
                         <?php if ($qrSvgContent): ?>
                             <?php echo $qrSvgContent; ?>
                         <?php elseif ($qrImageUrl): ?>
-                            <img src="<?php echo htmlspecialchars($qrImageUrl); ?>" alt="QR Code" style="max-width: 140px; width: 100%; height: auto; object-fit: contain;">
+                            <img src="<?php echo htmlspecialchars($qrImageUrl); ?>" alt="QR Code" style="max-width: 200px; width: 100%; height: auto; object-fit: contain;">
                         <?php else: ?>
                             <p style="color:#dc2626; font-size:11px; text-align:center;"><?php echo htmlspecialchars($qrError); ?></p>
                         <?php endif; ?>

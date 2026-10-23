@@ -155,8 +155,8 @@
 
 .id-qr-box svg,
 .id-qr-box img {
-    max-width: 140px;
-    max-height: 140px;
+    max-width: 200px;
+    max-height: 200px;
     width: 100%;
     height: auto;
     display: block;
@@ -608,12 +608,12 @@
 
     .id-qr-box svg,
     .id-qr-box img {
-        width: 62px !important;
-        height: 62px !important;
-        max-width: 62px !important;
-        max-height: 62px !important;
-        min-width: 62px !important;
-        min-height: 62px !important;
+        width: 105px !important;
+        height: 105px !important;
+        max-width: 105px !important;
+        max-height: 105px !important;
+        min-width: 105px !important;
+        min-height: 105px !important;
         display: block !important;
         margin: 0 auto !important;
         object-fit: contain !important;
@@ -972,8 +972,8 @@
 
     .id-qr-box svg,
     .id-qr-box img {
-        max-width: 120px !important;
-        max-height: 120px !important;
+        max-width: 165px !important;
+        max-height: 165px !important;
         width: 100% !important;
         height: auto !important;
     }

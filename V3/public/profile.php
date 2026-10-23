@@ -209,7 +209,7 @@ include __DIR__ . '/layout/sidebar.php';
                     <?php if ($qrSvgContent): ?>
                         <?php echo $qrSvgContent; ?>
                     <?php elseif ($qrImageUrl): ?>
-                        <img src="<?php echo htmlspecialchars($qrImageUrl); ?>" alt="QR Code" style="max-width: 140px; width: 100%; height: auto; object-fit: contain;">
+                        <img src="<?php echo htmlspecialchars($qrImageUrl); ?>" alt="QR Code" style="max-width: 200px; width: 100%; height: auto; object-fit: contain;">
                     <?php else: ?>
                         <p style="color:#c53030;font-size:10px;text-align:center;"><?php echo htmlspecialchars($qrError); ?></p>
                     <?php endif; ?>
