@@ -23,5 +23,5 @@ INSERT IGNORE INTO settings (setting_key, setting_value) VALUES
 ('church_address', '115 Rizal St, Pob 3, Peñaranda, Philippines, 3103');
 
 -- Index for attendance status searches
-CREATE INDEX idx_attendance_status ON attendance(status);
-CREATE INDEX idx_attendance_member_status ON attendance(member_id, status);
+CREATE INDEX IF NOT EXISTS idx_attendance_status ON attendance(status);
+CREATE INDEX IF NOT EXISTS idx_attendance_member_status ON attendance(member_id, status);
