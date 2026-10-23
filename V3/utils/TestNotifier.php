@@ -71,6 +71,26 @@ class TestNotifier {
     }
 
     /**
+     * Send a test OTP email using the production template and format.
+     * No password_resets row is written -- delivery check only.
+     */
+    public function sendOtpEmail(string $email): array {
+        // Same 6-digit format as AuthController::requestOTP()
+        $otp = sprintf('%06d', random_int(100000, 999999));
+
+        $success = (bool)$this->mailService->sendOTPMail($email, $otp);
+        $detail = $success
+            ? 'Email accepted by the SMTP server. Preview code: ' . $otp
+            : 'Email could not be sent.';
+
+        return [
+            'success' => $success,
+            'label' => 'OTP email',
+            'detail' => $detail,
+        ];
+    }
+
+    /**
      * Return the newest announcement image as a path relative to public/.
      */
     public function latestAnnouncementImage(): ?string {

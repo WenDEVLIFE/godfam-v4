@@ -32,10 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sendAnnouncement = !empty($_POST['send_announcement']);
     $sendBirthday = !empty($_POST['send_birthday']);
     $sendAnniversary = !empty($_POST['send_anniversary']);
+    $sendOtp = !empty($_POST['send_otp']);
 
     if ($testEmail === '' || !filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
         $error = 'Please enter a valid recipient email address.';
-    } elseif (!$sendAnnouncement && !$sendBirthday && !$sendAnniversary) {
+    } elseif (!$sendAnnouncement && !$sendBirthday && !$sendAnniversary && !$sendOtp) {
         $error = 'Select at least one item to send.';
     } else {
         $imagePath = null;
@@ -80,6 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             if ($sendAnniversary) {
                 $results[] = $notifier->sendAnniversaryEmail($testEmail);
+            }
+            if ($sendOtp) {
+                $results[] = $notifier->sendOtpEmail($testEmail);
             }
 
             $sentCount = 0;
@@ -159,6 +163,10 @@ include __DIR__ . '/layout/sidebar.php';
                                 <div class="d-flex align-items-center gap-2">
                                     <input type="checkbox" id="sendAnniversary" name="send_anniversary" value="1" checked style="width: 16px; height: 16px;">
                                     <label class="small text-muted mb-0" for="sendAnniversary" style="cursor:pointer;">Wedding anniversary greeting</label>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="checkbox" id="sendOtp" name="send_otp" value="1" style="width: 16px; height: 16px;">
+                                    <label class="small text-muted mb-0" for="sendOtp" style="cursor:pointer;">OTP verification code (password reset template)</label>
                                 </div>
                             </div>
                         </div>

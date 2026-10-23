@@ -2,7 +2,7 @@
 /**
  * Send real test notifications from the CLI.
  *
- * Usage: php scratch/send_test_notifications.php [email]
+ * Usage: php scratch/send_test_notifications.php [email] [--otp]
  */
 
 if (php_sapi_name() !== 'cli') {
@@ -33,6 +33,11 @@ $results[] = $notifier->sendAnnouncementEmail(
 );
 $results[] = $notifier->sendBirthdayEmail($email);
 $results[] = $notifier->sendAnniversaryEmail($email);
+
+// OTP test is opt-in because it sends a security-looking email.
+if (in_array($argv[2] ?? '', ['--otp', 'otp'], true)) {
+    $results[] = $notifier->sendOtpEmail($email);
+}
 
 $exitCode = 0;
 foreach ($results as $result) {
