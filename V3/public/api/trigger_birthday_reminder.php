@@ -34,11 +34,17 @@ if (!validateCsrfToken($csrfToken)) {
 }
 
 try {
-    // Manual trigger always forces a run (and marks today as processed so the
-    // automatic dashboard run does not duplicate it).
-    $results = runDailyRemindersOncePerDay($pdo, true);
+    // Manual trigger (button) always forces a run. The dashboard auto-dispatch
+    // passes auto=1 and is deduplicated to once per calendar day.
+    $isAuto = !empty($input['auto']) || !empty($_POST['auto']);
+    $results = runDailyRemindersOncePerDay($pdo, !$isAuto);
     if ($results === null) {
-        $results = ['birthdays_today' => 0, 'anniversaries_today' => 0, 'events_today' => 0, 'emails_sent' => 0, 'emails_failed' => 0];
+        echo json_encode([
+            'success' => true,
+            'skipped' => true,
+            'message' => 'Daily reminders already processed today.'
+        ]);
+        exit;
     }
 
     $msg = "Reminders & Greetings processed successfully! (" .

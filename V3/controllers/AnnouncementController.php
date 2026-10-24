@@ -217,11 +217,19 @@ class AnnouncementController {
         $successCount = 0;
         $failedCount = 0;
         $skippedCount = 0;
+        $batchStartedAt = microtime(true);
 
         $publisherRole = $_SESSION['role_name'] ?? 'System';
         $publishedAt = date('M d, Y h:i A');
 
         foreach ($recipients as $recipientEmail) {
+            // Safety net: stop dispatching before PHP's max_execution_time
+            // (120s by default) kills the request mid-send.
+            if ((microtime(true) - $batchStartedAt) > 60) {
+                $skippedCount++;
+                continue;
+            }
+
             if ($this->announcementModel->hasNotificationAttempt($announcementId, $recipientEmail)) {
                 $skippedCount++;
                 continue;

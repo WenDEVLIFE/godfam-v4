@@ -18,15 +18,6 @@ require_once __DIR__ . '/../models/Collection.php';
 // Ensure user is logged in
 requireLogin();
 
-// Automatic daily greetings (birthday, wedding anniversary, staff digest).
-// Runs at most once per calendar day; the manual "Trigger Reminders" button
-// still works and always forces a run.
-if (isStaff()) {
-    define('ALLOW_WEB_TRIGGER', true);
-    require_once __DIR__ . '/../utils/daily_reminders.php';
-    runDailyRemindersOncePerDay($pdo);
-}
-
 $csrf_token = generateCsrfToken();
 
 $memberModel     = new Member($pdo);
@@ -785,6 +776,18 @@ function triggerDailyReminders() {
 function sendBirthdayReminders() {
     triggerDailyReminders();
 }
+
+// Background auto-dispatch: runs at most once per day (server-side guard).
+// Fired after the page is interactive so slow SMTP never blocks the dashboard.
+(function autoDispatchDailyReminders() {
+    setTimeout(function () {
+        fetch('api/trigger_birthday_reminder.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ csrf_token: '<?php echo $csrf_token; ?>', auto: true })
+        }).catch(function () { /* silent: background task */ });
+    }, 1500);
+})();
 </script>
 <?php endif; ?>
 

@@ -39,6 +39,28 @@ use PHPMailer\PHPMailer\SMTP;
 class MailService {
     private $config;
 
+    /**
+     * Per-request circuit breaker. When the SMTP server cannot be reached or
+     * authentication fails, every further send in the same request is skipped
+     * immediately instead of waiting for another timeout. This keeps bulk
+     * sends (announcements, reminders) from blowing past PHP's max_execution_time.
+     */
+    private static $smtpUsable = null;
+
+    /** Cached pre-flight result for the current request. */
+    private static $smtpReachable = null;
+
+    /** Hard limit for a single SMTP connection / response (seconds). */
+    private const SMTP_TIMEOUT = 10;
+
+    /** Give up on the whole batch after this many seconds. */
+    private const BATCH_BUDGET = 45;
+
+    private $batchStartedAt = null;
+
+    /** Reused PHPMailer instance (SMTP keep-alive across a batch). */
+    private $mailer = null;
+
     public function __construct() {
         $this->config = require __DIR__ . '/../config/mail.php';
     }
@@ -255,30 +277,48 @@ class MailService {
             ];
         }
 
+        // Circuit breaker: an earlier send in this request already proved the
+        // SMTP server is unreachable or rejecting auth - stop waiting again.
+        if (self::$smtpUsable === false) {
+            return [
+                'success' => false,
+                'error' => 'Email service is temporarily unavailable.',
+                'internal_error' => 'Skipped: SMTP already failed earlier in this request.'
+            ];
+        }
+
+        // Batch budget: never let one page load run into PHP's execution limit.
+        if ($this->batchStartedAt === null) {
+            $this->batchStartedAt = microtime(true);
+        } elseif ((microtime(true) - $this->batchStartedAt) > self::BATCH_BUDGET) {
+            return [
+                'success' => false,
+                'error' => 'Email service is busy, remaining emails were skipped.',
+                'internal_error' => 'Skipped: batch time budget exhausted.'
+            ];
+        }
+
+        // Cheap pre-flight: fail in a few seconds instead of minutes.
+        if (!$this->smtpReachable()) {
+            self::$smtpUsable = false;
+            return [
+                'success' => false,
+                'error' => 'Email service is currently unreachable.',
+                'internal_error' => 'SMTP pre-flight connection failed.'
+            ];
+        }
+
         try {
-            $mail = new PHPMailer(true);
+            $mail = $this->getMailer();
 
-            // Server settings
-            $mail->isSMTP();
-            $mail->Host       = $this->config['host'];
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $this->config['username'];
-            $mail->Password   = $this->config['password'];
-            $mail->SMTPSecure = ($this->config['encryption'] ?? '') === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = (int)($this->config['port'] ?? 587);
-
-            // Bypass SSL certificate verification for local environments (XAMPP)
-            $mail->SMTPOptions = array(
-                'ssl' => array(
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                )
-            );
+            // Reuse the open SMTP connection for every recipient in the batch
+            // (keeps 16 announcements well inside PHP's execution limit).
+            $mail->clearAllRecipients();
+            $mail->clearAttachments();
+            $mail->clearCustomHeaders();
+            $mail->clearReplyTos();
 
             // Recipients
-            $mail->setFrom($this->config['from_email'], $this->config['from_name']);
-            
             $mail->addAddress($to);
 
             // Content
@@ -310,12 +350,16 @@ class MailService {
             }
 
             $mail->send();
+            self::$smtpUsable = true;
             return [
                 'success' => true
             ];
         } catch (Exception $e) {
             $errorInfo = isset($mail) && !empty($mail->ErrorInfo) ? $mail->ErrorInfo : $e->getMessage();
             error_log("Mail Error: {$errorInfo}");
+            if ($this->isConnectionError($errorInfo)) {
+                self::$smtpUsable = false;
+            }
             return [
                 'success' => false,
                 'error' => 'Message could not be sent.',
@@ -323,11 +367,116 @@ class MailService {
             ];
         } catch (\Throwable $e) {
             error_log("Mail Error: " . $e->getMessage());
+            if ($this->isConnectionError($e->getMessage())) {
+                self::$smtpUsable = false;
+            }
             return [
                 'success' => false,
                 'error' => 'An unexpected error occurred while sending email.',
                 'internal_error' => $e->getMessage()
             ];
         }
+    }
+
+    /**
+     * Build (once) and reuse the configured PHPMailer instance.
+     * SMTPKeepAlive avoids reconnecting + re-authenticating for every recipient.
+     */
+    private function getMailer(): PHPMailer {
+        if ($this->mailer instanceof PHPMailer) {
+            return $this->mailer;
+        }
+
+        $mail = new PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host       = $this->config['host'];
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $this->config['username'];
+        $mail->Password   = $this->config['password'];
+        $mail->SMTPSecure = ($this->config['encryption'] ?? '') === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = (int)($this->config['port'] ?? 587);
+
+        // Never hang: cap the socket timeout and the response read window.
+        // (PHPMailer defaults both to 300s, which blows past
+        // max_execution_time = 120 on bulk sends.)
+        $mail->Timeout = self::SMTP_TIMEOUT;
+        $mail->getSMTPInstance()->Timelimit = self::SMTP_TIMEOUT;
+
+        // Keep the connection open between recipients of the same batch.
+        $mail->SMTPKeepAlive = true;
+
+        // Bypass SSL certificate verification for local environments (XAMPP)
+        $mail->SMTPOptions = [
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true,
+            ],
+        ];
+
+        $mail->setFrom($this->config['from_email'], $this->config['from_name']);
+
+        $this->mailer = $mail;
+        return $mail;
+    }
+
+    public function __destruct() {
+        if ($this->mailer instanceof PHPMailer) {
+            try {
+                $this->mailer->smtpClose();
+            } catch (\Throwable $e) {
+                // Never let cleanup throw.
+            }
+        }
+    }
+
+    /**
+     * Quick TCP check so a dead network fails in seconds, not minutes.
+     */
+    private function smtpReachable(): bool {
+        if (self::$smtpReachable !== null) {
+            return self::$smtpReachable;
+        }
+
+        $host = $this->config['host'] ?? '';
+        $port = (int)($this->config['port'] ?? 587);
+        $scheme = (($this->config['encryption'] ?? '') === 'ssl') ? 'ssl://' : 'tcp://';
+
+        $conn = @fsockopen($scheme . $host, $port, $errno, $errstr, 5);
+        if (is_resource($conn)) {
+            fclose($conn);
+            self::$smtpReachable = true;
+        } else {
+            error_log("MailService pre-flight failed for {$host}:{$port} ({$errno}) {$errstr}");
+            self::$smtpReachable = false;
+        }
+
+        return self::$smtpReachable;
+    }
+
+    /**
+     * True when the error means "the SMTP server itself is unusable"
+     * (connection, TLS or auth), as opposed to a per-recipient rejection.
+     */
+    private function isConnectionError(string $errorInfo): bool {
+        $needles = [
+            'smtp connect() failed',
+            'could not connect',
+            'connection refused',
+            'connection timed out',
+            'operation timed out',
+            'stream_socket_client',
+            'could not authenticate',
+            'authentication failed',
+            'ssl',
+            'starttls',
+        ];
+        $haystack = strtolower($errorInfo);
+        foreach ($needles as $needle) {
+            if (strpos($haystack, $needle) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 }
