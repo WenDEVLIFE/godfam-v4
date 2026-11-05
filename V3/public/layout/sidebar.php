@@ -58,6 +58,10 @@ $user_initial = !empty($user_name) ? strtoupper(substr($user_name, 0, 1)) : 'U';
 
         <?php if ($can_manage): ?>
             <div class="nav-section-title">Management</div>
+            <a href="members.php" class="nav-link <?php echo $current_page === 'members.php' ? 'active' : ''; ?>">
+                <i class='bx bxs-group'></i>
+                <span>Member Management</span>
+            </a>
             <a href="events.php" class="nav-link <?php echo $current_page === 'events.php' ? 'active' : ''; ?>">
                 <i class='bx bxs-calendar-event'></i>
                 <span>Church Events</span>
