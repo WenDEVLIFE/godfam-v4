@@ -75,7 +75,7 @@ include __DIR__ . '/layout/sidebar.php';
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <span>ACTIVE MEMBERS</span>
         <div class="position-relative" style="min-width: 260px;">
-            <input type="text" id="memberSearchInput" class="form-control form-control-sm" placeholder="Search name, ID, email, category..." autocomplete="off" style="padding-left: 32px; border-radius: 6px;">
+            <input type="text" id="memberSearchInput" class="form-control form-control-sm" placeholder="Search name, ID, email, phone, category..." autocomplete="off" style="padding-left: 32px; border-radius: 6px;">
             <i class='bx bx-search' style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 15px; color: #94a3b8;"></i>
         </div>
     </div>
@@ -87,7 +87,8 @@ include __DIR__ . '/layout/sidebar.php';
                         <th>ID</th>
                         <th>Full Name</th>
                         <th>Category</th>
-                        <th>Email / Phone</th>
+                        <th style="min-width: 190px;"><i class='bx bx-envelope' style="color: #2563eb; margin-right: 4px; vertical-align: middle;"></i>Email</th>
+                        <th style="min-width: 150px;"><i class='bx bx-phone' style="color: #2563eb; margin-right: 4px; vertical-align: middle;"></i>Phone</th>
                         <th>Additional Info</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -95,7 +96,7 @@ include __DIR__ . '/layout/sidebar.php';
                 </thead>
                 <tbody>
                     <?php if (empty($members)): ?>
-                        <tr><td colspan="7" class="text-center py-4 text-muted">No members found.</td></tr>
+                        <tr><td colspan="8" class="text-center py-4 text-muted">No members found.</td></tr>
                     <?php else: ?>
                         <?php foreach ($members as $member): ?>
                         <tr>
@@ -106,22 +107,30 @@ include __DIR__ . '/layout/sidebar.php';
                                     <?php echo htmlspecialchars($member['member_type'] ?? 'Member'); ?>
                                 </span>
                             </td>
+                            <td class="small" style="word-break: break-word;">
+                                <?php if (!empty($member['email'])): ?>
+                                    <?php echo htmlspecialchars($member['email']); ?>
+                                <?php else: ?>
+                                    <span class="text-muted">---</span>
+                                <?php endif; ?>
+                            </td>
                             <td class="small">
-                                <div><?php echo htmlspecialchars($member['email'] ?? ''); ?></div>
-                                <div class="text-muted d-flex align-items-center gap-1">
-                                    <span><?php echo htmlspecialchars($member['phone'] ?? ''); ?></span>
-                                    <?php if (!empty($member['phone'])): 
-                                        $clean_phone = preg_replace('/[^0-9+]/', '', $member['phone']);
-                                        $default_body = urlencode("Hello " . $member['full_name'] . ", peace be with you from God's Family UMC.");
-                                    ?>
-                                        <a href="sms:<?php echo $clean_phone; ?>?&body=<?php echo $default_body; ?>" 
-                                           class="btn btn-outline-success py-0 px-1 font-weight-700" 
-                                           style="font-size: 10px; line-height: 1.4; border-radius: 4px;"
-                                           title="Send SMS">
-                                            <i class='bx bx-message-rounded-dots'></i> SMS
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
+                                <?php if (!empty($member['phone'])): 
+                                    $clean_phone = preg_replace('/[^0-9+]/', '', $member['phone']);
+                                    $default_body = urlencode("Hello " . $member['full_name'] . ", peace be with you from God's Family UMC.");
+                                ?>
+                                    <div style="white-space: nowrap; margin-bottom: 4px;">
+                                        <?php echo htmlspecialchars($member['phone']); ?>
+                                    </div>
+                                    <a href="sms:<?php echo $clean_phone; ?>?&body=<?php echo $default_body; ?>" 
+                                       class="btn btn-outline-success py-0 px-1 font-weight-700" 
+                                       style="font-size: 10px; line-height: 1.4; border-radius: 4px;"
+                                       title="Send SMS">
+                                        <i class='bx bx-message-rounded-dots'></i> SMS
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted">---</span>
+                                <?php endif; ?>
                             </td>
                             <td class="small text-muted">
                                 <?php echo htmlspecialchars($member['contact_info'] ?? '---'); ?>
