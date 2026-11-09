@@ -1,0 +1,10 @@
+# Entry point
+DirectoryIndex index.php index.html
+
+# Do not expose folder listings
+Options -Indexes
+
+# Block access to sensitive files if the project root is the document root
+<FilesMatch "^(\.env|composer\.(json|lock)|CHANGELOG\.txt|revisions\.md)$">
+    Require all denied
+</FilesMatch>
